@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<!-- Hidrocampo v2 — capturador y visualizador hidrogeológico offline. Un solo archivo, sin dependencias externas. -->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Hidrocampo — Captura y visualización hidrogeológica</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#123F37">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hidrocampo">
+<style>
+  :root{
+    --paper:#F3EFE3;
+    --paper-2:#EAE3D2;
+    --ink:#23241F;
+    --ink-soft:#5B5A50;
+    --line:#CFC6AC;
+    --teal:#1E6F61;
+    --teal-d:#123F37;
+    --clay:#B05A2A;
+    --clay-d:#7A3D1B;
+    --slate:#3C5A66;
+    --manantial:#3C8C9C;
+    --danger:#9C3B2E;
+    --card:#FFFDF7;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);}
+  body{padding-bottom:84px;}
+  .app{max-width:560px;margin:0 auto;min-height:100vh;background:var(--paper);position:relative;}
+
+  header.top{background:var(--teal-d); color:var(--paper); padding:18px 16px 14px; position:relative; overflow:hidden;}
+  header.top::after{
+    content:""; position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0 18px, rgba(243,239,227,0.045) 18px 19px),
+      repeating-linear-gradient(90deg, transparent 0 18px, rgba(243,239,227,0.045) 18px 19px);
+    pointer-events:none;
+  }
+  header.top .row{display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1;}
+  header.top h1{font-family:var(--serif); font-weight:700; font-size:21px; margin:0; letter-spacing:0.2px;}
+  header.top .sub{font-family:var(--mono); font-size:11px; color:#CFE4DD; margin-top:3px; letter-spacing:0.4px;}
+  .badge-count{font-family:var(--mono); font-size:12px; background:rgba(243,239,227,0.14); border:1px solid rgba(243,239,227,0.35); border-radius:20px; padding:5px 11px;}
+
+  nav.tabs{display:flex; gap:0; background:var(--paper-2); border-bottom:1px solid var(--line); overflow-x:auto; -webkit-overflow-scrolling:touch;}
+  nav.tabs button{flex:0 0 auto; font-family:var(--sans); font-size:12.5px; font-weight:600; color:var(--ink-soft); background:transparent; border:none; padding:11px 14px; border-bottom:2.5px solid transparent; white-space:nowrap; cursor:pointer;}
+  nav.tabs button.active{color:var(--teal-d); border-bottom-color:var(--teal);}
+
+  main{padding:16px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px;}
+  .card h2{font-family:var(--serif); font-size:16px; margin:0 0 3px; color:var(--ink);}
+  .card .hint{font-size:12px; color:var(--ink-soft); margin:0 0 14px; line-height:1.45;}
+
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:11.5px; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:5px;}
+  .field .unit{font-weight:400; text-transform:none; color:var(--ink-soft); font-size:11px;}
+  input, select, textarea{width:100%; font-family:var(--sans); font-size:15px; color:var(--ink); background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:10px 11px; font-variant-numeric:tabular-nums;}
+  input:focus, select:focus, textarea:focus{outline:none; border-color:var(--teal);}
+  textarea{resize:vertical; min-height:56px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+
+  .gps-box{border:1px dashed var(--line); border-radius:8px; padding:10px 11px; margin-bottom:14px; background:var(--paper-2);}
+  .gps-box .gps-row{display:flex; align-items:center; gap:10px;}
+  .gps-status{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); flex:1;}
+  .gps-status.ok{color:var(--teal-d);}
+  .gps-status.err{color:var(--danger);}
+  button.btn{font-family:var(--sans); font-size:13.5px; font-weight:600; cursor:pointer; border-radius:8px; padding:10px 14px; border:1px solid var(--line); background:var(--card); color:var(--ink);}
+  button.btn.primary{background:var(--teal); border-color:var(--teal-d); color:#fff;}
+  button.btn.primary:active{background:var(--teal-d);}
+  button.btn.ghost{background:transparent;}
+  button.btn.small{padding:7px 10px; font-size:12px;}
+  button.btn.danger-o{color:var(--danger); border-color:var(--danger);}
+  button.btn:disabled{opacity:0.5;}
+
+  .save-row{display:flex; gap:10px; margin-top:4px;}
+  .save-row button{flex:1;}
+
+  .list-toolbar{display:flex; gap:8px; margin-bottom:12px;}
+  .list-toolbar select{flex:0 0 120px;}
+  .list-toolbar input{flex:1;}
+
+  .rec{background:var(--card); border:1px solid var(--line); border-left:4px solid var(--slate); border-radius:8px; padding:11px 12px; margin-bottom:9px;}
+  .rec[data-tipo="pozo"]{border-left-color:var(--teal);}
+  .rec[data-tipo="manantial"]{border-left-color:var(--manantial);}
+  .rec[data-tipo="calidad"]{border-left-color:var(--slate);}
+  .rec[data-tipo="geologia"]{border-left-color:var(--clay);}
+  .rec .rec-top{display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
+  .rec .rec-code{font-family:var(--mono); font-weight:700; font-size:13.5px;}
+  .rec .rec-tipo{font-size:10.5px; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft);}
+  .rec .rec-meta{font-family:var(--mono); font-size:11px; color:var(--ink-soft); margin-top:4px;}
+  .rec .rec-actions{display:flex; gap:6px; margin-top:8px;}
+
+  .empty{text-align:center; padding:34px 16px; color:var(--ink-soft);}
+  .empty .glyph{font-size:30px; margin-bottom:6px; opacity:0.5;}
+
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px;}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:8px; padding:9px 6px; text-align:center;}
+  .stat .n{font-family:var(--mono); font-weight:700; font-size:17px; color:var(--teal-d);}
+  .stat .l{font-size:9.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.3px; margin-top:2px;}
+
+  .export-actions{display:flex; flex-direction:column; gap:9px;}
+  .export-actions button{width:100%; text-align:left; display:flex; justify-content:space-between; align-items:center;}
+
+  footer.bottom-bar{position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:560px; background:var(--paper-2); border-top:1px solid var(--line); display:flex; padding:6px 2px; z-index:5;}
+  footer.bottom-bar button{flex:1; background:transparent; border:none; font-family:var(--sans); font-size:10px; color:var(--ink-soft); padding:7px 1px; cursor:pointer; font-weight:600;}
+  footer.bottom-bar button .ic{display:block; font-size:16px; margin-bottom:2px;}
+  footer.bottom-bar button.active{color:var(--teal-d);}
+
+  .toast{position:fixed; bottom:78px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--paper); font-size:13px; padding:9px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity 0.2s; z-index:30; max-width:90%; text-align:center;}
+  .toast.show{opacity:1;}
+
+  .req::after{content:" *"; color:var(--clay-d);}
+
+  /* ---- Mapa ---- */
+  .map-toolbar{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  .map-toolbar select{flex:0 0 auto; width:auto; font-size:12px; padding:6px 8px;}
+  .map-zoom-btn{width:34px; height:34px; padding:0; font-size:16px; line-height:1;}
+  .map-wrap{position:relative; background:#EDE7D6;}
+  #mapSvg{width:100%; height:360px; display:block; touch-action:none;}
+  .map-empty{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#EDE7D6; text-align:center; color:var(--ink-soft); padding:16px;}
+  .map-scale{position:absolute; left:10px; bottom:8px; display:flex; align-items:center; gap:6px; background:rgba(255,253,247,0.88); padding:3px 9px; border-radius:4px; border:1px solid var(--line);}
+  .map-scale .bar{height:2px; background:var(--ink); width:60px;}
+  .map-scale .lbl{font-family:var(--mono); font-size:10px; color:var(--ink-soft);}
+  .map-hint{font-size:11px; color:var(--ink-soft); padding:9px 12px 0; line-height:1.4;}
+
+  .layer-toggle{margin-bottom:9px;}
+  .layer-toggle label{display:flex; align-items:center; gap:8px; font-size:13.5px; cursor:pointer;}
+  .layer-toggle input{width:auto;}
+  .dot{width:10px; height:10px; border-radius:50%; display:inline-block; flex:0 0 auto;}
+  .dot.c-pozo{background:var(--teal);}
+  .dot.c-manantial{background:var(--manantial);}
+  .dot.c-calidad{background:var(--slate);}
+  .dot.c-geologia{background:var(--clay);}
+
+  .map-point{cursor:pointer;}
+  .map-point.c-pozo{fill:var(--teal);}
+  .map-point.c-manantial{fill:var(--manantial);}
+  .map-point.c-calidad{fill:var(--slate);}
+  .map-point.c-geologia{fill:var(--clay);}
+  .map-dxf{stroke:#8A7F63; fill:none;}
+  .map-dxf-point{fill:#8A7F63; stroke:none;}
+
+  /* ---- Importar / exportar ---- */
+  .import-preview{border:1px dashed var(--line); border-radius:8px; padding:12px; background:var(--paper-2); margin-top:4px;}
+  .export-type-row{display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); gap:8px;}
+  .export-type-row:last-child{border-bottom:none;}
+  .export-type-row .lbl{font-size:13.5px; font-weight:600;}
+  .export-type-row .cnt{font-family:var(--mono); font-size:11px; color:var(--ink-soft); margin-left:6px;}
+  .export-type-row .btns{display:flex; gap:6px; flex:0 0 auto;}
+  .export-type-row .btns button{padding:6px 12px; font-size:12px;}
+  .step-btn{margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="row">
+      <div>
+        <h1>Hidrocampo</h1>
+        <div class="sub">CAPTURA Y VISUALIZACIÓN HIDROGEOLÓGICA · OFFLINE</div>
+      </div>
+      <div class="badge-count" id="totalBadge">0 registros</div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button data-panel="pozo" class="active">Pozos</button>
+    <button data-panel="manantial">Manantiales</button>
+    <button data-panel="calidad">Calidad</button>
+    <button data-panel="geologia">Geología</button>
+    <button data-panel="mapa">Mapa</button>
+    <button data-panel="registros">Registros</button>
+    <button data-panel="datos">Datos</button>
+  </nav>
+
+  <main>
+
+    <!-- POZOS -->
+    <section class="panel active" id="panel-pozo">
+      <div class="card">
+        <h2>Pozo / piezómetro</h2>
+        <p class="hint">Nivel freático, construcción y litología del punto.</p>
+        <div class="field"><label class="req">Código de punto</label><input type="text" id="pozo-codigo" placeholder="POZ-001"></div>
+        <div id="pozo-gps" class="gps-box"></div>
+        <div class="row2">
+          <div class="field"><label>Profundidad total <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-profundidad"></div>
+          <div class="field"><label>Diámetro <span class="unit">(in)</span></label><input type="number" step="0.1" id="pozo-diametro"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Nivel estático <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-estatico"></div>
+          <div class="field"><label>Nivel dinámico <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-dinamico"></div>
+        </div>
+        <div class="field"><label>Uso del agua</label>
+          <select id="pozo-uso">
+            <option value="">Sin especificar</option><option>Consumo humano</option><option>Riego</option>
+            <option>Pecuario</option><option>Industrial</option><option>Monitoreo</option><option>Sin uso</option>
+          </select></div>
+        <div class="field"><label>Litología / perfil resumido</label><textarea id="pozo-litologia" placeholder="Ej: 0-5m arena fina, 5-20m arcilla, 20-35m grava..."></textarea></div>
+        <div class="field"><label>Observaciones</label><textarea id="pozo-obs"></textarea></div>
+        <div class="save-row">
+          <button class="btn ghost" onclick="clearForm('pozo')">Limpiar</button>
+          <button class="btn primary" onclick="saveRecord('pozo')">Guardar registro</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MANANTIALES -->
+    <section class="panel" id="panel-manantial">
+      <div class="card">
+        <h2>Manantial / fuente superficial</h2>
+        <p class="hint">Afloramientos, caudal y características del agua.</p>
+        <div class="field"><label class="req">Código de punto</label><input type="text" id="manantial-codigo" placeholder="MAN-001"></div>
+        <div id="manantial-gps" class="gps-box"></div>
+        <div class="row2">
+          <div class="field"><label>Caudal estimado <span class="unit">(L/s)</span></label><input type="number" step="0.01" id="manantial-caudal"></div>
+          <div class="field"><label>Temp. del agua <span class="unit">(°C)</span></label><input type="number" step="0.1" id="manantial-temp"></div>
+        </div>
+        <div class="field"><label>Método de aforo</label>
+          <select id="manantial-metodo">
+            <option value="">Sin especificar</option><option>Volumétrico</option><option>Vertedero</option>
+            <option>Flotador</option><option>Estimación visual</option>
+          </select></div>
+        <div class="field"><label>Tipo de afloramiento</label>
+          <select id="manantial-tipo-aflor">
+            <option value="">Sin especificar</option><option>Contacto litológico</option><option>Fractura / falla</option>
+            <option>Depresión / ladera</option><option>Difuso</option>
+          </select></div>
+        <div class="field"><label>Vegetación / entorno asociado</label><input type="text" id="manantial-vegetacion" placeholder="Ej: bofedal, totora, pastizal..."></div>
+        <div class="field"><label>Observaciones</label><textarea id="manantial-obs"></textarea></div>
+        <div class="save-row">
+          <button class="btn ghost" onclick="clearForm('manantial')">Limpiar</button>
+          <button class="btn primary" onclick="saveRecord('manantial')">Guardar registro</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALIDAD -->
+    <section class="panel" id="panel-calidad">
+      <div class="card">
+        <h2>Calidad de agua in situ</h2>
+        <p class="hint">Parámetros fisicoquímicos medidos en campo.</p>
+        <div class="field"><label class="req">Código de punto</label><input type="text" id="calidad-codigo" placeholder="CAL-001 (puede ser igual a un pozo/manantial)"></div>
+        <div id="calidad-gps" class="gps-box"></div>
+        <div class="row3">
+          <div class="field"><label>pH</label><input type="number" step="0.01" id="calidad-ph"></div>
+          <div class="field"><label>CE <span class="unit">(µS/cm)</span></label><input type="number" step="0.1" id="calidad-ce"></div>
+          <div class="field"><label>Temp. <span class="unit">(°C)</span></label><input type="number" step="0.1" id="calidad-temp"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Oxígeno disuelto <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-od"></div>
+          <div class="field"><label>STD <span class="unit">(ppm)</span></label><input type="number" step="0.1" id="calidad-std"></div>
+        </div>
+        <div class="field"><label>Turbidez <span class="unit">(NTU)</span></label><input type="number" step="0.1" id="calidad-turbidez"></div>
+        <div class="field"><label>Observaciones</label><textarea id="calidad-obs"></textarea></div>
+        <div class="save-row">
+          <button class="btn ghost" onclick="clearForm('calidad')">Limpiar</button>
+          <button class="btn primary" onclick="saveRecord('calidad')">Guardar registro</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GEOLOGIA -->
+    <section class="panel" id="panel-geologia">
+      <div class="card">
+        <h2>Punto geológico</h2>
+        <p class="hint">Afloramientos, formación y estructura.</p>
+        <div class="field"><label class="req">Código de punto</label><input type="text" id="geologia-codigo" placeholder="GEO-001"></div>
+        <div id="geologia-gps" class="gps-box"></div>
+        <div class="field"><label>Formación / unidad</label><input type="text" id="geologia-formacion"></div>
+        <div class="field"><label>Litología principal</label><input type="text" id="geologia-litologia" placeholder="Ej: arenisca cuarzosa, caliza, lutita..."></div>
+        <div class="row2">
+          <div class="field"><label>Rumbo <span class="unit">(°)</span></label><input type="text" id="geologia-rumbo" placeholder="N45°E"></div>
+          <div class="field"><label>Buzamiento <span class="unit">(°)</span></label><input type="text" id="geologia-buzamiento" placeholder="30°SE"></div>
+        </div>
+        <div class="field"><label>Estructuras observadas</label><input type="text" id="geologia-estructuras" placeholder="Fallas, fracturas, pliegues..."></div>
+        <div class="field"><label>Observaciones</label><textarea id="geologia-obs"></textarea></div>
+        <div class="save-row">
+          <button class="btn ghost" onclick="clearForm('geologia')">Limpiar</button>
+          <button class="btn primary" onclick="saveRecord('geologia')">Guardar registro</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAPA -->
+    <section class="panel" id="panel-mapa">
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div class="map-toolbar">
+          <select id="utmZoneSelect" onchange="fitMapView(); renderMap();">
+            <option value="auto">Zona UTM automática</option>
+            <option value="17-S">17S</option>
+            <option value="18-S">18S (Lima)</option>
+            <option value="19-S">19S</option>
+          </select>
+          <button class="btn small ghost" onclick="fitMapView()" style="margin-left:auto;">Centrar</button>
+          <button class="btn map-zoom-btn ghost" onclick="zoomMap(0.8)">+</button>
+          <button class="btn map-zoom-btn ghost" onclick="zoomMap(1.25)">−</button>
+        </div>
+        <p class="map-hint">Los puntos GPS se proyectan a UTM en la zona elegida. La capa CAD y la imagen se muestran asumiendo que ya están en ese mismo sistema.</p>
+        <div class="map-wrap">
+          <svg id="mapSvg" viewBox="0 0 100 100"></svg>
+          <div class="map-empty" id="mapEmptyMsg"><div class="glyph">○</div>Captura puntos con GPS para verlos aquí.</div>
+          <div class="map-scale"><div class="bar" id="mapScaleBar"></div><span class="lbl" id="mapScaleLabel">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Capas</h2>
+        <div class="layer-toggle"><label><input type="checkbox" id="layer-pozo" checked onchange="renderMap()"><span class="dot c-pozo"></span>Pozos</label></div>
+        <div class="layer-toggle"><label><input type="checkbox" id="layer-manantial" checked onchange="renderMap()"><span class="dot c-manantial"></span>Manantiales</label></div>
+        <div class="layer-toggle"><label><input type="checkbox" id="layer-calidad" checked onchange="renderMap()"><span class="dot c-calidad"></span>Calidad</label></div>
+        <div class="layer-toggle"><label><input type="checkbox" id="layer-geologia" checked onchange="renderMap()"><span class="dot c-geologia"></span>Geología</label></div>
+        <div class="layer-toggle" id="dxfLayerRow" style="display:none;"><label><input type="checkbox" id="layer-dxf" checked onchange="renderMap()"><span class="dot" style="background:#8A7F63;"></span><span id="dxfLayerLabel">Capa CAD</span></label></div>
+        <div class="layer-toggle" id="imgLayerRow" style="display:none;"><label><input type="checkbox" id="layer-img" checked onchange="renderMap()"><span class="dot" style="background:var(--clay);"></span><span id="imgLayerLabel">Imagen de fondo</span></label></div>
+      </div>
+    </section>
+
+    <!-- REGISTROS -->
+    <section class="panel" id="panel-registros">
+      <div class="stats" id="statsRow"></div>
+      <div class="list-toolbar">
+        <select id="filterTipo" onchange="renderList()">
+          <option value="todos">Todos</option><option value="pozo">Pozos</option><option value="manantial">Manantiales</option>
+          <option value="calidad">Calidad</option><option value="geologia">Geología</option>
+        </select>
+        <input type="text" id="filterTexto" placeholder="Buscar por código..." oninput="renderList()">
+      </div>
+      <div id="listContainer"></div>
+    </section>
+
+    <!-- DATOS: importar / exportar -->
+    <section class="panel" id="panel-datos">
+
+      <div class="card">
+        <h2>Respaldo de la sesión</h2>
+        <p class="hint">Esta app no guarda datos en el teléfono entre sesiones. Exporta antes de cerrar el navegador y vuelve a importar para continuar otro día.</p>
+        <div class="export-actions">
+          <button class="btn primary" onclick="exportJSON()"><span>Descargar respaldo completo (.json)</span></button>
+          <button class="btn" onclick="document.getElementById('importInput').click()"><span>Importar respaldo (.json)</span></button>
+          <input type="file" id="importInput" accept="application/json" style="display:none" onchange="importJSON(event)">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Importar CSV o TXT</h2>
+        <p class="hint">Trae coordenadas o inventarios de otra fuente. Se detectan columnas de código/latitud/longitud automáticamente, pero puedes corregirlas antes de importar.</p>
+        <input type="file" id="csvFileInput" accept=".csv,.txt,text/csv,text/plain" style="display:none" onchange="handleCsvFile(event)">
+        <button class="btn" onclick="document.getElementById('csvFileInput').click()" style="width:100%;">Elegir archivo .csv / .txt</button>
+        <div id="csvPreviewBox" style="display:none;" class="import-preview"></div>
+      </div>
+
+      <div class="card">
+        <h2>Capa CAD (vectorial)</h2>
+        <p class="hint">Importa líneas, polilíneas, puntos y círculos desde un DXF (AutoCAD ASCII) como referencia en el mapa. Si tienes .dwg, expórtalo primero a .dxf desde AutoCAD o QGIS — el binario propietario de .dwg no se puede leer aquí. Se asume que el DXF ya está en la misma zona UTM elegida en la pestaña Mapa.</p>
+        <input type="file" id="dxfFileInput" accept=".dxf" style="display:none" onchange="handleDxfFile(event)">
+        <button class="btn" onclick="document.getElementById('dxfFileInput').click()" style="width:100%;">Elegir archivo .dxf</button>
+        <p class="hint" id="dxfStatus" style="margin-top:8px; margin-bottom:0;"></p>
+      </div>
+
+      <div class="card">
+        <h2>Imagen topográfica georreferenciada</h2>
+        <p class="hint">Importa un plano, ortofoto o topografía escaneada (PNG/JPG) junto a su archivo world (.tfw, .jgw o .wld) para ubicarla en coordenadas reales. Si tienes un GeoTIFF, expórtalo antes como imagen + world file (por ejemplo desde QGIS: Exportar → Imagen georreferenciada).</p>
+        <input type="file" id="imgFileInput" accept="image/png,image/jpeg" style="display:none" onchange="handleImageFile(event)">
+        <button class="btn" onclick="document.getElementById('imgFileInput').click()" style="width:100%;">1. Elegir imagen (.png / .jpg)</button>
+        <div id="worldFileSection" style="display:none; margin-top:10px;">
+          <p class="hint" id="imagePreviewName" style="margin-bottom:8px;"></p>
+          <input type="file" id="worldFileInput" accept=".tfw,.jgw,.wld,.txt" style="display:none" onchange="handleWorldFile(event)">
+          <button class="btn step-btn" onclick="document.getElementById('worldFileInput').click()" style="width:100%;">2. Elegir archivo world (.tfw / .jgw / .wld)</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Exportar por tipo</h2>
+        <p class="hint">CSV para hojas de cálculo · SHP comprimido en .zip (con .shp/.shx/.dbf/.prj/.cpg) listo para QGIS o ArcGIS, en la zona UTM elegida en la pestaña Mapa.</p>
+        <div class="export-type-row"><div><span class="lbl">Pozos</span><span class="cnt" id="cnt-pozo">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('pozo')">CSV</button><button class="btn" onclick="exportSHP('pozo')">SHP</button></div></div>
+        <div class="export-type-row"><div><span class="lbl">Manantiales</span><span class="cnt" id="cnt-manantial">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('manantial')">CSV</button><button class="btn" onclick="exportSHP('manantial')">SHP</button></div></div>
+        <div class="export-type-row"><div><span class="lbl">Calidad</span><span class="cnt" id="cnt-calidad">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('calidad')">CSV</button><button class="btn" onclick="exportSHP('calidad')">SHP</button></div></div>
+        <div class="export-type-row"><div><span class="lbl">Geología</span><span class="cnt" id="cnt-geologia">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('geologia')">CSV</button><button class="btn" onclick="exportSHP('geologia')">SHP</button></div></div>
+        <div class="export-type-row"><div><span class="lbl">Todos unificados</span><span class="cnt" id="cnt-todos">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('todos')">CSV</button><button class="btn" onclick="exportSHP('todos')">SHP</button></div></div>
+      </div>
+
+      <div class="card">
+        <h2>Borrar sesión</h2>
+        <p class="hint">Elimina todos los registros capturados en este dispositivo. No se puede deshacer.</p>
+        <button class="btn danger-o" onclick="resetAll()" style="width:100%;">Borrar todos los registros</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bottom-bar" id="bottomTabs">
+    <button data-panel="pozo" class="active"><span class="ic">⛏</span>Pozos</button>
+    <button data-panel="manantial"><span class="ic">≈</span>Manantial</button>
+    <button data-panel="calidad"><span class="ic">⚗</span>Calidad</button>
+    <button data-panel="geologia"><span class="ic">▲</span>Geología</button>
+    <button data-panel="mapa"><span class="ic">⊞</span>Mapa</button>
+    <button data-panel="registros"><span class="ic">☰</span>Registros</button>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ======================================================================
+   ESTADO GLOBAL
+   ====================================================================== */
+let records = [];
+let idCounter = 1;
+const TYPES = ["pozo","manantial","calidad","geologia"];
+const TYPE_LABEL = {pozo:"Pozo", manantial:"Manantial", calidad:"Calidad", geologia:"Geología"};
+const gpsState = {};
+
+let dxfEntities = [];
+let mapImage = null;      // {img, minX,maxX,minY,maxY, name}
+let pendingImage = null;  // imagen cargada, esperando su world file
+let pendingCsvImport = null;
+let mapInitialized = false;
+let currentViewBox = {x:0,y:0,w:100,h:100};
+
+const FIELD_TYPES = {
+  pozo: { profundidad:"N", diametro:"N", nivel_estatico:"N", nivel_dinamico:"N", uso:"C", litologia:"C", obs:"C" },
+  manantial: { caudal:"N", temp:"N", metodo:"C", tipo_aflor:"C", vegetacion:"C", obs:"C" },
+  calidad: { ph:"N", ce:"N", temp:"N", od:"N", std:"N", turbidez:"N", obs:"C" },
+  geologia: { formacion:"C", litologia:"C", rumbo:"C", buzamiento:"C", estructuras:"C", obs:"C" }
+};
+
+/* ======================================================================
+   NAVEGACIÓN
+   ====================================================================== */
+function switchPanel(name){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("panel-"+name).classList.add("active");
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active", b.dataset.panel===name));
+  document.querySelectorAll("#bottomTabs button").forEach(b=>b.classList.toggle("active", b.dataset.panel===name));
+  if(name==="registros") renderList();
+  if(name==="mapa"){
+    if(!mapInitialized){ initMapInteraction(); mapInitialized = true; }
+    fitMapView();
+    renderMap();
+  }
+}
+document.querySelectorAll("#tabs button, #bottomTabs button").forEach(b=>{
+  b.addEventListener("click", ()=>switchPanel(b.dataset.panel));
+});
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2000);
+}
+
+/* ======================================================================
+   GPS Y FORMULARIOS DE CAPTURA
+   ====================================================================== */
+function initGpsBox(tipo){
+  const box = document.getElementById(tipo+"-gps");
+  box.innerHTML = `
+    <div class="gps-row">
+      <button class="btn small" onclick="captureGps('${tipo}')">Capturar GPS</button>
+      <span class="gps-status" id="${tipo}-gps-status">Sin coordenadas</span>
+    </div>`;
+}
+TYPES.forEach(initGpsBox);
+
+function captureGps(tipo){
+  const statusEl = document.getElementById(tipo+"-gps-status");
+  if(!navigator.geolocation){
+    statusEl.textContent = "GPS no disponible en este navegador";
+    statusEl.className = "gps-status err";
+    return;
+  }
+  statusEl.textContent = "Obteniendo posición...";
+  statusEl.className = "gps-status";
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const {latitude, longitude, altitude, accuracy} = pos.coords;
+      gpsState[tipo] = {
+        lat: latitude, lon: longitude,
+        alt: (altitude!==null && altitude!==undefined) ? Math.round(altitude) : null,
+        accuracy: accuracy ? Math.round(accuracy) : null
+      };
+      const altTxt = gpsState[tipo].alt!==null ? `, ${gpsState[tipo].alt} m` : "";
+      const accTxt = gpsState[tipo].accuracy!==null ? ` · ±${gpsState[tipo].accuracy} m` : "";
+      statusEl.textContent = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}${altTxt}${accTxt}`;
+      statusEl.className = "gps-status ok";
+    },
+    err=>{
+      statusEl.textContent = "No se pudo obtener GPS (" + err.message + ")";
+      statusEl.className = "gps-status err";
+    },
+    {enableHighAccuracy:true, timeout:15000, maximumAge:0}
+  );
+}
+
+function fieldIds(tipo){
+  const map = {
+    pozo: ["codigo","profundidad","diametro","nivel-estatico","nivel-dinamico","uso","litologia","obs"],
+    manantial: ["codigo","caudal","temp","metodo","tipo-aflor","vegetacion","obs"],
+    calidad: ["codigo","ph","ce","temp","od","std","turbidez","obs"],
+    geologia: ["codigo","formacion","litologia","rumbo","buzamiento","estructuras","obs"]
+  };
+  return map[tipo];
+}
+
+function saveRecord(tipo){
+  const codigoEl = document.getElementById(tipo+"-codigo");
+  if(!codigoEl.value.trim()){
+    showToast("Falta el código de punto");
+    codigoEl.focus();
+    return;
+  }
+  const data = {};
+  fieldIds(tipo).forEach(f=>{
+    const el = document.getElementById(tipo+"-"+f);
+    data[f.replace(/-/g,"_")] = el.value.trim();
+  });
+  const rec = {
+    id: idCounter++,
+    tipo,
+    fecha: new Date().toISOString(),
+    gps: gpsState[tipo] ? {...gpsState[tipo]} : null,
+    data
+  };
+  records.push(rec);
+  showToast("Registro " + data.codigo + " guardado");
+  clearForm(tipo);
+  updateBadges();
+}
+
+function clearForm(tipo){
+  fieldIds(tipo).forEach(f=>{
+    document.getElementById(tipo+"-"+f).value = "";
+  });
+  delete gpsState[tipo];
+  initGpsBox(tipo);
+}
+
+function updateBadges(){
+  document.getElementById("totalBadge").textContent = records.length + " registro" + (records.length===1?"":"s");
+  TYPES.forEach(t=>{
+    const c = records.filter(r=>r.tipo===t).length;
+    const el = document.getElementById("cnt-"+t);
+    if(el) el.textContent = c;
+  });
+  const elAll = document.getElementById("cnt-todos");
+  if(elAll) elAll.textContent = records.length;
+
+  const statsRow = document.getElementById("statsRow");
+  if(statsRow){
+    statsRow.innerHTML = TYPES.map(t=>{
+      const c = records.filter(r=>r.tipo===t).length;
+      return `<div class="stat"><div class="n">${c}</div><div class="l">${TYPE_LABEL[t]}</div></div>`;
+    }).join("");
+  }
+}
+
+/* ======================================================================
+   REGISTROS: LISTA
+   ====================================================================== */
+function renderList(){
+  const tipoFilter = document.getElementById("filterTipo").value;
+  const txt = document.getElementById("filterTexto").value.trim().toLowerCase();
+  let list = records.slice().reverse();
+  if(tipoFilter !== "todos") list = list.filter(r=>r.tipo===tipoFilter);
+  if(txt) list = list.filter(r=>(r.data.codigo||"").toLowerCase().includes(txt));
+
+  const container = document.getElementById("listContainer");
+  if(list.length===0){
+    container.innerHTML = `<div class="empty"><div class="glyph">○</div>Sin registros todavía.<br>Captura un punto o impórtalo desde la pestaña Datos.</div>`;
+    updateBadges();
+    return;
+  }
+  container.innerHTML = list.map(r=>{
+    const f = new Date(r.fecha);
+    const fTxt = f.toLocaleDateString() + " " + f.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const gpsTxt = r.gps ? `${r.gps.lat.toFixed(5)}, ${r.gps.lon.toFixed(5)}` : "sin GPS";
+    return `<div class="rec" data-tipo="${r.tipo}">
+      <div class="rec-top">
+        <span class="rec-code">${escapeHtml(r.data.codigo||"(sin código)")}</span>
+        <span class="rec-tipo">${TYPE_LABEL[r.tipo]}</span>
+      </div>
+      <div class="rec-meta">${fTxt} · ${gpsTxt}</div>
+      <div class="rec-actions">
+        <button class="btn small ghost" onclick="deleteRecord(${r.id})">Eliminar</button>
+      </div>
+    </div>`;
+  }).join("");
+  updateBadges();
+}
+
+function deleteRecord(id){
+  records = records.filter(r=>r.id!==id);
+  renderList();
+  showToast("Registro eliminado");
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function downloadBlob(content, filename, mime){
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function dateStamp(){
+  const d = new Date();
+  return d.toISOString().slice(0,16).replace(/[:T]/g,"-");
+}
+
+/* ======================================================================
+   RESPALDO JSON
+   ====================================================================== */
+function exportJSON(){
+  if(records.length===0){ showToast("No hay registros que exportar"); return; }
+  const payload = {exportado: new Date().toISOString(), total: records.length, registros: records};
+  downloadBlob(JSON.stringify(payload, null, 2), "hidrocampo_backup_" + dateStamp() + ".json", "application/json");
+  showToast("Respaldo descargado");
+}
+
+function importJSON(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const payload = JSON.parse(e.target.result);
+      const incoming = payload.registros || payload;
+      if(!Array.isArray(incoming)) throw new Error("formato inválido");
+      let maxId = idCounter;
+      incoming.forEach(r=>{
+        if(typeof r.id !== "number") r.id = maxId++;
+        else maxId = Math.max(maxId, r.id+1);
+      });
+      records = records.concat(incoming);
+      idCounter = maxId;
+      updateBadges();
+      renderList();
+      showToast(incoming.length + " registros importados");
+    }catch(err){
+      showToast("No se pudo leer el archivo: revisa que sea un respaldo válido");
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value = "";
+}
+
+function resetAll(){
+  if(records.length===0){ showToast("No hay registros"); return; }
+  if(confirm("¿Borrar los " + records.length + " registros de esta sesión? Esta acción no se puede deshacer.")){
+    records = [];
+    dxfEntities = [];
+    mapImage = null;
+    renderList();
+    updateBadges();
+    showToast("Registros eliminados");
+  }
+}
+
+/* ======================================================================
+   IMPORTAR CSV / TXT GENÉRICO
+   ====================================================================== */
+function parseDelimitedText(text){
+  text = text.replace(/^\uFEFF/, "");
+  const lines = text.split(/\r\n|\n|\r/).filter(l=>l.length>0);
+  if(lines.length===0) return {headers:[], rows:[]};
+  const sample = lines[0];
+  const counts = {",":0,";":0,"\t":0};
+  for(const ch of sample){ if(counts.hasOwnProperty(ch)) counts[ch]++; }
+  let delim = ",";
+  if(counts[";"]>counts[delim]) delim=";";
+  if(counts["\t"]>counts[delim]) delim="\t";
+
+  function splitLine(line){
+    const out = [];
+    let cur = "";
+    let inQuotes = false;
+    for(let i=0;i<line.length;i++){
+      const c = line[i];
+      if(inQuotes){
+        if(c === '"'){
+          if(line[i+1] === '"'){ cur += '"'; i++; }
+          else inQuotes = false;
+        } else cur += c;
+      } else {
+        if(c === '"') inQuotes = true;
+        else if(c === delim){ out.push(cur); cur=""; }
+        else cur += c;
+      }
+    }
+    out.push(cur);
+    return out.map(s=>s.trim());
+  }
+
+  const headers = splitLine(lines[0]);
+  const rows = lines.slice(1).map(splitLine);
+  return {headers, rows};
+}
+
+function detectColumn(headers, candidates){
+  const lower = headers.map(h=>h.toLowerCase());
+  for(const cand of candidates){
+    const idx = lower.findIndex(h=>h===cand);
+    if(idx>=0) return idx;
+  }
+  for(const cand of candidates){
+    const idx = lower.findIndex(h=>h.includes(cand));
+    if(idx>=0) return idx;
+  }
+  return -1;
+}
+
+function autoMapColumns(headers){
+  return {
+    codigo: detectColumn(headers, ["codigo","código","code","id","punto","nombre","name"]),
+    lat: detectColumn(headers, ["lat","latitud","latitude"]),
+    lon: detectColumn(headers, ["lon","long","longitud","longitude"]),
+    tipo: detectColumn(headers, ["tipo","type","categoria","categoría"]),
+    fecha: detectColumn(headers, ["fecha","date"])
+  };
+}
+
+function sanitizeKey(h){
+  return h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"") || "campo";
+}
+
+function handleCsvFile(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const {headers, rows} = parseDelimitedText(e.target.result);
+    if(headers.length===0 || rows.length===0){
+      showToast("El archivo está vacío o no se pudo leer");
+      return;
+    }
+    const guess = autoMapColumns(headers);
+    pendingCsvImport = {filename: file.name, headers, rows};
+    renderCsvPreview(guess);
+  };
+  reader.readAsText(file);
+  evt.target.value = "";
+}
+
+function optionsForHeaders(headers, selectedIdx){
+  let html = `<option value="-1">(ninguna)</option>`;
+  headers.forEach((h,i)=>{
+    html += `<option value="${i}" ${i===selectedIdx?"selected":""}>${escapeHtml(h)}</option>`;
+  });
+  return html;
+}
+
+function renderCsvPreview(guess){
+  const {filename, headers, rows} = pendingCsvImport;
+  const box = document.getElementById("csvPreviewBox");
+  box.style.display = "block";
+  box.innerHTML = `
+    <p class="hint" style="margin-bottom:10px;"><strong>${escapeHtml(filename)}</strong> · ${rows.length} filas · ${headers.length} columnas</p>
+    <div class="row2">
+      <div class="field"><label>Columna código</label><select id="map-codigo">${optionsForHeaders(headers, guess.codigo)}</select></div>
+      <div class="field"><label>Columna tipo</label><select id="map-tipo">${optionsForHeaders(headers, guess.tipo)}</select></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Columna latitud</label><select id="map-lat">${optionsForHeaders(headers, guess.lat)}</select></div>
+      <div class="field"><label>Columna longitud</label><select id="map-lon">${optionsForHeaders(headers, guess.lon)}</select></div>
+    </div>
+    <div class="field"><label>Si no hay columna tipo, o el valor no coincide, asignar a</label>
+      <select id="map-fallback-tipo">
+        <option value="pozo">Pozos</option><option value="manantial">Manantiales</option>
+        <option value="calidad">Calidad</option><option value="geologia">Geología</option>
+      </select></div>
+    <div class="save-row">
+      <button class="btn ghost" onclick="cancelCsvImport()">Cancelar</button>
+      <button class="btn primary" onclick="confirmCsvImport()">Importar filas</button>
+    </div>
+  `;
+}
+
+function cancelCsvImport(){
+  pendingCsvImport = null;
+  document.getElementById("csvPreviewBox").style.display = "none";
+}
+
+function confirmCsvImport(){
+  const {headers, rows} = pendingCsvImport;
+  const iCodigo = parseInt(document.getElementById("map-codigo").value);
+  const iTipo = parseInt(document.getElementById("map-tipo").value);
+  const iLat = parseInt(document.getElementById("map-lat").value);
+  const iLon = parseInt(document.getElementById("map-lon").value);
+  const fallbackTipo = document.getElementById("map-fallback-tipo").value;
+
+  let imported = 0, skipped = 0;
+  rows.forEach(row=>{
+    const lat = iLat>=0 ? parseFloat(row[iLat]) : NaN;
+    const lon = iLon>=0 ? parseFloat(row[iLon]) : NaN;
+    let tipo = fallbackTipo;
+    if(iTipo>=0){
+      const raw = (row[iTipo]||"").toLowerCase();
+      if(TYPES.includes(raw)) tipo = raw;
+    }
+    const data = {};
+    headers.forEach((h,i)=>{
+      if(i===iLat || i===iLon || i===iCodigo || i===iTipo) return;
+      data[sanitizeKey(h)] = row[i] !== undefined ? row[i] : "";
+    });
+    data.codigo = iCodigo>=0 ? row[iCodigo] : "";
+    if(!data.codigo) data.codigo = "IMP-" + (idCounter);
+
+    const rec = {
+      id: idCounter++,
+      tipo,
+      fecha: new Date().toISOString(),
+      gps: (!isNaN(lat) && !isNaN(lon)) ? {lat, lon, alt:null, accuracy:null} : null,
+      data
+    };
+    records.push(rec);
+    imported++;
+    if(!rec.gps) skipped++;
+  });
+
+  cancelCsvImport();
+  updateBadges();
+  showToast(imported + " filas importadas" + (skipped ? (" · " + skipped + " sin coordenadas") : ""));
+}
+
+/* ======================================================================
+   EXPORTAR CSV (incluye columnas extra de datos importados)
+   ====================================================================== */
+function csvEscape(v){
+  if(v===null || v===undefined) return "";
+  const s = String(v);
+  if(s.includes(",") || s.includes('"') || s.includes("\n")){
+    return '"' + s.replace(/"/g,'""') + '"';
+  }
+  return s;
+}
+
+function collectExtraKeys(list, known){
+  const set = new Set();
+  list.forEach(r=>{
+    Object.keys(r.data).forEach(k=>{ if(!known.includes(k)) set.add(k); });
+  });
+  return Array.from(set).sort();
+}
+
+function exportCSV(tipo){
+  let list = tipo==="todos" ? records : records.filter(r=>r.tipo===tipo);
+  if(list.length===0){ showToast("No hay registros de este tipo"); return; }
+
+  let header, rows;
+  if(tipo==="todos"){
+    const allKnown = Array.from(new Set(TYPES.flatMap(t=>fieldIds(t).map(k=>k.replace(/-/g,"_")))));
+    const extraKeys = collectExtraKeys(list, allKnown);
+    header = ["id","tipo","codigo","fecha","lat","lon","altitud_m","precision_m","obs", ...extraKeys];
+    rows = list.map(r=>[r.id, TYPE_LABEL[r.tipo], r.data.codigo, r.fecha,
+      r.gps?r.gps.lat:"", r.gps?r.gps.lon:"", r.gps?r.gps.alt:"", r.gps?r.gps.accuracy:"",
+      r.data.obs||"", ...extraKeys.map(k=>r.data[k]||"")]);
+  } else {
+    const keys = fieldIds(tipo).map(k=>k.replace(/-/g,"_"));
+    const extraKeys = collectExtraKeys(list, keys);
+    header = ["id","fecha","lat","lon","altitud_m","precision_m", ...keys, ...extraKeys];
+    rows = list.map(r=>[r.id, r.fecha,
+      r.gps?r.gps.lat:"", r.gps?r.gps.lon:"", r.gps?r.gps.alt:"", r.gps?r.gps.accuracy:"",
+      ...keys.map(k=>r.data[k]||""), ...extraKeys.map(k=>r.data[k]||"")]);
+  }
+  const csv = [header.join(","), ...rows.map(row=>row.map(csvEscape).join(","))].join("\n");
+  downloadBlob("\ufeff"+csv, "hidrocampo_" + tipo + "_" + dateStamp() + ".csv", "text/csv;charset=utf-8");
+  showToast("CSV descargado");
+}
+
+/* ======================================================================
+   UTM (WGS84) — necesario para exportar SHP y para el mapa
+   ====================================================================== */
+function latLonToUTM(lat, lon, zoneNumber, hemisphere){
+  const a = 6378137.0;
+  const f = 1/298.257223563;
+  const k0 = 0.9996;
+  const e2 = f*(2-f);
+  const e2p = e2/(1-e2);
+
+  const latRad = lat*Math.PI/180;
+  const lonRad = lon*Math.PI/180;
+  const lon0 = ((zoneNumber-1)*6 - 180 + 3) * Math.PI/180;
+
+  const N = a/Math.sqrt(1-e2*Math.sin(latRad)*Math.sin(latRad));
+  const T = Math.tan(latRad)*Math.tan(latRad);
+  const C = e2p*Math.cos(latRad)*Math.cos(latRad);
+  const A = Math.cos(latRad)*(lonRad-lon0);
+
+  const M = a*(
+    (1 - e2/4 - 3*e2*e2/64 - 5*e2*e2*e2/256)*latRad
+    - (3*e2/8 + 3*e2*e2/32 + 45*e2*e2*e2/1024)*Math.sin(2*latRad)
+    + (15*e2*e2/256 + 45*e2*e2*e2/1024)*Math.sin(4*latRad)
+    - (35*e2*e2*e2/3072)*Math.sin(6*latRad)
+  );
+
+  let easting = k0*N*(A + (1-T+C)*Math.pow(A,3)/6 + (5-18*T+T*T+72*C-58*e2p)*Math.pow(A,5)/120) + 500000;
+  let northing = k0*(M + N*Math.tan(latRad)*(A*A/2 + (5-T+9*C+4*C*C)*Math.pow(A,4)/24 + (61-58*T+T*T+600*C-330*e2p)*Math.pow(A,6)/720));
+
+  if(hemisphere === "S") northing += 10000000;
+  return {x: easting, y: northing};
+}
+
+function autoUtmZone(lon){ return Math.floor((lon+180)/6)+1; }
+
+function buildPrjWKT(zone, hemisphere){
+  const centralMeridian = (zone-1)*6-180+3;
+  const falseNorthing = hemisphere==="S" ? "10000000.0" : "0.0";
+  return `PROJCS["WGS_1984_UTM_Zone_${zone}${hemisphere}",GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]],PROJECTION["Transverse_Mercator"],PARAMETER["False_Easting",500000.0],PARAMETER["False_Northing",${falseNorthing}],PARAMETER["Central_Meridian",${centralMeridian}.0],PARAMETER["Scale_Factor",0.9996],PARAMETER["Latitude_Of_Origin",0.0],UNIT["Meter",1.0]]`;
+}
+
+function getActiveUtmZone(){
+  const sel = document.getElementById("utmZoneSelect");
+  const val = sel ? sel.value : "auto";
+  if(val==="auto"){
+    const withGps = records.filter(r=>r.gps);
+    if(withGps.length===0) return {zone:18, hemisphere:"S"};
+    const lon = withGps.reduce((s,r)=>s+r.gps.lon,0)/withGps.length;
+    const lat = withGps.reduce((s,r)=>s+r.gps.lat,0)/withGps.length;
+    return {zone: autoUtmZone(lon), hemisphere: lat>=0?"N":"S"};
+  }
+  const [zone,hem] = val.split("-");
+  return {zone: parseInt(zone), hemisphere: hem};
+}
+
+/* ======================================================================
+   DXF (AutoCAD ASCII) — entidades soportadas: LINE, LWPOLYLINE, POLYLINE, POINT, CIRCLE
+   ====================================================================== */
+function parseDXF(text){
+  const lines = text.split(/\r\n|\r|\n/);
+  const pairs = [];
+  for(let i=0;i+1<lines.length;i+=2){
+    pairs.push([parseInt(lines[i].trim(),10), lines[i+1].trim()]);
+  }
+
+  const entities = [];
+  let inEntities = false;
+  let cur = null;
+  let pendingVertex = null;
+
+  function pushEntity(){
+    if(cur) entities.push(cur);
+    cur = null; pendingVertex = null;
+  }
+
+  for(let p=0;p<pairs.length;p++){
+    const [code, val] = pairs[p];
+
+    if(code === 0){
+      if(val === "SECTION"){ continue; }
+      if(val === "ENDSEC"){ inEntities=false; pushEntity(); continue; }
+      if(val === "EOF"){ pushEntity(); break; }
+      if(val === "VERTEX" && cur && cur.type==="POLYLINE"){
+        pendingVertex = {x:0,y:0};
+        cur.vertices.push(pendingVertex);
+        continue;
+      }
+      if(val === "SEQEND"){ pendingVertex = null; continue; }
+
+      pushEntity();
+      if(inEntities){
+        if(val === "LINE") cur = {type:"LINE", x1:0,y1:0,x2:0,y2:0};
+        else if(val === "LWPOLYLINE") cur = {type:"LWPOLYLINE", closed:false, vertices:[]};
+        else if(val === "POLYLINE") cur = {type:"POLYLINE", closed:false, vertices:[]};
+        else if(val === "POINT") cur = {type:"POINT", x:0,y:0};
+        else if(val === "CIRCLE") cur = {type:"CIRCLE", x:0,y:0,r:0};
+        else cur = null;
+      }
+      continue;
+    }
+
+    if(code===2 && val === "ENTITIES"){ inEntities = true; continue; }
+    if(!inEntities || !cur) continue;
+
+    const num = parseFloat(val);
+
+    if(cur.type === "LINE"){
+      if(code===10) cur.x1=num;
+      else if(code===20) cur.y1=num;
+      else if(code===11) cur.x2=num;
+      else if(code===21) cur.y2=num;
+    } else if(cur.type === "POINT"){
+      if(code===10) cur.x=num;
+      else if(code===20) cur.y=num;
+    } else if(cur.type === "CIRCLE"){
+      if(code===10) cur.x=num;
+      else if(code===20) cur.y=num;
+      else if(code===40) cur.r=num;
+    } else if(cur.type === "LWPOLYLINE"){
+      if(code===70) cur.closed = (num & 1) === 1;
+      else if(code===10) cur.vertices.push({x:num, y:0});
+      else if(code===20){ const v=cur.vertices[cur.vertices.length-1]; if(v) v.y=num; }
+    } else if(cur.type === "POLYLINE"){
+      if(code===70) cur.closed = (num & 1) === 1;
+      else if(pendingVertex){
+        if(code===10) pendingVertex.x=num;
+        else if(code===20) pendingVertex.y=num;
+      }
+    }
+  }
+  pushEntity();
+  return entities;
+}
+
+function dxfBounds(entities){
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  function upd(x,y){ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }
+  entities.forEach(e=>{
+    if(e.type==="LINE"){ upd(e.x1,e.y1); upd(e.x2,e.y2); }
+    else if(e.type==="POINT"){ upd(e.x,e.y); }
+    else if(e.type==="CIRCLE"){ upd(e.x-e.r,e.y-e.r); upd(e.x+e.r,e.y+e.r); }
+    else if(e.type==="LWPOLYLINE" || e.type==="POLYLINE"){ e.vertices.forEach(v=>upd(v.x,v.y)); }
+  });
+  if(minX===Infinity) return null;
+  return {minX,minY,maxX,maxY};
+}
+
+function dxfToSvg(entities){
+  let out = "";
+  entities.forEach(e=>{
+    if(e.type==="LINE"){
+      out += `<line class="map-dxf" x1="${e.x1}" y1="${-e.y1}" x2="${e.x2}" y2="${-e.y2}"/>`;
+    } else if(e.type==="POINT"){
+      out += `<circle class="map-dxf-point" cx="${e.x}" cy="${-e.y}"/>`;
+    } else if(e.type==="CIRCLE"){
+      out += `<circle class="map-dxf" cx="${e.x}" cy="${-e.y}" r="${e.r}"/>`;
+    } else if((e.type==="LWPOLYLINE"||e.type==="POLYLINE") && e.vertices.length>1){
+      const pts = e.vertices.map(v=>`${v.x},${-v.y}`).join(" ");
+      out += e.closed ? `<polygon class="map-dxf" points="${pts}"/>` : `<polyline class="map-dxf" points="${pts}"/>`;
+    }
+  });
+  return out;
+}
+
+function handleDxfFile(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      dxfEntities = parseDXF(e.target.result);
+      const counts = {};
+      dxfEntities.forEach(en=>{ counts[en.type]=(counts[en.type]||0)+1; });
+      const summary = Object.entries(counts).map(([k,v])=>`${v} ${k.toLowerCase()}`).join(", ");
+      document.getElementById("dxfStatus").textContent = dxfEntities.length
+        ? `${file.name}: ${dxfEntities.length} entidades (${summary})`
+        : `${file.name}: no se encontraron entidades compatibles (LINE, LWPOLYLINE, POLYLINE, POINT, CIRCLE)`;
+      document.getElementById("dxfLayerRow").style.display = dxfEntities.length ? "block" : "none";
+      document.getElementById("dxfLayerLabel").textContent = "Capa CAD: " + file.name;
+      fitMapView();
+      renderMap();
+      if(dxfEntities.length) showToast("DXF cargado. Ve a la pestaña Mapa.");
+    }catch(err){
+      document.getElementById("dxfStatus").textContent = "No se pudo leer el archivo DXF.";
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value = "";
+}
+
+/* ======================================================================
+   IMAGEN GEORREFERENCIADA (world file)
+   ====================================================================== */
+function handleImageFile(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const img = new Image();
+    img.onload = ()=>{
+      pendingImage = {img, file};
+      document.getElementById("worldFileSection").style.display = "block";
+      document.getElementById("imagePreviewName").textContent = file.name + " (" + img.width + "×" + img.height + " px) cargada.";
+      showToast("Imagen cargada. Ahora elige su archivo world.");
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  evt.target.value = "";
+}
+
+function handleWorldFile(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const lines = e.target.result.split(/\r\n|\r|\n/).map(l=>parseFloat(l.trim())).filter(n=>!isNaN(n));
+    if(lines.length<6){
+      showToast("Archivo world inválido: se esperaban 6 líneas numéricas");
+      return;
+    }
+    if(!pendingImage){ showToast("Primero elige la imagen"); return; }
+    const [A,D,B,E,C,F] = lines;
+    const w = pendingImage.img.width, h = pendingImage.img.height;
+    const cornerMinX = C, cornerMaxY = F;
+    const cornerMaxX = C + A*w, cornerMinY = F + E*h;
+    mapImage = {
+      img: pendingImage.img,
+      minX: Math.min(cornerMinX,cornerMaxX), maxX: Math.max(cornerMinX,cornerMaxX),
+      minY: Math.min(cornerMinY,cornerMaxY), maxY: Math.max(cornerMinY,cornerMaxY),
+      name: pendingImage.file.name
+    };
+    pendingImage = null;
+    document.getElementById("imgLayerRow").style.display = "block";
+    document.getElementById("imgLayerLabel").textContent = "Imagen: " + mapImage.name;
+    fitMapView();
+    renderMap();
+    showToast("Imagen georreferenciada. Ve a la pestaña Mapa.");
+  };
+  reader.readAsText(file);
+  evt.target.value = "";
+}
+
+/* ======================================================================
+   MAPA — SVG en coordenadas UTM (eje Y invertido: svgY = -utmY)
+   ====================================================================== */
+function computeCombinedBounds(){
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  function upd(x,y){ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }
+
+  const zoneInfo = getActiveUtmZone();
+  records.filter(r=>r.gps).forEach(r=>{
+    const p = latLonToUTM(r.gps.lat, r.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
+    upd(p.x, -p.y);
+  });
+  if(dxfEntities.length){
+    const b = dxfBounds(dxfEntities);
+    if(b){ upd(b.minX,-b.minY); upd(b.maxX,-b.maxY); }
+  }
+  if(mapImage){
+    upd(mapImage.minX, -mapImage.minY);
+    upd(mapImage.maxX, -mapImage.maxY);
+  }
+  if(minX===Infinity) return null;
+  return {minX,minY,maxX,maxY};
+}
+
+function fitMapView(){
+  const b = computeCombinedBounds();
+  const emptyMsg = document.getElementById("mapEmptyMsg");
+  if(!b){
+    currentViewBox = {x:0,y:0,w:100,h:100};
+    if(emptyMsg) emptyMsg.style.display = "flex";
+    applyViewBox();
+    return;
+  }
+  if(emptyMsg) emptyMsg.style.display = "none";
+  const w = Math.max(b.maxX-b.minX, 1);
+  const h = Math.max(b.maxY-b.minY, 1);
+  const pad = Math.max(w,h)*0.15 || 10;
+  currentViewBox = {x:b.minX-pad, y:b.minY-pad, w:w+pad*2, h:h+pad*2};
+  applyViewBox();
+}
+
+function applyViewBox(){
+  const svg = document.getElementById("mapSvg");
+  if(!svg) return;
+  svg.setAttribute("viewBox", `${currentViewBox.x} ${currentViewBox.y} ${currentViewBox.w} ${currentViewBox.h}`);
+  const base = Math.max(currentViewBox.w, currentViewBox.h);
+  const r = base * 0.007;
+  document.querySelectorAll(".map-point").forEach(el=>{
+    el.setAttribute("r", r);
+    el.setAttribute("stroke-width", r*0.3);
+  });
+  document.querySelectorAll(".map-dxf-point").forEach(el=>el.setAttribute("r", base*0.004));
+  const sw = base * 0.0015;
+  document.querySelectorAll(".map-dxf").forEach(el=>el.setAttribute("stroke-width", sw));
+  updateScaleBar();
+}
+
+function renderMap(){
+  const svg = document.getElementById("mapSvg");
+  if(!svg) return;
+  const layerEl = id=>document.getElementById(id);
+  const layersOn = {
+    pozo: layerEl("layer-pozo").checked,
+    manantial: layerEl("layer-manantial").checked,
+    calidad: layerEl("layer-calidad").checked,
+    geologia: layerEl("layer-geologia").checked,
+    dxf: layerEl("layer-dxf") ? layerEl("layer-dxf").checked : true,
+    img: layerEl("layer-img") ? layerEl("layer-img").checked : true
+  };
+
+  let html = "";
+  if(mapImage && layersOn.img){
+    html += `<image x="${mapImage.minX}" y="${-mapImage.maxY}" width="${mapImage.maxX-mapImage.minX}" height="${mapImage.maxY-mapImage.minY}" href="${mapImage.img.src}" preserveAspectRatio="none" opacity="0.85"/>`;
+  }
+  if(dxfEntities.length && layersOn.dxf){
+    html += dxfToSvg(dxfEntities);
+  }
+
+  const zoneInfo = getActiveUtmZone();
+  records.filter(r=>r.gps).forEach(r=>{
+    if(!layersOn[r.tipo]) return;
+    const p = latLonToUTM(r.gps.lat, r.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
+    const label = escapeHtml(r.data.codigo||"");
+    html += `<circle class="map-point c-${r.tipo}" cx="${p.x}" cy="${-p.y}" r="1" stroke="#FFFDF7" data-id="${r.id}" onclick="focusRecord(${r.id})"><title>${label}</title></circle>`;
+  });
+
+  svg.innerHTML = html;
+  applyViewBox();
+}
+
+function focusRecord(id){
+  const r = records.find(x=>x.id===id);
+  if(!r || !r.gps) return;
+  showToast(`${TYPE_LABEL[r.tipo]} ${r.data.codigo||""} · ${r.gps.lat.toFixed(5)}, ${r.gps.lon.toFixed(5)}`);
+}
+
+function updateScaleBar(){
+  const el = document.getElementById("mapScaleBar");
+  const svg = document.getElementById("mapSvg");
+  if(!el || !svg) return;
+  const rect = svg.getBoundingClientRect();
+  if(!rect.width) return;
+  const metersPerPixel = currentViewBox.w / rect.width;
+  const targetMeters = metersPerPixel*70;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(targetMeters||1)));
+  const options = [1,2,5,10].map(m=>m*magnitude);
+  const niceMeters = options.reduce((a,b)=>Math.abs(b-targetMeters)<Math.abs(a-targetMeters)?b:a, options[0]);
+  const barPx = niceMeters/metersPerPixel;
+  el.style.width = Math.max(barPx,2)+"px";
+  const label = niceMeters>=1000 ? (niceMeters/1000).toFixed(niceMeters%1000===0?0:1)+" km" : Math.round(niceMeters)+" m";
+  document.getElementById("mapScaleLabel").textContent = label;
+}
+
+function zoomMap(factor, evt){
+  const svg = document.getElementById("mapSvg");
+  const rect = svg.getBoundingClientRect();
+  let cx = currentViewBox.x + currentViewBox.w/2;
+  let cy = currentViewBox.y + currentViewBox.h/2;
+  if(evt && evt.clientX!==undefined && rect.width){
+    const px = (evt.clientX-rect.left)/rect.width;
+    const py = (evt.clientY-rect.top)/rect.height;
+    cx = currentViewBox.x + px*currentViewBox.w;
+    cy = currentViewBox.y + py*currentViewBox.h;
+  }
+  currentViewBox = {
+    x: cx - (cx-currentViewBox.x)*factor,
+    y: cy - (cy-currentViewBox.y)*factor,
+    w: currentViewBox.w*factor,
+    h: currentViewBox.h*factor
+  };
+  applyViewBox();
+}
+
+function initMapInteraction(){
+  const svg = document.getElementById("mapSvg");
+  let dragging = false, lastX=0, lastY=0;
+
+  svg.addEventListener("pointerdown", e=>{
+    dragging = true; lastX = e.clientX; lastY = e.clientY;
+    svg.setPointerCapture(e.pointerId);
+  });
+  svg.addEventListener("pointermove", e=>{
+    if(!dragging) return;
+    const rect = svg.getBoundingClientRect();
+    const dxScreen = e.clientX-lastX, dyScreen = e.clientY-lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    if(!rect.width) return;
+    currentViewBox.x -= dxScreen * (currentViewBox.w/rect.width);
+    currentViewBox.y -= dyScreen * (currentViewBox.h/rect.height);
+    applyViewBox();
+  });
+  svg.addEventListener("pointerup", ()=>{ dragging=false; });
+  svg.addEventListener("pointerleave", ()=>{ dragging=false; });
+  svg.addEventListener("wheel", e=>{
+    e.preventDefault();
+    zoomMap(e.deltaY<0 ? 0.85 : 1.176, e);
+  }, {passive:false});
+}
+
+/* ======================================================================
+   SHAPEFILE: .shp / .shx / .dbf / .prj / .cpg comprimidos en .zip
+   ====================================================================== */
+function writeShpHeader(dv, fileLengthWords, minX,minY,maxX,maxY){
+  dv.setInt32(0, 9994, false);
+  for(let i=4;i<=20;i+=4) dv.setInt32(i,0,false);
+  dv.setInt32(24, fileLengthWords, false);
+  dv.setInt32(28, 1000, true);
+  dv.setInt32(32, 1, true);
+  dv.setFloat64(36, minX, true);
+  dv.setFloat64(44, minY, true);
+  dv.setFloat64(52, maxX, true);
+  dv.setFloat64(60, maxY, true);
+  dv.setFloat64(68, 0, true);
+  dv.setFloat64(76, 0, true);
+  dv.setFloat64(84, 0, true);
+  dv.setFloat64(92, 0, true);
+}
+
+function writeShpShx(points){
+  const numRecords = points.length;
+  const shpRecSize = 8 + 20;
+  const shpFileWords = (100 + shpRecSize*numRecords) / 2;
+  const shxFileWords = (100 + 8*numRecords) / 2;
+
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  points.forEach(p=>{ if(p.x<minX)minX=p.x; if(p.x>maxX)maxX=p.x; if(p.y<minY)minY=p.y; if(p.y>maxY)maxY=p.y; });
+  if(numRecords===0){ minX=minY=maxX=maxY=0; }
+
+  const shpBuf = new ArrayBuffer(100 + shpRecSize*numRecords);
+  const shpDv = new DataView(shpBuf);
+  writeShpHeader(shpDv, shpFileWords, minX,minY,maxX,maxY);
+
+  const shxBuf = new ArrayBuffer(100 + 8*numRecords);
+  const shxDv = new DataView(shxBuf);
+  writeShpHeader(shxDv, shxFileWords, minX,minY,maxX,maxY);
+
+  let shpOffsetWords = 50, shpPos = 100, shxPos = 100;
+
+  points.forEach((p,i)=>{
+    shpDv.setInt32(shpPos, i+1, false);
+    shpDv.setInt32(shpPos+4, 10, false);
+    shpPos += 8;
+    shpDv.setInt32(shpPos, 1, true);
+    shpDv.setFloat64(shpPos+4, p.x, true);
+    shpDv.setFloat64(shpPos+12, p.y, true);
+    shpPos += 20;
+
+    shxDv.setInt32(shxPos, shpOffsetWords, false);
+    shxDv.setInt32(shxPos+4, 10, false);
+    shxPos += 8;
+
+    shpOffsetWords += 4 + 10;
+  });
+
+  return {shp: new Uint8Array(shpBuf), shx: new Uint8Array(shxBuf)};
+}
+
+function writeDbf(fields, rows){
+  const headerLen = 32 + fields.length*32 + 1;
+  const recordLen = 1 + fields.reduce((s,f)=>s+f.length,0);
+  const numRecords = rows.length;
+  const totalLen = headerLen + recordLen*numRecords + 1;
+
+  const buf = new ArrayBuffer(totalLen);
+  const dv = new DataView(buf);
+  const bytes = new Uint8Array(buf);
+
+  const now = new Date();
+  dv.setUint8(0, 0x03);
+  dv.setUint8(1, now.getFullYear()-1900);
+  dv.setUint8(2, now.getMonth()+1);
+  dv.setUint8(3, now.getDate());
+  dv.setUint32(4, numRecords, true);
+  dv.setUint16(8, headerLen, true);
+  dv.setUint16(10, recordLen, true);
+
+  let pos = 32;
+  fields.forEach(f=>{
+    const nameBytes = new TextEncoder().encode(f.name.slice(0,10));
+    for(let i=0;i<11;i++) bytes[pos+i] = i<nameBytes.length ? nameBytes[i] : 0;
+    bytes[pos+11] = f.type.charCodeAt(0);
+    bytes[pos+16] = f.length;
+    bytes[pos+17] = f.decimals||0;
+    pos += 32;
+  });
+  bytes[pos] = 0x0D;
+  pos += 1;
+
+  rows.forEach(rec=>{
+    bytes[pos] = 0x20;
+    pos += 1;
+    fields.forEach(f=>{
+      let raw = rec[f.name];
+      if(raw===undefined || raw===null) raw = "";
+      let strBytes;
+      if(f.type === 'N'){
+        let numStr = "";
+        if(raw !== ""){
+          const num = Number(raw);
+          numStr = isNaN(num) ? "" : num.toFixed(f.decimals||0);
+        }
+        strBytes = new TextEncoder().encode(numStr);
+        const padLen = Math.max(0, f.length - strBytes.length);
+        for(let i=0;i<padLen;i++) bytes[pos+i] = 0x20;
+        for(let i=0;i<strBytes.length && i<f.length;i++) bytes[pos+padLen+i] = strBytes[i];
+      } else {
+        strBytes = new TextEncoder().encode(String(raw));
+        for(let i=0;i<f.length;i++) bytes[pos+i] = 0x20;
+        for(let i=0;i<strBytes.length && i<f.length;i++) bytes[pos+i] = strBytes[i];
+      }
+      pos += f.length;
+    });
+  });
+
+  bytes[pos] = 0x1A;
+  return bytes;
+}
+
+const DBF_ABBR = {
+  id:"ID", tipo_registro:"TIPO_REG", codigo:"CODIGO", fecha:"FECHA",
+  lat:"LAT", lon:"LON", alt:"ALT", precision:"PRECISION",
+  profundidad:"PROFUND", diametro:"DIAMETRO",
+  nivel_estatico:"NIV_ESTAT", nivel_dinamico:"NIV_DINAM", uso:"USO",
+  litologia:"LITOLOGIA", obs:"OBS",
+  caudal:"CAUDAL", temp:"TEMP", metodo:"METODO", tipo_aflor:"TIPO_AFL",
+  vegetacion:"VEGETACION",
+  ph:"PH", ce:"CE", od:"OD", std:"STD", turbidez:"TURBIDEZ",
+  formacion:"FORMACION", rumbo:"RUMBO", buzamiento:"BUZAMIENTO",
+  estructuras:"ESTRUCTURA"
+};
+
+function dbfFieldName(key, used){
+  let base = DBF_ABBR[key];
+  if(!base){
+    base = key.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Z0-9_]/g,"").slice(0,10);
+    if(!base) base = "CAMPO";
+  }
+  let name = base.slice(0,10);
+  let n = 1;
+  while(used.has(name)){
+    const suffix = String(n++);
+    name = base.slice(0, 10-suffix.length) + suffix;
+  }
+  used.add(name);
+  return name;
+}
+
+function buildDbfFieldsForType(tipo, recs){
+  const used = new Set();
+  const fields = [];
+  function addField(key, dbfType, length, decimals){
+    fields.push({key, name: dbfFieldName(key, used), type:dbfType, length, decimals: decimals||0});
+  }
+
+  addField("id","N",9,0);
+  addField("tipo_registro","C",12,0);
+  addField("codigo","C",40,0);
+  addField("fecha","C",19,0);
+  addField("lat","N",11,6);
+  addField("lon","N",11,6);
+  addField("alt","N",8,1);
+  addField("precision","N",6,1);
+
+  if(tipo==="todos"){
+    addField("obs","C",180,0);
+    const allKnown = Array.from(new Set(TYPES.flatMap(t=>fieldIds(t).map(k=>k.replace(/-/g,"_")))));
+    collectExtraKeys(recs, allKnown).forEach(k=>addExtraField(k, recs, addField));
+    return fields;
+  }
+
+  const typeMap = FIELD_TYPES[tipo] || {};
+  const knownKeys = fieldIds(tipo).map(k=>k.replace(/-/g,"_")).filter(k=>k!=="codigo" && k!=="obs");
+  knownKeys.forEach(k=>{
+    if(typeMap[k]==="N") addField(k,"N",14,3);
+    else addField(k,"C",120,0);
+  });
+  addField("obs","C",180,0);
+  collectExtraKeys(recs, fieldIds(tipo).map(k=>k.replace(/-/g,"_"))).forEach(k=>addExtraField(k, recs, addField));
+  return fields;
+}
+
+function addExtraField(key, recs, addField){
+  let maxLen = 10;
+  recs.forEach(r=>{ const v=r.data[key]; if(v) maxLen=Math.max(maxLen, new TextEncoder().encode(String(v)).length); });
+  addField(key, "C", Math.min(150,maxLen));
+}
+
+function recordToDbfRow(rec, fields){
+  const row = {};
+  fields.forEach(f=>{
+    let val;
+    if(f.key==="id") val = rec.id;
+    else if(f.key==="tipo_registro") val = TYPE_LABEL[rec.tipo] || rec.tipo;
+    else if(f.key==="fecha") val = new Date(rec.fecha).toISOString().slice(0,19).replace("T"," ");
+    else if(f.key==="lat") val = rec.gps ? rec.gps.lat : "";
+    else if(f.key==="lon") val = rec.gps ? rec.gps.lon : "";
+    else if(f.key==="alt") val = rec.gps && rec.gps.alt!==null ? rec.gps.alt : "";
+    else if(f.key==="precision") val = rec.gps && rec.gps.accuracy!==null ? rec.gps.accuracy : "";
+    else val = rec.data[f.key] !== undefined ? rec.data[f.key] : "";
+    row[f.name] = val;
+  });
+  return row;
+}
+
+/* ---- ZIP (almacenamiento sin compresión) ---- */
+const CRC_TABLE = (()=>{
+  const table = new Uint32Array(256);
+  for(let n=0;n<256;n++){
+    let c = n;
+    for(let k=0;k<8;k++){ c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); }
+    table[n] = c >>> 0;
+  }
+  return table;
+})();
+
+function crc32(bytes){
+  let crc = 0xFFFFFFFF;
+  for(let i=0;i<bytes.length;i++){ crc = CRC_TABLE[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8); }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+function dosDateTime(date){
+  const time = ((date.getHours() & 0x1F) << 11) | ((date.getMinutes() & 0x3F) << 5) | ((date.getSeconds()>>1) & 0x1F);
+  const dt = (((date.getFullYear()-1980) & 0x7F) << 9) | (((date.getMonth()+1) & 0xF) << 5) | (date.getDate() & 0x1F);
+  return {time, dt};
+}
+
+function makeZip(files){
+  const {time, dt} = dosDateTime(new Date());
+  const chunks = [], central = [];
+  let offset = 0;
+
+  files.forEach(file=>{
+    const nameBytes = new TextEncoder().encode(file.name);
+    const data = file.data;
+    const crc = crc32(data);
+
+    const local = new ArrayBuffer(30 + nameBytes.length);
+    const ldv = new DataView(local);
+    ldv.setUint32(0, 0x04034b50, true);
+    ldv.setUint16(4, 20, true); ldv.setUint16(6, 0, true); ldv.setUint16(8, 0, true);
+    ldv.setUint16(10, time, true); ldv.setUint16(12, dt, true);
+    ldv.setUint32(14, crc, true);
+    ldv.setUint32(18, data.length, true); ldv.setUint32(22, data.length, true);
+    ldv.setUint16(26, nameBytes.length, true); ldv.setUint16(28, 0, true);
+    new Uint8Array(local).set(nameBytes, 30);
+    chunks.push(new Uint8Array(local));
+    chunks.push(data);
+
+    const centralRec = new ArrayBuffer(46 + nameBytes.length);
+    const cdv = new DataView(centralRec);
+    cdv.setUint32(0, 0x02014b50, true);
+    cdv.setUint16(4, 20, true); cdv.setUint16(6, 20, true); cdv.setUint16(8, 0, true); cdv.setUint16(10, 0, true);
+    cdv.setUint16(12, time, true); cdv.setUint16(14, dt, true);
+    cdv.setUint32(16, crc, true);
+    cdv.setUint32(20, data.length, true); cdv.setUint32(24, data.length, true);
+    cdv.setUint16(28, nameBytes.length, true);
+    cdv.setUint16(30, 0, true); cdv.setUint16(32, 0, true); cdv.setUint16(34, 0, true); cdv.setUint16(36, 0, true);
+    cdv.setUint32(38, 0, true); cdv.setUint32(42, offset, true);
+    new Uint8Array(centralRec).set(nameBytes, 46);
+    central.push(new Uint8Array(centralRec));
+
+    offset += local.byteLength + data.length;
+  });
+
+  const centralStart = offset;
+  let centralSize = 0;
+  central.forEach(c=>{ centralSize += c.length; });
+
+  const end = new ArrayBuffer(22);
+  const edv = new DataView(end);
+  edv.setUint32(0, 0x06054b50, true);
+  edv.setUint16(4, 0, true); edv.setUint16(6, 0, true);
+  edv.setUint16(8, files.length, true); edv.setUint16(10, files.length, true);
+  edv.setUint32(12, centralSize, true); edv.setUint32(16, centralStart, true);
+  edv.setUint16(20, 0, true);
+
+  const all = chunks.concat(central).concat([new Uint8Array(end)]);
+  let totalLen = 0;
+  all.forEach(a=>totalLen+=a.length);
+  const result = new Uint8Array(totalLen);
+  let p=0;
+  all.forEach(a=>{ result.set(a,p); p+=a.length; });
+  return result;
+}
+
+function exportSHP(tipo){
+  let list = tipo==="todos" ? records.slice() : records.filter(r=>r.tipo===tipo);
+  const withGps = list.filter(r=>r.gps);
+  const skipped = list.length - withGps.length;
+  if(withGps.length===0){
+    showToast("No hay puntos con coordenadas para exportar");
+    return;
+  }
+
+  const zoneInfo = getActiveUtmZone();
+  const points = withGps.map(r=>latLonToUTM(r.gps.lat, r.gps.lon, zoneInfo.zone, zoneInfo.hemisphere));
+
+  const {shp, shx} = writeShpShx(points);
+  const fields = buildDbfFieldsForType(tipo, withGps);
+  const dbfRows = withGps.map(r=>recordToDbfRow(r, fields));
+  const dbf = writeDbf(fields, dbfRows);
+  const prj = buildPrjWKT(zoneInfo.zone, zoneInfo.hemisphere);
+
+  const base = "hidrocampo_" + tipo + "_" + dateStamp();
+  const zipBytes = makeZip([
+    {name: base+".shp", data: shp},
+    {name: base+".shx", data: shx},
+    {name: base+".dbf", data: dbf},
+    {name: base+".prj", data: new TextEncoder().encode(prj)},
+    {name: base+".cpg", data: new TextEncoder().encode("UTF-8")}
+  ]);
+
+  downloadBlob(zipBytes, base+".zip", "application/zip");
+  showToast(withGps.length + " puntos exportados" + (skipped?(" · "+skipped+" sin GPS omitidos"):"") + " · zona UTM "+zoneInfo.zone+zoneInfo.hemisphere);
+}
+
+/* ======================================================================
+   INICIO
+   ====================================================================== */
+updateBadges();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
