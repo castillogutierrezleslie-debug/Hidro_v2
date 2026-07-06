@@ -8,63 +8,150 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#123F37">
+<meta name="theme-color" content="#0F3A5C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Hidrocampo">
 <style>
-  :root{
+  :root, [data-theme="papel"]{
     --paper:#F3EFE3;
     --paper-2:#EAE3D2;
     --ink:#23241F;
     --ink-soft:#5B5A50;
     --line:#CFC6AC;
-    --teal:#1E6F61;
-    --teal-d:#123F37;
+    --teal:#1B5D8E;
+    --teal-d:#0F3A5C;
     --clay:#B05A2A;
     --clay-d:#7A3D1B;
     --slate:#3C5A66;
     --manantial:#3C8C9C;
     --danger:#9C3B2E;
     --card:#FFFDF7;
+    --map-bg:#EDE7D6;
+    --dxf-line:#8A7F63;
+    --point-stroke:#FFFDF7;
+    --header-sub:#CFE4DD;
+    --scale-bg:rgba(255,253,247,0.88);
+  }
+  [data-theme="oscuro"]{
+    --paper:#1B1D1A;
+    --paper-2:#242720;
+    --ink:#EDE8DC;
+    --ink-soft:#A8A398;
+    --line:#3A3D34;
+    --teal:#4FA3D9;
+    --teal-d:#123047;
+    --clay:#D98452;
+    --clay-d:#8A4A22;
+    --slate:#7C97A3;
+    --manantial:#5FB6C4;
+    --danger:#E5695A;
+    --card:#232620;
+    --map-bg:#14201C;
+    --dxf-line:#9AA08C;
+    --point-stroke:#1B1D1A;
+    --header-sub:#9FCABF;
+    --scale-bg:rgba(35,38,32,0.88);
+  }
+  [data-theme="contraste"]{
+    --paper:#FFFFFF;
+    --paper-2:#F0F0F0;
+    --ink:#000000;
+    --ink-soft:#1A1A1A;
+    --line:#000000;
+    --teal:#00447A;
+    --teal-d:#00223D;
+    --clay:#A33200;
+    --clay-d:#6E2200;
+    --slate:#00324A;
+    --manantial:#00636D;
+    --danger:#B00000;
+    --card:#FFFFFF;
+    --map-bg:#F0F0F0;
+    --dxf-line:#000000;
+    --point-stroke:#FFFFFF;
+    --header-sub:#D8F3EC;
+    --scale-bg:rgba(255,255,255,0.95);
+  }
+  html{font-size:16px;}
+  :root{
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     --serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);}
-  body{padding-bottom:84px;}
-  .app{max-width:560px;margin:0 auto;min-height:100vh;background:var(--paper);position:relative;}
+  .shell{display:flex; min-height:100vh; background:var(--paper);}
 
-  header.top{background:var(--teal-d); color:var(--paper); padding:18px 16px 14px; position:relative; overflow:hidden;}
-  header.top::after{
-    content:""; position:absolute; inset:0;
-    background-image:
-      repeating-linear-gradient(0deg, transparent 0 18px, rgba(243,239,227,0.045) 18px 19px),
-      repeating-linear-gradient(90deg, transparent 0 18px, rgba(243,239,227,0.045) 18px 19px);
-    pointer-events:none;
+  .sidebar{
+    width:224px; flex:0 0 224px; background:var(--teal-d); color:var(--paper);
+    display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:45;
+    transition:transform 0.25s ease;
   }
-  header.top .row{display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1;}
-  header.top h1{font-family:var(--serif); font-weight:700; font-size:21px; margin:0; letter-spacing:0.2px;}
-  header.top .sub{font-family:var(--mono); font-size:11px; color:#CFE4DD; margin-top:3px; letter-spacing:0.4px;}
-  .badge-count{font-family:var(--mono); font-size:12px; background:rgba(243,239,227,0.14); border:1px solid rgba(243,239,227,0.35); border-radius:20px; padding:5px 11px;}
+  .sidebar-brand{
+    font-family:var(--serif); font-weight:700; font-size:1.25rem; padding:22px 20px 16px;
+    border-bottom:1px solid rgba(243,239,227,0.14);
+  }
+  .sidebar-brand .sub{display:block; font-family:var(--mono); font-weight:400; font-size:0.575rem; color:var(--header-sub); margin-top:6px; letter-spacing:0.4px; line-height:1.4;}
+  .sidebar-nav{flex:1 1 auto; overflow-y:auto; padding:14px 12px;}
+  .sidebar-nav button, .sidebar-footer button{
+    display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+    background:transparent; border:none; color:rgba(243,239,227,0.72); font-family:var(--sans);
+    font-size:0.85rem; font-weight:600; padding:10px 12px; border-radius:9px; cursor:pointer; margin-bottom:3px;
+  }
+  .sidebar-nav button .ic, .sidebar-footer button .ic{font-size:1.05rem; width:20px; text-align:center; flex:0 0 auto;}
+  .sidebar-nav button:hover, .sidebar-footer button:hover{background:rgba(243,239,227,0.08); color:var(--paper);}
+  .sidebar-nav button.active, .sidebar-footer button.active{background:var(--teal); color:#fff;}
+  .sidebar-footer{padding:12px; border-top:1px solid rgba(243,239,227,0.14);}
+  .sidebar-scrim{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:40;}
 
-  nav.tabs{display:flex; gap:0; background:var(--paper-2); border-bottom:1px solid var(--line); overflow-x:auto; -webkit-overflow-scrolling:touch;}
-  nav.tabs button{flex:0 0 auto; font-family:var(--sans); font-size:12.5px; font-weight:600; color:var(--ink-soft); background:transparent; border:none; padding:11px 14px; border-bottom:2.5px solid transparent; white-space:nowrap; cursor:pointer;}
-  nav.tabs button.active{color:var(--teal-d); border-bottom-color:var(--teal);}
+  .main-area{flex:1 1 auto; min-width:0; margin-left:224px; display:flex; flex-direction:column;}
+  .topbar{
+    position:sticky; top:0; z-index:20; background:var(--card); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:14px; padding:16px 26px;
+  }
+  .topbar h1{font-family:var(--serif); font-size:1.2rem; font-weight:700; margin:0; flex:1 1 auto; color:var(--ink);}
+  .hamburger{display:none; background:transparent; border:1px solid var(--line); border-radius:8px; width:36px; height:36px; font-size:1rem; cursor:pointer; color:var(--ink); flex:0 0 auto;}
+  .badge-count{font-family:var(--mono); font-size:0.75rem; background:var(--paper-2); border:1px solid var(--line); color:var(--ink-soft); border-radius:20px; padding:5px 11px; flex:0 0 auto;}
+
+  html,body{overflow-x:hidden;}
+  main{padding:26px; max-width:1180px; width:100%; margin:0 auto;}
+
+  @media (max-width: 900px){
+    .sidebar{transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);}
+    .sidebar-scrim.show{display:block;}
+    .main-area{margin-left:0;}
+    .hamburger{display:flex; align-items:center; justify-content:center;}
+    main{padding:14px;}
+    .topbar{padding:12px 14px; gap:10px;}
+    .topbar h1{font-size:1.05rem;}
+    .capture-map-col{min-width:0;}
+    .sat-panel{height:320px;}
+  }
+
+  @media (max-width: 560px){
+    .row3{grid-template-columns:1fr;}
+    .export-type-row{flex-wrap:wrap; row-gap:8px;}
+    .export-type-row .btns{width:100%;}
+    .export-type-row .btns button{flex:1;}
+    .stats-grid{grid-template-columns:repeat(2,1fr);}
+    .chart-row{gap:12px;}
+    .badge-count{display:none;}
+  }
 
   main{padding:16px;}
   .panel{display:none;}
   .panel.active{display:block;}
 
   .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px;}
-  .card h2{font-family:var(--serif); font-size:16px; margin:0 0 3px; color:var(--ink);}
-  .card .hint{font-size:12px; color:var(--ink-soft); margin:0 0 14px; line-height:1.45;}
+  .card h2{font-family:var(--serif); font-size:1rem; margin:0 0 3px; color:var(--ink);}
+  .card .hint{font-size:0.75rem; color:var(--ink-soft); margin:0 0 14px; line-height:1.45;}
 
   .field{margin-bottom:12px;}
-  .field label{display:block; font-size:11.5px; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:5px;}
-  .field .unit{font-weight:400; text-transform:none; color:var(--ink-soft); font-size:11px;}
-  input, select, textarea{width:100%; font-family:var(--sans); font-size:15px; color:var(--ink); background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:10px 11px; font-variant-numeric:tabular-nums;}
+  .field label{display:block; font-size:0.7188rem; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:5px;}
+  .field .unit{font-weight:400; text-transform:none; color:var(--ink-soft); font-size:0.6875rem;}
+  input, select, textarea{width:100%; font-family:var(--sans); font-size:0.9375rem; color:var(--ink); background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:10px 11px; font-variant-numeric:tabular-nums;}
   input:focus, select:focus, textarea:focus{outline:none; border-color:var(--teal);}
   textarea{resize:vertical; min-height:56px;}
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
@@ -72,14 +159,14 @@
 
   .gps-box{border:1px dashed var(--line); border-radius:8px; padding:10px 11px; margin-bottom:14px; background:var(--paper-2);}
   .gps-box .gps-row{display:flex; align-items:center; gap:10px;}
-  .gps-status{font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); flex:1;}
+  .gps-status{font-family:var(--mono); font-size:0.7188rem; color:var(--ink-soft); flex:1;}
   .gps-status.ok{color:var(--teal-d);}
   .gps-status.err{color:var(--danger);}
-  button.btn{font-family:var(--sans); font-size:13.5px; font-weight:600; cursor:pointer; border-radius:8px; padding:10px 14px; border:1px solid var(--line); background:var(--card); color:var(--ink);}
+  button.btn{font-family:var(--sans); font-size:0.8438rem; font-weight:600; cursor:pointer; border-radius:8px; padding:10px 14px; border:1px solid var(--line); background:var(--card); color:var(--ink);}
   button.btn.primary{background:var(--teal); border-color:var(--teal-d); color:#fff;}
   button.btn.primary:active{background:var(--teal-d);}
   button.btn.ghost{background:transparent;}
-  button.btn.small{padding:7px 10px; font-size:12px;}
+  button.btn.small{padding:7px 10px; font-size:0.75rem;}
   button.btn.danger-o{color:var(--danger); border-color:var(--danger);}
   button.btn:disabled{opacity:0.5;}
 
@@ -96,46 +183,49 @@
   .rec[data-tipo="calidad"]{border-left-color:var(--slate);}
   .rec[data-tipo="geologia"]{border-left-color:var(--clay);}
   .rec .rec-top{display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
-  .rec .rec-code{font-family:var(--mono); font-weight:700; font-size:13.5px;}
-  .rec .rec-tipo{font-size:10.5px; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft);}
-  .rec .rec-meta{font-family:var(--mono); font-size:11px; color:var(--ink-soft); margin-top:4px;}
+  .rec .rec-code{font-family:var(--mono); font-weight:700; font-size:0.8438rem;}
+  .rec .rec-tipo{font-size:0.6562rem; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft);}
+  .rec .rec-meta{font-family:var(--mono); font-size:0.6875rem; color:var(--ink-soft); margin-top:4px;}
   .rec .rec-actions{display:flex; gap:6px; margin-top:8px;}
 
   .empty{text-align:center; padding:34px 16px; color:var(--ink-soft);}
-  .empty .glyph{font-size:30px; margin-bottom:6px; opacity:0.5;}
+  .empty .glyph{font-size:1.875rem; margin-bottom:6px; opacity:0.5;}
 
   .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px;}
   .stat{background:var(--card); border:1px solid var(--line); border-radius:8px; padding:9px 6px; text-align:center;}
-  .stat .n{font-family:var(--mono); font-weight:700; font-size:17px; color:var(--teal-d);}
-  .stat .l{font-size:9.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.3px; margin-top:2px;}
+  .stat .n{font-family:var(--mono); font-weight:700; font-size:1.0625rem; color:var(--teal-d);}
+  .stat .l{font-size:0.5938rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.3px; margin-top:2px;}
+
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:18px;}
+  .stats-grid .stat{padding:16px 10px;}
+  .stats-grid .stat .n{font-size:1.6rem;}
+  .stats-grid .stat .l{font-size:0.6875rem; margin-top:5px;}
+  .chart-row{display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px;}
+  .chart-card{flex:1 1 320px; margin-bottom:0;}
+  .chart-box{position:relative; height:260px;}
 
   .export-actions{display:flex; flex-direction:column; gap:9px;}
   .export-actions button{width:100%; text-align:left; display:flex; justify-content:space-between; align-items:center;}
 
-  footer.bottom-bar{position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:560px; background:var(--paper-2); border-top:1px solid var(--line); display:flex; padding:6px 2px; z-index:5;}
-  footer.bottom-bar button{flex:1; background:transparent; border:none; font-family:var(--sans); font-size:10px; color:var(--ink-soft); padding:7px 1px; cursor:pointer; font-weight:600;}
-  footer.bottom-bar button .ic{display:block; font-size:16px; margin-bottom:2px;}
-  footer.bottom-bar button.active{color:var(--teal-d);}
-
-  .toast{position:fixed; bottom:78px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--paper); font-size:13px; padding:9px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity 0.2s; z-index:30; max-width:90%; text-align:center;}
+  .toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--paper); font-size:0.8125rem; padding:9px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity 0.2s; z-index:60; max-width:90%; text-align:center;}
   .toast.show{opacity:1;}
 
   .req::after{content:" *"; color:var(--clay-d);}
 
   /* ---- Mapa ---- */
   .map-toolbar{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--line); flex-wrap:wrap;}
-  .map-toolbar select{flex:0 0 auto; width:auto; font-size:12px; padding:6px 8px;}
-  .map-zoom-btn{width:34px; height:34px; padding:0; font-size:16px; line-height:1;}
-  .map-wrap{position:relative; background:#EDE7D6;}
+  .map-toolbar select{flex:0 0 auto; width:auto; font-size:0.75rem; padding:6px 8px;}
+  .map-zoom-btn{width:34px; height:34px; padding:0; font-size:1rem; line-height:1;}
+  .map-wrap{position:relative; background:var(--map-bg);}
   #mapSvg{width:100%; height:360px; display:block; touch-action:none;}
-  .map-empty{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#EDE7D6; text-align:center; color:var(--ink-soft); padding:16px;}
-  .map-scale{position:absolute; left:10px; bottom:8px; display:flex; align-items:center; gap:6px; background:rgba(255,253,247,0.88); padding:3px 9px; border-radius:4px; border:1px solid var(--line);}
+  .map-empty{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--map-bg); text-align:center; color:var(--ink-soft); padding:16px;}
+  .map-scale{position:absolute; left:10px; bottom:8px; display:flex; align-items:center; gap:6px; background:var(--scale-bg); padding:3px 9px; border-radius:4px; border:1px solid var(--line);}
   .map-scale .bar{height:2px; background:var(--ink); width:60px;}
-  .map-scale .lbl{font-family:var(--mono); font-size:10px; color:var(--ink-soft);}
-  .map-hint{font-size:11px; color:var(--ink-soft); padding:9px 12px 0; line-height:1.4;}
+  .map-scale .lbl{font-family:var(--mono); font-size:0.625rem; color:var(--ink-soft);}
+  .map-hint{font-size:0.6875rem; color:var(--ink-soft); padding:9px 12px 0; line-height:1.4;}
 
   .layer-toggle{margin-bottom:9px;}
-  .layer-toggle label{display:flex; align-items:center; gap:8px; font-size:13.5px; cursor:pointer;}
+  .layer-toggle label{display:flex; align-items:center; gap:8px; font-size:0.8438rem; cursor:pointer;}
   .layer-toggle input{width:auto;}
   .dot{width:10px; height:10px; border-radius:50%; display:inline-block; flex:0 0 auto;}
   .dot.c-pozo{background:var(--teal);}
@@ -143,115 +233,171 @@
   .dot.c-calidad{background:var(--slate);}
   .dot.c-geologia{background:var(--clay);}
 
-  .map-point{cursor:pointer;}
+  .map-point{cursor:pointer; stroke:var(--point-stroke);}
   .map-point.c-pozo{fill:var(--teal);}
   .map-point.c-manantial{fill:var(--manantial);}
   .map-point.c-calidad{fill:var(--slate);}
   .map-point.c-geologia{fill:var(--clay);}
-  .map-dxf{stroke:#8A7F63; fill:none;}
-  .map-dxf-point{fill:#8A7F63; stroke:none;}
+  .map-dxf{stroke:var(--dxf-line); fill:none;}
+  .map-dxf-point{fill:var(--dxf-line); stroke:none;}
 
   /* ---- Importar / exportar ---- */
   .import-preview{border:1px dashed var(--line); border-radius:8px; padding:12px; background:var(--paper-2); margin-top:4px;}
   .export-type-row{display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); gap:8px;}
   .export-type-row:last-child{border-bottom:none;}
-  .export-type-row .lbl{font-size:13.5px; font-weight:600;}
-  .export-type-row .cnt{font-family:var(--mono); font-size:11px; color:var(--ink-soft); margin-left:6px;}
+  .export-type-row .lbl{font-size:0.8438rem; font-weight:600;}
+  .export-type-row .cnt{font-family:var(--mono); font-size:0.6875rem; color:var(--ink-soft); margin-left:6px;}
   .export-type-row .btns{display:flex; gap:6px; flex:0 0 auto;}
-  .export-type-row .btns button{padding:6px 12px; font-size:12px;}
+  .export-type-row .btns button{padding:6px 12px; font-size:0.75rem;}
   .step-btn{margin-top:8px;}
+
+  /* ---- Configuración ---- */
+  .settings-group{margin-bottom:20px;}
+  .settings-group>label{display:block; font-size:0.7188rem; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:8px;}
+  .segmented{display:flex; gap:6px; flex-wrap:wrap;}
+  .segmented button{flex:1; min-width:64px; font-family:var(--sans); font-size:0.8438rem; font-weight:600; padding:9px 8px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer;}
+  .segmented button.active{background:var(--teal); border-color:var(--teal-d); color:#fff;}
+  .settings-note{font-size:0.6875rem; color:var(--ink-soft); line-height:1.5; margin-top:4px;}
+
+  /* ---- Panel satelital + layout de dos columnas ---- */
+  .capture-layout{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;}
+  .capture-form-col{flex:1 1 380px; min-width:0;}
+  .capture-map-col{flex:1 1 320px; min-width:280px;}
+  .sat-panel{
+    position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    background:var(--card); height:420px; display:flex; flex-direction:column;
+  }
+  .sat-header{
+    font-family:var(--sans); font-size:0.75rem; font-weight:600; color:var(--ink-soft);
+    padding:9px 12px; border-bottom:1px solid var(--line); background:var(--paper-2);
+    text-transform:uppercase; letter-spacing:0.4px; flex:0 0 auto;
+  }
+  .sat-map{flex:1 1 auto; width:100%; background:var(--map-bg);}
+  .sat-overlay{
+    position:absolute; left:0; right:0; bottom:0; top:33px;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    background:var(--paper-2); color:var(--ink-soft); font-size:0.8125rem; padding:16px;
+    pointer-events:none;
+  }
+  .sat-overlay.hidden{display:none;}
+  .sat-marker{
+    width:16px; height:16px; border-radius:50%; background:var(--clay);
+    border:2.5px solid #fff; box-shadow:0 0 0 2px rgba(0,0,0,0.25);
+  }
 </style>
 </head>
 <body>
-<div class="app">
-
-  <header class="top">
-    <div class="row">
-      <div>
-        <h1>Hidrocampo</h1>
-        <div class="sub">CAPTURA Y VISUALIZACIÓN HIDROGEOLÓGICA · OFFLINE</div>
-      </div>
-      <div class="badge-count" id="totalBadge">0 registros</div>
+<div class="shell">
+  <div class="sidebar-scrim" id="sidebarScrim" onclick="toggleSidebar()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      Hidrocampo
+      <span class="sub" data-i18n="header_sub">CAPTURA Y VISUALIZACIÓN HIDROGEOLÓGICA · OFFLINE</span>
     </div>
-  </header>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <button data-panel="pozo" class="active"><span class="ic">⛏</span><span data-i18n="nav_pozo">Pozos</span></button>
+      <button data-panel="manantial"><span class="ic">≈</span><span data-i18n="nav_manantial">Manantiales</span></button>
+      <button data-panel="calidad"><span class="ic">⚗</span><span data-i18n="nav_calidad">Calidad</span></button>
+      <button data-panel="geologia"><span class="ic">▲</span><span data-i18n="nav_geologia">Geología</span></button>
+      <button data-panel="mapa"><span class="ic">⊞</span><span data-i18n="nav_mapa">Mapa</span></button>
+      <button data-panel="estadistica"><span class="ic">▤</span><span data-i18n="nav_estadistica">Estadística</span></button>
+      <button data-panel="registros"><span class="ic">☰</span><span data-i18n="nav_registros">Registros</span></button>
+      <button data-panel="datos"><span class="ic">⇅</span><span data-i18n="nav_datos">Datos</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <button data-panel="cuenta">
+        <span class="ic">◍</span><span data-i18n="nav_account">Cuenta</span>
+      </button>
+      <button data-panel="config"><span class="ic">⚙</span><span data-i18n="nav_config">Configuración</span></button>
+    </div>
+  </aside>
 
-  <nav class="tabs" id="tabs">
-    <button data-panel="pozo" class="active">Pozos</button>
-    <button data-panel="manantial">Manantiales</button>
-    <button data-panel="calidad">Calidad</button>
-    <button data-panel="geologia">Geología</button>
-    <button data-panel="mapa">Mapa</button>
-    <button data-panel="registros">Registros</button>
-    <button data-panel="datos">Datos</button>
-  </nav>
+  <div class="main-area">
+    <header class="topbar">
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+      <h1 id="pageTitle" data-i18n="nav_pozo">Pozos</h1>
+      <div class="badge-count" id="totalBadge">0 registros</div>
+    </header>
 
   <main>
 
     <!-- POZOS -->
     <section class="panel active" id="panel-pozo">
+      <div class="capture-layout">
+      <div class="capture-form-col">
       <div class="card">
-        <h2>Pozo / piezómetro</h2>
-        <p class="hint">Nivel freático, construcción y litología del punto.</p>
-        <div class="field"><label class="req">Código de punto</label><input type="text" id="pozo-codigo" placeholder="POZ-001"></div>
+        <h2 data-i18n="pozo_title">Pozo / piezómetro</h2>
+        <p class="hint" data-i18n="pozo_hint">Nivel freático, construcción y litología del punto.</p>
+        <div class="field"><label class="req" data-i18n="label_codigo">Código de punto</label><input type="text" id="pozo-codigo" placeholder="POZ-001"></div>
         <div id="pozo-gps" class="gps-box"></div>
         <div class="row2">
-          <div class="field"><label>Profundidad total <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-profundidad"></div>
-          <div class="field"><label>Diámetro <span class="unit">(in)</span></label><input type="number" step="0.1" id="pozo-diametro"></div>
+          <div class="field"><label data-i18n="label_profundidad">Profundidad total <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-profundidad"></div>
+          <div class="field"><label data-i18n="label_diametro">Diámetro <span class="unit">(in)</span></label><input type="number" step="0.1" id="pozo-diametro"></div>
         </div>
         <div class="row2">
-          <div class="field"><label>Nivel estático <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-estatico"></div>
-          <div class="field"><label>Nivel dinámico <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-dinamico"></div>
+          <div class="field"><label data-i18n="label_nivel_estatico">Nivel estático <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-estatico"></div>
+          <div class="field"><label data-i18n="label_nivel_dinamico">Nivel dinámico <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-dinamico"></div>
         </div>
-        <div class="field"><label>Uso del agua</label>
+        <div class="field"><label data-i18n="label_uso">Uso del agua</label>
           <select id="pozo-uso">
             <option value="">Sin especificar</option><option>Consumo humano</option><option>Riego</option>
             <option>Pecuario</option><option>Industrial</option><option>Monitoreo</option><option>Sin uso</option>
           </select></div>
-        <div class="field"><label>Litología / perfil resumido</label><textarea id="pozo-litologia" placeholder="Ej: 0-5m arena fina, 5-20m arcilla, 20-35m grava..."></textarea></div>
-        <div class="field"><label>Observaciones</label><textarea id="pozo-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_litologia">Litología / perfil resumido</label><textarea id="pozo-litologia" placeholder="Ej: 0-5m arena fina, 5-20m arcilla, 20-35m grava..."></textarea></div>
+        <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="pozo-obs"></textarea></div>
         <div class="save-row">
-          <button class="btn ghost" onclick="clearForm('pozo')">Limpiar</button>
-          <button class="btn primary" onclick="saveRecord('pozo')">Guardar registro</button>
+          <button class="btn ghost" onclick="clearForm('pozo')" data-i18n="btn_limpiar">Limpiar</button>
+          <button class="btn primary" onclick="saveRecord('pozo')" data-i18n="btn_guardar">Guardar registro</button>
         </div>
+      </div>
+      </div>
+      <div class="capture-map-col" id="satSlot-pozo"></div>
       </div>
     </section>
 
     <!-- MANANTIALES -->
     <section class="panel" id="panel-manantial">
+      <div class="capture-layout">
+      <div class="capture-form-col">
       <div class="card">
-        <h2>Manantial / fuente superficial</h2>
-        <p class="hint">Afloramientos, caudal y características del agua.</p>
-        <div class="field"><label class="req">Código de punto</label><input type="text" id="manantial-codigo" placeholder="MAN-001"></div>
+        <h2 data-i18n="manantial_title">Manantial / fuente superficial</h2>
+        <p class="hint" data-i18n="manantial_hint">Afloramientos, caudal y características del agua.</p>
+        <div class="field"><label class="req" data-i18n="label_codigo">Código de punto</label><input type="text" id="manantial-codigo" placeholder="MAN-001"></div>
         <div id="manantial-gps" class="gps-box"></div>
         <div class="row2">
-          <div class="field"><label>Caudal estimado <span class="unit">(L/s)</span></label><input type="number" step="0.01" id="manantial-caudal"></div>
-          <div class="field"><label>Temp. del agua <span class="unit">(°C)</span></label><input type="number" step="0.1" id="manantial-temp"></div>
+          <div class="field"><label data-i18n="label_caudal">Caudal estimado <span class="unit">(L/s)</span></label><input type="number" step="0.01" id="manantial-caudal"></div>
+          <div class="field"><label data-i18n="label_temp_agua">Temp. del agua <span class="unit">(°C)</span></label><input type="number" step="0.1" id="manantial-temp"></div>
         </div>
-        <div class="field"><label>Método de aforo</label>
+        <div class="field"><label data-i18n="label_metodo">Método de aforo</label>
           <select id="manantial-metodo">
             <option value="">Sin especificar</option><option>Volumétrico</option><option>Vertedero</option>
             <option>Flotador</option><option>Estimación visual</option>
           </select></div>
-        <div class="field"><label>Tipo de afloramiento</label>
+        <div class="field"><label data-i18n="label_tipo_aflor">Tipo de afloramiento</label>
           <select id="manantial-tipo-aflor">
             <option value="">Sin especificar</option><option>Contacto litológico</option><option>Fractura / falla</option>
             <option>Depresión / ladera</option><option>Difuso</option>
           </select></div>
-        <div class="field"><label>Vegetación / entorno asociado</label><input type="text" id="manantial-vegetacion" placeholder="Ej: bofedal, totora, pastizal..."></div>
-        <div class="field"><label>Observaciones</label><textarea id="manantial-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_vegetacion">Vegetación / entorno asociado</label><input type="text" id="manantial-vegetacion" placeholder="Ej: bofedal, totora, pastizal..."></div>
+        <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="manantial-obs"></textarea></div>
         <div class="save-row">
-          <button class="btn ghost" onclick="clearForm('manantial')">Limpiar</button>
-          <button class="btn primary" onclick="saveRecord('manantial')">Guardar registro</button>
+          <button class="btn ghost" onclick="clearForm('manantial')" data-i18n="btn_limpiar">Limpiar</button>
+          <button class="btn primary" onclick="saveRecord('manantial')" data-i18n="btn_guardar">Guardar registro</button>
         </div>
+      </div>
+      </div>
+      <div class="capture-map-col" id="satSlot-manantial"></div>
       </div>
     </section>
 
     <!-- CALIDAD -->
     <section class="panel" id="panel-calidad">
+      <div class="capture-layout">
+      <div class="capture-form-col">
       <div class="card">
-        <h2>Calidad de agua in situ</h2>
-        <p class="hint">Parámetros fisicoquímicos medidos en campo.</p>
-        <div class="field"><label class="req">Código de punto</label><input type="text" id="calidad-codigo" placeholder="CAL-001 (puede ser igual a un pozo/manantial)"></div>
+        <h2 data-i18n="calidad_title">Calidad de agua in situ</h2>
+        <p class="hint" data-i18n="calidad_hint">Parámetros fisicoquímicos medidos en campo.</p>
+        <div class="field"><label class="req" data-i18n="label_codigo">Código de punto</label><input type="text" id="calidad-codigo" placeholder="CAL-001 (puede ser igual a un pozo/manantial)"></div>
         <div id="calidad-gps" class="gps-box"></div>
         <div class="row3">
           <div class="field"><label>pH</label><input type="number" step="0.01" id="calidad-ph"></div>
@@ -259,37 +405,45 @@
           <div class="field"><label>Temp. <span class="unit">(°C)</span></label><input type="number" step="0.1" id="calidad-temp"></div>
         </div>
         <div class="row2">
-          <div class="field"><label>Oxígeno disuelto <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-od"></div>
+          <div class="field"><label data-i18n="label_od">Oxígeno disuelto <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-od"></div>
           <div class="field"><label>STD <span class="unit">(ppm)</span></label><input type="number" step="0.1" id="calidad-std"></div>
         </div>
-        <div class="field"><label>Turbidez <span class="unit">(NTU)</span></label><input type="number" step="0.1" id="calidad-turbidez"></div>
-        <div class="field"><label>Observaciones</label><textarea id="calidad-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_turbidez">Turbidez <span class="unit">(NTU)</span></label><input type="number" step="0.1" id="calidad-turbidez"></div>
+        <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="calidad-obs"></textarea></div>
         <div class="save-row">
-          <button class="btn ghost" onclick="clearForm('calidad')">Limpiar</button>
-          <button class="btn primary" onclick="saveRecord('calidad')">Guardar registro</button>
+          <button class="btn ghost" onclick="clearForm('calidad')" data-i18n="btn_limpiar">Limpiar</button>
+          <button class="btn primary" onclick="saveRecord('calidad')" data-i18n="btn_guardar">Guardar registro</button>
         </div>
+      </div>
+      </div>
+      <div class="capture-map-col" id="satSlot-calidad"></div>
       </div>
     </section>
 
     <!-- GEOLOGIA -->
     <section class="panel" id="panel-geologia">
+      <div class="capture-layout">
+      <div class="capture-form-col">
       <div class="card">
-        <h2>Punto geológico</h2>
-        <p class="hint">Afloramientos, formación y estructura.</p>
-        <div class="field"><label class="req">Código de punto</label><input type="text" id="geologia-codigo" placeholder="GEO-001"></div>
+        <h2 data-i18n="geologia_title">Punto geológico</h2>
+        <p class="hint" data-i18n="geologia_hint">Afloramientos, formación y estructura.</p>
+        <div class="field"><label class="req" data-i18n="label_codigo">Código de punto</label><input type="text" id="geologia-codigo" placeholder="GEO-001"></div>
         <div id="geologia-gps" class="gps-box"></div>
-        <div class="field"><label>Formación / unidad</label><input type="text" id="geologia-formacion"></div>
-        <div class="field"><label>Litología principal</label><input type="text" id="geologia-litologia" placeholder="Ej: arenisca cuarzosa, caliza, lutita..."></div>
+        <div class="field"><label data-i18n="label_formacion">Formación / unidad</label><input type="text" id="geologia-formacion"></div>
+        <div class="field"><label data-i18n="label_litologia_principal">Litología principal</label><input type="text" id="geologia-litologia" placeholder="Ej: arenisca cuarzosa, caliza, lutita..."></div>
         <div class="row2">
-          <div class="field"><label>Rumbo <span class="unit">(°)</span></label><input type="text" id="geologia-rumbo" placeholder="N45°E"></div>
-          <div class="field"><label>Buzamiento <span class="unit">(°)</span></label><input type="text" id="geologia-buzamiento" placeholder="30°SE"></div>
+          <div class="field"><label data-i18n="label_rumbo">Rumbo <span class="unit">(°)</span></label><input type="text" id="geologia-rumbo" placeholder="N45°E"></div>
+          <div class="field"><label data-i18n="label_buzamiento">Buzamiento <span class="unit">(°)</span></label><input type="text" id="geologia-buzamiento" placeholder="30°SE"></div>
         </div>
-        <div class="field"><label>Estructuras observadas</label><input type="text" id="geologia-estructuras" placeholder="Fallas, fracturas, pliegues..."></div>
-        <div class="field"><label>Observaciones</label><textarea id="geologia-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_estructuras">Estructuras observadas</label><input type="text" id="geologia-estructuras" placeholder="Fallas, fracturas, pliegues..."></div>
+        <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="geologia-obs"></textarea></div>
         <div class="save-row">
-          <button class="btn ghost" onclick="clearForm('geologia')">Limpiar</button>
-          <button class="btn primary" onclick="saveRecord('geologia')">Guardar registro</button>
+          <button class="btn ghost" onclick="clearForm('geologia')" data-i18n="btn_limpiar">Limpiar</button>
+          <button class="btn primary" onclick="saveRecord('geologia')" data-i18n="btn_guardar">Guardar registro</button>
         </div>
+      </div>
+      </div>
+      <div class="capture-map-col" id="satSlot-geologia"></div>
       </div>
     </section>
 
@@ -298,31 +452,31 @@
       <div class="card" style="padding:0; overflow:hidden;">
         <div class="map-toolbar">
           <select id="utmZoneSelect" onchange="fitMapView(); renderMap();">
-            <option value="auto">Zona UTM automática</option>
+            <option value="auto" data-i18n="map_zone_auto">Zona UTM automática</option>
             <option value="17-S">17S</option>
             <option value="18-S">18S (Lima)</option>
             <option value="19-S">19S</option>
           </select>
-          <button class="btn small ghost" onclick="fitMapView()" style="margin-left:auto;">Centrar</button>
+          <button class="btn small ghost" onclick="fitMapView()" style="margin-left:auto;" data-i18n="map_centrar">Centrar</button>
           <button class="btn map-zoom-btn ghost" onclick="zoomMap(0.8)">+</button>
           <button class="btn map-zoom-btn ghost" onclick="zoomMap(1.25)">−</button>
         </div>
-        <p class="map-hint">Los puntos GPS se proyectan a UTM en la zona elegida. La capa CAD y la imagen se muestran asumiendo que ya están en ese mismo sistema.</p>
+        <p class="map-hint" data-i18n="map_hint">Los puntos GPS se proyectan a UTM en la zona elegida. La capa CAD y la imagen se muestran asumiendo que ya están en ese mismo sistema.</p>
         <div class="map-wrap">
           <svg id="mapSvg" viewBox="0 0 100 100"></svg>
-          <div class="map-empty" id="mapEmptyMsg"><div class="glyph">○</div>Captura puntos con GPS para verlos aquí.</div>
+          <div class="map-empty" id="mapEmptyMsg"><div class="glyph">○</div><span data-i18n="map_empty">Captura puntos con GPS para verlos aquí.</span></div>
           <div class="map-scale"><div class="bar" id="mapScaleBar"></div><span class="lbl" id="mapScaleLabel">—</span></div>
         </div>
       </div>
 
       <div class="card">
-        <h2>Capas</h2>
-        <div class="layer-toggle"><label><input type="checkbox" id="layer-pozo" checked onchange="renderMap()"><span class="dot c-pozo"></span>Pozos</label></div>
-        <div class="layer-toggle"><label><input type="checkbox" id="layer-manantial" checked onchange="renderMap()"><span class="dot c-manantial"></span>Manantiales</label></div>
-        <div class="layer-toggle"><label><input type="checkbox" id="layer-calidad" checked onchange="renderMap()"><span class="dot c-calidad"></span>Calidad</label></div>
-        <div class="layer-toggle"><label><input type="checkbox" id="layer-geologia" checked onchange="renderMap()"><span class="dot c-geologia"></span>Geología</label></div>
-        <div class="layer-toggle" id="dxfLayerRow" style="display:none;"><label><input type="checkbox" id="layer-dxf" checked onchange="renderMap()"><span class="dot" style="background:#8A7F63;"></span><span id="dxfLayerLabel">Capa CAD</span></label></div>
-        <div class="layer-toggle" id="imgLayerRow" style="display:none;"><label><input type="checkbox" id="layer-img" checked onchange="renderMap()"><span class="dot" style="background:var(--clay);"></span><span id="imgLayerLabel">Imagen de fondo</span></label></div>
+        <h2 data-i18n="map_layers_title">Capas</h2>
+        <div class="layer-toggle"><label><input type="checkbox" id="layer-pozo" checked onchange="renderMap()"><span class="dot c-pozo"></span><span data-i18n="nav_pozo">Pozos</span></label></div>
+        <div class="layer-toggle"><label><input type="checkbox" id="layer-manantial" checked onchange="renderMap()"><span class="dot c-manantial"></span><span data-i18n="nav_manantial">Manantiales</span></label></div>
+        <div class="layer-toggle"><label><input type="checkbox" id="layer-calidad" checked onchange="renderMap()"><span class="dot c-calidad"></span><span data-i18n="nav_calidad">Calidad</span></label></div>
+        <div class="layer-toggle"><label><input type="checkbox" id="layer-geologia" checked onchange="renderMap()"><span class="dot c-geologia"></span><span data-i18n="nav_geologia">Geología</span></label></div>
+        <div class="layer-toggle" id="dxfLayerRow" style="display:none;"><label><input type="checkbox" id="layer-dxf" checked onchange="renderMap()"><span class="dot" style="background:var(--dxf-line);"></span><span id="dxfLayerLabel" data-i18n="dxf_layer_default">Capa CAD</span></label></div>
+        <div class="layer-toggle" id="imgLayerRow" style="display:none;"><label><input type="checkbox" id="layer-img" checked onchange="renderMap()"><span class="dot" style="background:var(--clay);"></span><span id="imgLayerLabel" data-i18n="img_layer_default">Imagen de fondo</span></label></div>
       </div>
     </section>
 
@@ -331,10 +485,10 @@
       <div class="stats" id="statsRow"></div>
       <div class="list-toolbar">
         <select id="filterTipo" onchange="renderList()">
-          <option value="todos">Todos</option><option value="pozo">Pozos</option><option value="manantial">Manantiales</option>
-          <option value="calidad">Calidad</option><option value="geologia">Geología</option>
+          <option value="todos" data-i18n="filter_todos">Todos</option><option value="pozo" data-i18n="nav_pozo">Pozos</option><option value="manantial" data-i18n="nav_manantial">Manantiales</option>
+          <option value="calidad" data-i18n="nav_calidad">Calidad</option><option value="geologia" data-i18n="nav_geologia">Geología</option>
         </select>
-        <input type="text" id="filterTexto" placeholder="Buscar por código..." oninput="renderList()">
+        <input type="text" id="filterTexto" placeholder="Buscar por código..." oninput="renderList()" data-i18n-placeholder="filter_placeholder">
       </div>
       <div id="listContainer"></div>
     </section>
@@ -343,73 +497,210 @@
     <section class="panel" id="panel-datos">
 
       <div class="card">
-        <h2>Respaldo de la sesión</h2>
-        <p class="hint">Esta app no guarda datos en el teléfono entre sesiones. Exporta antes de cerrar el navegador y vuelve a importar para continuar otro día.</p>
+        <h2 data-i18n="datos_backup_title">Respaldo de la sesión</h2>
+        <p class="hint" data-i18n="datos_backup_hint">Esta app no guarda datos en el teléfono entre sesiones. Exporta antes de cerrar el navegador y vuelve a importar para continuar otro día.</p>
         <div class="export-actions">
-          <button class="btn primary" onclick="exportJSON()"><span>Descargar respaldo completo (.json)</span></button>
-          <button class="btn" onclick="document.getElementById('importInput').click()"><span>Importar respaldo (.json)</span></button>
+          <button class="btn primary" onclick="exportJSON()"><span data-i18n="btn_export_json">Descargar respaldo completo (.json)</span></button>
+          <button class="btn" onclick="document.getElementById('importInput').click()"><span data-i18n="btn_import_json">Importar respaldo (.json)</span></button>
           <input type="file" id="importInput" accept="application/json" style="display:none" onchange="importJSON(event)">
         </div>
       </div>
 
       <div class="card">
-        <h2>Importar CSV o TXT</h2>
-        <p class="hint">Trae coordenadas o inventarios de otra fuente. Se detectan columnas de código/latitud/longitud automáticamente, pero puedes corregirlas antes de importar.</p>
+        <h2 data-i18n="datos_csv_title">Importar CSV o TXT</h2>
+        <p class="hint" data-i18n="datos_csv_hint">Trae coordenadas o inventarios de otra fuente. Se detectan columnas de código/latitud/longitud automáticamente, pero puedes corregirlas antes de importar.</p>
         <input type="file" id="csvFileInput" accept=".csv,.txt,text/csv,text/plain" style="display:none" onchange="handleCsvFile(event)">
-        <button class="btn" onclick="document.getElementById('csvFileInput').click()" style="width:100%;">Elegir archivo .csv / .txt</button>
+        <button class="btn" onclick="document.getElementById('csvFileInput').click()" style="width:100%;" data-i18n="btn_choose_csv">Elegir archivo .csv / .txt</button>
         <div id="csvPreviewBox" style="display:none;" class="import-preview"></div>
       </div>
 
       <div class="card">
-        <h2>Capa CAD (vectorial)</h2>
-        <p class="hint">Importa líneas, polilíneas, puntos y círculos desde un DXF (AutoCAD ASCII) como referencia en el mapa. Si tienes .dwg, expórtalo primero a .dxf desde AutoCAD o QGIS — el binario propietario de .dwg no se puede leer aquí. Se asume que el DXF ya está en la misma zona UTM elegida en la pestaña Mapa.</p>
+        <h2 data-i18n="datos_dxf_title">Capa CAD (vectorial)</h2>
+        <p class="hint" data-i18n="datos_dxf_hint">Importa líneas, polilíneas, puntos y círculos desde un DXF (AutoCAD ASCII) como referencia en el mapa. Si tienes .dwg, expórtalo primero a .dxf desde AutoCAD o QGIS — el binario propietario de .dwg no se puede leer aquí. Se asume que el DXF ya está en la misma zona UTM elegida en la pestaña Mapa.</p>
         <input type="file" id="dxfFileInput" accept=".dxf" style="display:none" onchange="handleDxfFile(event)">
-        <button class="btn" onclick="document.getElementById('dxfFileInput').click()" style="width:100%;">Elegir archivo .dxf</button>
+        <button class="btn" onclick="document.getElementById('dxfFileInput').click()" style="width:100%;" data-i18n="btn_choose_dxf">Elegir archivo .dxf</button>
         <p class="hint" id="dxfStatus" style="margin-top:8px; margin-bottom:0;"></p>
       </div>
 
       <div class="card">
-        <h2>Imagen topográfica georreferenciada</h2>
-        <p class="hint">Importa un plano, ortofoto o topografía escaneada (PNG/JPG) junto a su archivo world (.tfw, .jgw o .wld) para ubicarla en coordenadas reales. Si tienes un GeoTIFF, expórtalo antes como imagen + world file (por ejemplo desde QGIS: Exportar → Imagen georreferenciada).</p>
+        <h2 data-i18n="datos_img_title">Imagen topográfica georreferenciada</h2>
+        <p class="hint" data-i18n="datos_img_hint">Importa un plano, ortofoto o topografía escaneada (PNG/JPG) junto a su archivo world (.tfw, .jgw o .wld) para ubicarla en coordenadas reales. Si tienes un GeoTIFF, expórtalo antes como imagen + world file (por ejemplo desde QGIS: Exportar → Imagen georreferenciada).</p>
         <input type="file" id="imgFileInput" accept="image/png,image/jpeg" style="display:none" onchange="handleImageFile(event)">
-        <button class="btn" onclick="document.getElementById('imgFileInput').click()" style="width:100%;">1. Elegir imagen (.png / .jpg)</button>
+        <button class="btn" onclick="document.getElementById('imgFileInput').click()" style="width:100%;" data-i18n="btn_choose_img">1. Elegir imagen (.png / .jpg)</button>
         <div id="worldFileSection" style="display:none; margin-top:10px;">
           <p class="hint" id="imagePreviewName" style="margin-bottom:8px;"></p>
           <input type="file" id="worldFileInput" accept=".tfw,.jgw,.wld,.txt" style="display:none" onchange="handleWorldFile(event)">
-          <button class="btn step-btn" onclick="document.getElementById('worldFileInput').click()" style="width:100%;">2. Elegir archivo world (.tfw / .jgw / .wld)</button>
+          <button class="btn step-btn" onclick="document.getElementById('worldFileInput').click()" style="width:100%;" data-i18n="btn_choose_world">2. Elegir archivo world (.tfw / .jgw / .wld)</button>
         </div>
       </div>
 
       <div class="card">
-        <h2>Exportar por tipo</h2>
-        <p class="hint">CSV para hojas de cálculo · SHP comprimido en .zip (con .shp/.shx/.dbf/.prj/.cpg) listo para QGIS o ArcGIS, en la zona UTM elegida en la pestaña Mapa.</p>
-        <div class="export-type-row"><div><span class="lbl">Pozos</span><span class="cnt" id="cnt-pozo">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('pozo')">CSV</button><button class="btn" onclick="exportSHP('pozo')">SHP</button></div></div>
-        <div class="export-type-row"><div><span class="lbl">Manantiales</span><span class="cnt" id="cnt-manantial">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('manantial')">CSV</button><button class="btn" onclick="exportSHP('manantial')">SHP</button></div></div>
-        <div class="export-type-row"><div><span class="lbl">Calidad</span><span class="cnt" id="cnt-calidad">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('calidad')">CSV</button><button class="btn" onclick="exportSHP('calidad')">SHP</button></div></div>
-        <div class="export-type-row"><div><span class="lbl">Geología</span><span class="cnt" id="cnt-geologia">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('geologia')">CSV</button><button class="btn" onclick="exportSHP('geologia')">SHP</button></div></div>
-        <div class="export-type-row"><div><span class="lbl">Todos unificados</span><span class="cnt" id="cnt-todos">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('todos')">CSV</button><button class="btn" onclick="exportSHP('todos')">SHP</button></div></div>
+        <h2 data-i18n="datos_export_title">Exportar por tipo</h2>
+        <p class="hint" data-i18n="datos_export_hint">CSV para hojas de cálculo · SHP comprimido en .zip (con .shp/.shx/.dbf/.prj/.cpg) listo para QGIS o ArcGIS, en la zona UTM elegida en la pestaña Mapa.</p>
+        <div class="export-type-row"><div><span class="lbl" data-i18n="nav_pozo">Pozos</span><span class="cnt" id="cnt-pozo">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('pozo')">CSV</button><button class="btn" onclick="exportSHP('pozo')">SHP</button></div></div>
+        <div class="export-type-row"><div><span class="lbl" data-i18n="nav_manantial">Manantiales</span><span class="cnt" id="cnt-manantial">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('manantial')">CSV</button><button class="btn" onclick="exportSHP('manantial')">SHP</button></div></div>
+        <div class="export-type-row"><div><span class="lbl" data-i18n="nav_calidad">Calidad</span><span class="cnt" id="cnt-calidad">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('calidad')">CSV</button><button class="btn" onclick="exportSHP('calidad')">SHP</button></div></div>
+        <div class="export-type-row"><div><span class="lbl" data-i18n="nav_geologia">Geología</span><span class="cnt" id="cnt-geologia">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('geologia')">CSV</button><button class="btn" onclick="exportSHP('geologia')">SHP</button></div></div>
+        <div class="export-type-row"><div><span class="lbl" data-i18n="export_todos">Todos unificados</span><span class="cnt" id="cnt-todos">0</span></div><div class="btns"><button class="btn" onclick="exportCSV('todos')">CSV</button><button class="btn" onclick="exportSHP('todos')">SHP</button></div></div>
       </div>
 
       <div class="card">
-        <h2>Borrar sesión</h2>
-        <p class="hint">Elimina todos los registros capturados en este dispositivo. No se puede deshacer.</p>
-        <button class="btn danger-o" onclick="resetAll()" style="width:100%;">Borrar todos los registros</button>
+        <h2 data-i18n="datos_reset_title">Borrar sesión</h2>
+        <p class="hint" data-i18n="datos_reset_hint">Elimina todos los registros capturados en este dispositivo. No se puede deshacer.</p>
+        <button class="btn danger-o" onclick="resetAll()" style="width:100%;" data-i18n="btn_reset">Borrar todos los registros</button>
+      </div>
+    </section>
+
+    <!-- ESTADISTICA -->
+    <section class="panel" id="panel-estadistica">
+      <div class="stats-grid" id="statsGeneralGrid"></div>
+
+      <div class="chart-row">
+        <div class="card chart-card">
+          <h2 data-i18n="stats_bar_title">Puntos por tipo</h2>
+          <div class="chart-box"><canvas id="chartBar"></canvas></div>
+        </div>
+        <div class="card chart-card">
+          <h2 data-i18n="stats_pie_title">Proporción por tipo</h2>
+          <div class="chart-box"><canvas id="chartPie"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="stats_xy_title">Dispersión X / Y</h2>
+        <p class="hint" data-i18n="stats_xy_hint">Compara dos variables numéricas de un mismo tipo de punto.</p>
+        <div class="row3">
+          <div class="field"><label data-i18n="stats_xy_tipo">Tipo</label>
+            <select id="xyTipo" onchange="populateXyFields(); renderStats();"></select></div>
+          <div class="field"><label data-i18n="stats_xy_x">Eje X</label>
+            <select id="xyFieldX" onchange="renderStats()"></select></div>
+          <div class="field"><label data-i18n="stats_xy_y">Eje Y</label>
+            <select id="xyFieldY" onchange="renderStats()"></select></div>
+        </div>
+        <div class="chart-box"><canvas id="chartXY"></canvas></div>
+        <p class="hint" id="xyEmptyMsg" style="display:none;" data-i18n="stats_xy_empty">No hay suficientes datos numéricos para graficar todavía.</p>
+      </div>
+    </section>
+
+    <!-- CONFIGURACION -->
+    <section class="panel" id="panel-config">
+      <div class="card">
+        <h2 data-i18n="settings_title">Configuración</h2>
+
+        <div class="settings-group">
+          <label data-i18n="settings_theme">Tema de colores</label>
+          <div class="segmented" id="themeSegmented">
+            <button data-value="papel" data-i18n="theme_papel">Papel</button>
+            <button data-value="oscuro" data-i18n="theme_oscuro">Oscuro</button>
+            <button data-value="contraste" data-i18n="theme_contraste">Alto contraste</button>
+          </div>
+          <p class="settings-note" data-i18n="settings_theme_note">"Alto contraste" facilita leer la pantalla bajo sol fuerte en campo.</p>
+        </div>
+
+        <div class="settings-group">
+          <label data-i18n="settings_fontsize">Tamaño de letra</label>
+          <div class="segmented" id="fontSegmented">
+            <button data-value="0.875">A-</button>
+            <button data-value="1">A</button>
+            <button data-value="1.15">A+</button>
+            <button data-value="1.3">A++</button>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <label data-i18n="settings_language">Idioma / Language</label>
+          <div class="segmented" id="langSegmented">
+            <button data-value="es">Español</button>
+            <button data-value="en">English</button>
+          </div>
+          <p class="settings-note" data-i18n="settings_lang_note">La traducción cubre los textos de la interfaz. Los archivos CSV/SHP exportados mantienen nombres de campo fijos en español para no romper compatibilidad con datos ya exportados.</p>
+        </div>
+
+        <p class="settings-note" data-i18n="settings_persist_note">Estas preferencias se guardan en este navegador y se recuerdan la próxima vez que abras la app.</p>
+
+        <div class="settings-group">
+          <label data-i18n="settings_esri_key">Clave API de Esri (opcional)</label>
+          <input type="text" id="esriKeyInput" placeholder="Pega aquí tu clave (token)" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <p class="settings-note" data-i18n="settings_esri_key_note">Sin clave, el panel satelital usa el acceso gratuito sin registro, que Esri puede limitar. Con una clave gratuita (developers.arcgis.com, sin tarjeta) la imagen carga de forma confiable.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUENTA -->
+    <section class="panel" id="panel-cuenta">
+      <div class="card" id="accountCard">
+        <h2 data-i18n="account_title">Cuenta de equipo</h2>
+        <p class="hint" data-i18n="account_intro">Inicia sesión para sincronizar tus puntos con tu equipo desde cualquier dispositivo. Requiere conexión a internet y un proyecto gratuito de Supabase.</p>
+
+        <div id="supaSetupSection">
+          <div class="field"><label data-i18n="account_supa_url">URL de tu proyecto Supabase</label>
+            <input type="text" id="supaUrlInput" placeholder="https://xxxxx.supabase.co" autocomplete="off" spellcheck="false"></div>
+          <div class="field"><label data-i18n="account_supa_key">Clave pública (anon / publishable)</label>
+            <input type="text" id="supaKeyInput" placeholder="eyJhbGciOi..." autocomplete="off" spellcheck="false"></div>
+          <button class="btn primary" onclick="saveSupabaseConfig()" style="width:100%;" data-i18n="account_supa_save">Guardar y conectar</button>
+          <p class="hint" style="margin-top:12px;" data-i18n="account_supa_help">Necesitas crear un proyecto gratuito en supabase.com (sin tarjeta), y crear una tabla "records" con la estructura que te indicó Claude en el chat. La URL y la clave están en tu proyecto, en Settings → API.</p>
+        </div>
+
+        <div id="authSection" style="display:none;">
+          <div id="loginForm">
+            <div class="field"><label data-i18n="account_email">Correo</label><input type="email" id="loginEmail" autocomplete="username"></div>
+            <div class="field"><label data-i18n="account_password">Contraseña</label><input type="password" id="loginPassword" autocomplete="current-password"></div>
+            <div class="save-row">
+              <button class="btn primary" onclick="doSignIn()" data-i18n="account_signin">Iniciar sesión</button>
+            </div>
+            <p class="hint" style="margin-top:10px;"><span data-i18n="account_no_account">¿No tienes cuenta?</span> <a href="#" onclick="showSignupForm(); return false;" data-i18n="account_create_link">Créala aquí</a></p>
+            <p class="hint" id="loginError" style="color:var(--danger); display:none;"></p>
+          </div>
+          <div id="signupForm" style="display:none;">
+            <div class="field"><label data-i18n="account_email">Correo</label><input type="email" id="signupEmail" autocomplete="username"></div>
+            <div class="field"><label data-i18n="account_password">Contraseña <span class="unit">(mín. 6 caracteres)</span></label><input type="password" id="signupPassword" autocomplete="new-password"></div>
+            <div class="save-row">
+              <button class="btn primary" onclick="doSignUp()" data-i18n="account_signup">Crear cuenta</button>
+            </div>
+            <p class="hint" style="margin-top:10px;"><a href="#" onclick="showLoginForm(); return false;" data-i18n="account_back_login">Volver a iniciar sesión</a></p>
+            <p class="hint" id="signupError" style="color:var(--danger); display:none;"></p>
+            <p class="hint" id="signupSuccess" style="color:var(--teal-d); display:none;" data-i18n="account_signup_success">Cuenta creada. Si tu proyecto pide confirmación, revisa tu correo y luego inicia sesión.</p>
+          </div>
+        </div>
+
+        <div id="loggedInSection" style="display:none;">
+          <p class="hint"><span data-i18n="account_signed_in_as">Sesión iniciada como</span> <strong id="loggedInEmail"></strong></p>
+          <div class="save-row">
+            <button class="btn" onclick="doSyncNow()" data-i18n="account_sync_now">Sincronizar ahora</button>
+            <button class="btn danger-o" onclick="doSignOut()" data-i18n="account_signout">Cerrar sesión</button>
+          </div>
+          <p class="hint" id="syncStatus" style="margin-top:10px;"></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="account_reconfigure">Cambiar configuración de Supabase</h2>
+        <p class="hint" data-i18n="account_reconfigure_hint">Úsalo solo si necesitas conectar esta app a otro proyecto de Supabase.</p>
+        <button class="btn ghost" onclick="resetSupabaseConfig()" style="width:100%;" data-i18n="account_reconfigure_btn">Olvidar conexión actual</button>
       </div>
     </section>
 
   </main>
-
-  <footer class="bottom-bar" id="bottomTabs">
-    <button data-panel="pozo" class="active"><span class="ic">⛏</span>Pozos</button>
-    <button data-panel="manantial"><span class="ic">≈</span>Manantial</button>
-    <button data-panel="calidad"><span class="ic">⚗</span>Calidad</button>
-    <button data-panel="geologia"><span class="ic">▲</span>Geología</button>
-    <button data-panel="mapa"><span class="ic">⊞</span>Mapa</button>
-    <button data-panel="registros"><span class="ic">☰</span>Registros</button>
-  </footer>
-
-  <div class="toast" id="toast"></div>
+  </div>
 </div>
+
+<div class="toast" id="toast"></div>
+
+
+<div id="satPanel" class="sat-panel">
+  <div class="sat-header">
+    <span id="satHeaderText" data-i18n="sat_panel_title">Ubicación satelital</span>
+  </div>
+  <div id="satMapEl" class="sat-map"></div>
+  <div id="satOverlay" class="sat-overlay">
+    <span data-i18n="sat_panel_empty">Captura el GPS para ver la ubicación aquí.</span>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 /* ======================================================================
@@ -441,18 +732,49 @@ const FIELD_TYPES = {
 function switchPanel(name){
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
   document.getElementById("panel-"+name).classList.add("active");
-  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active", b.dataset.panel===name));
-  document.querySelectorAll("#bottomTabs button").forEach(b=>b.classList.toggle("active", b.dataset.panel===name));
+  document.querySelectorAll(".sidebar-nav button, .sidebar-footer button[data-panel]").forEach(b=>b.classList.toggle("active", b.dataset.panel===name));
+  const titleEl = document.getElementById("pageTitle");
+  const activeBtn = document.querySelector('.sidebar-nav button[data-panel="'+name+'"]') || document.querySelector('.sidebar-footer button[data-panel="'+name+'"]');
+  if(titleEl && activeBtn){
+    const span = activeBtn.querySelector("[data-i18n]");
+    titleEl.textContent = span ? span.textContent : activeBtn.textContent;
+  }
+  closeSidebarMobile();
   if(name==="registros") renderList();
   if(name==="mapa"){
     if(!mapInitialized){ initMapInteraction(); mapInitialized = true; }
     fitMapView();
     renderMap();
   }
+  if(name==="estadistica"){
+    populateXyFields();
+    renderStats();
+  }
+  if(name==="config"){
+    refreshSegmented();
+    document.getElementById("esriKeyInput").value = esriApiKey;
+  }
+  if(name==="cuenta"){
+    document.getElementById("supaUrlInput").value = supaUrl;
+    document.getElementById("supaKeyInput").value = supaKey;
+    renderAccountPanel();
+  }
+  if(TYPES.includes(name)){
+    moveSatPanelTo(name);
+  }
 }
-document.querySelectorAll("#tabs button, #bottomTabs button").forEach(b=>{
+document.querySelectorAll(".sidebar-nav button, .sidebar-footer button[data-panel]").forEach(b=>{
   b.addEventListener("click", ()=>switchPanel(b.dataset.panel));
 });
+
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sidebarScrim").classList.toggle("show");
+}
+function closeSidebarMobile(){
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sidebarScrim").classList.remove("show");
+}
 
 function showToast(msg){
   const t = document.getElementById("toast");
@@ -495,6 +817,7 @@ function captureGps(tipo){
       const accTxt = gpsState[tipo].accuracy!==null ? ` · ±${gpsState[tipo].accuracy} m` : "";
       statusEl.textContent = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}${altTxt}${accTxt}`;
       statusEl.className = "gps-status ok";
+      updateSatPanel(tipo);
     },
     err=>{
       statusEl.textContent = "No se pudo obtener GPS (" + err.message + ")";
@@ -537,6 +860,7 @@ function saveRecord(tipo){
   showToast("Registro " + data.codigo + " guardado");
   clearForm(tipo);
   updateBadges();
+  if(sb && currentUser) syncPushRecord(rec);
 }
 
 function clearForm(tipo){
@@ -545,10 +869,12 @@ function clearForm(tipo){
   });
   delete gpsState[tipo];
   initGpsBox(tipo);
+  updateSatPanel(tipo);
 }
 
 function updateBadges(){
-  document.getElementById("totalBadge").textContent = records.length + " registro" + (records.length===1?"":"s");
+  const suffix = records.length===1 ? t("toast_count_suffix_one") : t("toast_count_suffix_many");
+  document.getElementById("totalBadge").textContent = records.length + suffix;
   TYPES.forEach(t=>{
     const c = records.filter(r=>r.tipo===t).length;
     const el = document.getElementById("cnt-"+t);
@@ -578,7 +904,7 @@ function renderList(){
 
   const container = document.getElementById("listContainer");
   if(list.length===0){
-    container.innerHTML = `<div class="empty"><div class="glyph">○</div>Sin registros todavía.<br>Captura un punto o impórtalo desde la pestaña Datos.</div>`;
+    container.innerHTML = `<div class="empty"><div class="glyph">○</div>${t("empty_list")}</div>`;
     updateBadges();
     return;
   }
@@ -1210,7 +1536,7 @@ function renderMap(){
     if(!layersOn[r.tipo]) return;
     const p = latLonToUTM(r.gps.lat, r.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
     const label = escapeHtml(r.data.codigo||"");
-    html += `<circle class="map-point c-${r.tipo}" cx="${p.x}" cy="${-p.y}" r="1" stroke="#FFFDF7" data-id="${r.id}" onclick="focusRecord(${r.id})"><title>${label}</title></circle>`;
+    html += `<circle class="map-point c-${r.tipo}" cx="${p.x}" cy="${-p.y}" r="1" data-id="${r.id}" onclick="focusRecord(${r.id})"><title>${label}</title></circle>`;
   });
 
   svg.innerHTML = html;
@@ -1605,9 +1931,670 @@ function exportSHP(tipo){
 }
 
 /* ======================================================================
+   PANEL SATELITAL (Leaflet + Esri World Imagery, requiere internet)
+   ====================================================================== */
+let satMap = null;
+let satMarker = null;
+let satTileLayer = null;
+let satTileErrorSeen = false;
+let satCurrentTipo = null;
+let satLeafletReady = (typeof L !== "undefined");
+let esriApiKey = "";
+
+function esriTileUrl(){
+  if(esriApiKey && esriApiKey.trim()){
+    return "https://ibasemaps-api.arcgis.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}?token=" + encodeURIComponent(esriApiKey.trim());
+  }
+  return "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+}
+
+function initSatMap(){
+  if(satMap || !satLeafletReady) return;
+  try{
+    satMap = L.map("satMapEl", {attributionControl:true, zoomControl:true}).setView([-9.19, -75.02], 5);
+    satTileLayer = L.tileLayer(esriTileUrl(), {
+      maxZoom: 19,
+      attribution: "Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics"
+    }).addTo(satMap);
+    satTileLayer.on("tileerror", ()=>{ satTileErrorSeen = true; refreshSatOverlayHint(); });
+  }catch(e){
+    satLeafletReady = false;
+  }
+}
+
+function refreshSatOverlayHint(){
+  if(!satTileErrorSeen) return;
+  const overlay = document.getElementById("satOverlay");
+  if(overlay && overlay.classList.contains("hidden")){
+    // hay un marcador puesto pero los tiles no cargaron: mostramos aviso igual
+    overlay.classList.remove("hidden");
+    overlay.style.background = "transparent";
+    overlay.style.pointerEvents = "none";
+    overlay.querySelector("span").textContent = t("sat_panel_tile_error");
+  }
+}
+
+function moveSatPanelTo(tipo){
+  const slot = document.getElementById("satSlot-"+tipo);
+  const panel = document.getElementById("satPanel");
+  if(!slot || !panel) return;
+  slot.appendChild(panel);
+  satCurrentTipo = tipo;
+  if(!satMap) initSatMap();
+  setTimeout(()=>{ if(satMap) satMap.invalidateSize(); }, 60);
+  updateSatPanel(tipo);
+}
+
+function updateSatPanel(tipo){
+  if(tipo !== satCurrentTipo) return;
+  const overlay = document.getElementById("satOverlay");
+  const headerText = document.getElementById("satHeaderText");
+  const codigoEl = document.getElementById(tipo+"-codigo");
+  const label = (codigoEl && codigoEl.value.trim()) ? codigoEl.value.trim() : t("sat_panel_title");
+  if(headerText) headerText.textContent = label;
+
+  if(!satLeafletReady){
+    if(overlay){
+      overlay.classList.remove("hidden");
+      overlay.querySelector("span").textContent = t("sat_panel_offline");
+    }
+    return;
+  }
+  if(!satMap) initSatMap();
+
+  const gps = gpsState[tipo];
+  if(!gps){
+    if(overlay){
+      overlay.classList.remove("hidden");
+      overlay.querySelector("span").textContent = t("sat_panel_empty");
+    }
+    return;
+  }
+  if(overlay) overlay.classList.add("hidden");
+  overlay.style.background = "";
+  overlay.style.pointerEvents = "";
+  satTileErrorSeen = false;
+  if(satMap){
+    satMap.setView([gps.lat, gps.lon], 17);
+    if(satMarker) satMap.removeLayer(satMarker);
+    satMarker = L.marker([gps.lat, gps.lon], {
+      icon: L.divIcon({className:"", html:'<div class="sat-marker"></div>', iconSize:[16,16], iconAnchor:[8,8]})
+    }).addTo(satMap);
+  }
+}
+
+
+/* ======================================================================
+   ESTADÍSTICA: tarjetas generales + gráficos (Chart.js)
+   ====================================================================== */
+let chartBar = null, chartPie = null, chartXY = null;
+const CHART_COLORS = { pozo:"#1B5D8E", manantial:"#3C8C9C", calidad:"#3C5A66", geologia:"#B05A2A" };
+const TYPE_I18N_KEY = { pozo:"nav_pozo", manantial:"nav_manantial", calidad:"nav_calidad", geologia:"nav_geologia" };
+const NUMERIC_FIELDS_BY_TYPE = {
+  pozo: ["profundidad","diametro","nivel_estatico","nivel_dinamico"],
+  manantial: ["caudal","temp"],
+  calidad: ["ph","ce","temp","od","std","turbidez"],
+  geologia: []
+};
+const FIELD_LABEL_KEY = {
+  profundidad:"label_profundidad", diametro:"label_diametro",
+  nivel_estatico:"label_nivel_estatico", nivel_dinamico:"label_nivel_dinamico",
+  caudal:"label_caudal", temp:"label_temp_agua",
+  od:"label_od", turbidez:"label_turbidez"
+};
+const FIELD_LABEL_PLAIN = { ph:"pH", ce:"CE", std:"STD" };
+
+function plainLabel(key){
+  return t(key).replace(/<[^>]+>/g,"").trim();
+}
+function fieldLabel(field){
+  if(FIELD_LABEL_KEY[field]) return plainLabel(FIELD_LABEL_KEY[field]);
+  if(FIELD_LABEL_PLAIN[field]) return FIELD_LABEL_PLAIN[field];
+  return field;
+}
+
+function renderGeneralStats(){
+  const grid = document.getElementById("statsGeneralGrid");
+  if(!grid) return;
+  const withGps = records.filter(r=>r.gps).length;
+  const withoutGps = records.length - withGps;
+  let dateRange = "—";
+  if(records.length){
+    const dates = records.map(r=>new Date(r.fecha)).sort((a,b)=>a-b);
+    const first = dates[0], last = dates[dates.length-1];
+    dateRange = first.toLocaleDateString() + (dates.length>1 ? " – " + last.toLocaleDateString() : "");
+  }
+  const cards = [
+    {n: records.length, l: t("stats_total")},
+    {n: withGps, l: t("stats_with_gps")},
+    {n: withoutGps, l: t("stats_without_gps")},
+    {n: new Set(records.map(r=>r.tipo)).size, l: t("stats_types_used")}
+  ];
+  grid.innerHTML = cards.map(c=>`<div class="stat"><div class="n">${c.n}</div><div class="l">${c.l}</div></div>`).join("")
+    + `<div class="stat"><div class="n" style="font-size:0.85rem;">${dateRange}</div><div class="l">${t("stats_date_range")}</div></div>`;
+}
+
+function renderBarPie(){
+  const barCanvas = document.getElementById("chartBar");
+  const pieCanvas = document.getElementById("chartPie");
+  if(!barCanvas || !pieCanvas || typeof Chart === "undefined") return;
+
+  const counts = TYPES.map(ty=>records.filter(r=>r.tipo===ty).length);
+  const labels = TYPES.map(ty=>t(TYPE_I18N_KEY[ty]));
+  const colors = TYPES.map(ty=>CHART_COLORS[ty]);
+
+  if(chartBar) chartBar.destroy();
+  chartBar = new Chart(barCanvas, {
+    type: "bar",
+    data: { labels, datasets: [{ data: counts, backgroundColor: colors, borderRadius: 4 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
+
+  if(chartPie) chartPie.destroy();
+  chartPie = new Chart(pieCanvas, {
+    type: "pie",
+    data: { labels, datasets: [{ data: counts, backgroundColor: colors }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } }
+    }
+  });
+}
+
+function populateXyFields(){
+  const tipoSel = document.getElementById("xyTipo");
+  if(!tipoSel) return;
+  const validTypes = TYPES.filter(ty => (NUMERIC_FIELDS_BY_TYPE[ty]||[]).length >= 2);
+  const prevTipo = tipoSel.value;
+  tipoSel.innerHTML = validTypes.map(ty=>`<option value="${ty}">${t(TYPE_I18N_KEY[ty])}</option>`).join("");
+  if(validTypes.includes(prevTipo)) tipoSel.value = prevTipo;
+
+  const tipo = tipoSel.value;
+  const xSel = document.getElementById("xyFieldX");
+  const ySel = document.getElementById("xyFieldY");
+  if(!tipo){ xSel.innerHTML = ""; ySel.innerHTML = ""; return; }
+
+  const fields = NUMERIC_FIELDS_BY_TYPE[tipo] || [];
+  const prevX = xSel.value, prevY = ySel.value;
+  const optsHtml = fields.map(f=>`<option value="${f}">${fieldLabel(f)}</option>`).join("");
+  xSel.innerHTML = optsHtml;
+  ySel.innerHTML = optsHtml;
+  xSel.value = fields.includes(prevX) ? prevX : fields[0];
+  ySel.value = fields.includes(prevY) ? prevY : fields[Math.min(1, fields.length-1)];
+}
+
+function renderXY(){
+  const tipoSel = document.getElementById("xyTipo");
+  const canvas = document.getElementById("chartXY");
+  const emptyMsg = document.getElementById("xyEmptyMsg");
+  if(!tipoSel || !canvas) return;
+  const tipo = tipoSel.value;
+  const fx = document.getElementById("xyFieldX").value;
+  const fy = document.getElementById("xyFieldY").value;
+
+  const clearChart = ()=>{
+    if(chartXY){ chartXY.destroy(); chartXY = null; }
+    canvas.style.display = "none";
+    if(emptyMsg) emptyMsg.style.display = "block";
+  };
+
+  if(!tipo || !fx || !fy || typeof Chart === "undefined"){ clearChart(); return; }
+
+  const points = records.filter(r=>r.tipo===tipo).map(r=>{
+    const x = parseFloat(r.data[fx]), y = parseFloat(r.data[fy]);
+    return (!isNaN(x) && !isNaN(y)) ? {x, y, codigo: r.data.codigo||""} : null;
+  }).filter(Boolean);
+
+  if(points.length===0){ clearChart(); return; }
+
+  if(emptyMsg) emptyMsg.style.display = "none";
+  canvas.style.display = "block";
+  if(chartXY) chartXY.destroy();
+  chartXY = new Chart(canvas, {
+    type: "scatter",
+    data: { datasets: [{ label: fieldLabel(fx)+" / "+fieldLabel(fy), data: points, backgroundColor: CHART_COLORS[tipo] || "#1B5D8E" }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => (ctx.raw.codigo || "") + ": (" + ctx.raw.x + ", " + ctx.raw.y + ")" } }
+      },
+      scales: {
+        x: { title: { display: true, text: fieldLabel(fx) } },
+        y: { title: { display: true, text: fieldLabel(fy) } }
+      }
+    }
+  });
+}
+
+function renderStats(){
+  renderGeneralStats();
+  renderBarPie();
+  renderXY();
+}
+
+
+/* ======================================================================
+   CUENTA: autenticación y sincronización con Supabase (opcional, en línea)
+   ====================================================================== */
+let sb = null;
+let supaUrl = "", supaKey = "";
+let currentUser = null;
+let syncing = false;
+
+function initSupabaseClient(){
+  if(typeof window.supabase === "undefined" || !supaUrl || !supaKey) return false;
+  try{
+    sb = window.supabase.createClient(supaUrl, supaKey);
+    sb.auth.onAuthStateChange((_event, session)=>{
+      currentUser = session ? session.user : null;
+      renderAccountPanel();
+    });
+    sb.auth.getSession().then(({data})=>{
+      currentUser = data.session ? data.session.user : null;
+      renderAccountPanel();
+      if(currentUser) doSyncNow();
+    });
+    return true;
+  }catch(e){
+    sb = null;
+    return false;
+  }
+}
+
+function saveSupabaseConfig(){
+  const url = document.getElementById("supaUrlInput").value.trim();
+  const key = document.getElementById("supaKeyInput").value.trim();
+  if(!url || !key){ showToast(t("account_supa_missing")); return; }
+  supaUrl = url; supaKey = key;
+  saveSettings();
+  const ok = initSupabaseClient();
+  if(ok) showToast(t("account_supa_connected"));
+  else showToast(t("account_supa_error"));
+  renderAccountPanel();
+}
+
+function resetSupabaseConfig(){
+  if(!confirm(t("account_reconfigure_confirm"))) return;
+  if(sb){ try{ sb.auth.signOut(); }catch(e){} }
+  supaUrl = ""; supaKey = ""; sb = null; currentUser = null;
+  saveSettings();
+  renderAccountPanel();
+}
+
+function renderAccountPanel(){
+  const setupSection = document.getElementById("supaSetupSection");
+  const authSection = document.getElementById("authSection");
+  const loggedInSection = document.getElementById("loggedInSection");
+  if(!setupSection) return;
+  if(!sb){
+    setupSection.style.display = "block";
+    authSection.style.display = "none";
+    loggedInSection.style.display = "none";
+    return;
+  }
+  setupSection.style.display = "none";
+  if(currentUser){
+    authSection.style.display = "none";
+    loggedInSection.style.display = "block";
+    const emailEl = document.getElementById("loggedInEmail");
+    if(emailEl) emailEl.textContent = currentUser.email;
+  } else {
+    authSection.style.display = "block";
+    loggedInSection.style.display = "none";
+  }
+}
+
+function showSignupForm(){
+  document.getElementById("loginForm").style.display = "none";
+  document.getElementById("signupForm").style.display = "block";
+}
+function showLoginForm(){
+  document.getElementById("signupForm").style.display = "none";
+  document.getElementById("loginForm").style.display = "block";
+}
+
+async function doSignIn(){
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const errEl = document.getElementById("loginError");
+  errEl.style.display = "none";
+  if(!email || !password){ showToast(t("account_fill_fields")); return; }
+  try{
+    const {error} = await sb.auth.signInWithPassword({email, password});
+    if(error){ errEl.textContent = error.message; errEl.style.display = "block"; return; }
+    showToast(t("account_welcome"));
+  }catch(e){
+    errEl.textContent = String(e.message || e);
+    errEl.style.display = "block";
+  }
+}
+
+async function doSignUp(){
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value;
+  const errEl = document.getElementById("signupError");
+  const okEl = document.getElementById("signupSuccess");
+  errEl.style.display = "none"; okEl.style.display = "none";
+  if(!email || !password){ showToast(t("account_fill_fields")); return; }
+  if(password.length < 6){ errEl.textContent = t("account_password_short"); errEl.style.display = "block"; return; }
+  try{
+    const {error} = await sb.auth.signUp({email, password});
+    if(error){ errEl.textContent = error.message; errEl.style.display = "block"; return; }
+    okEl.style.display = "block";
+  }catch(e){
+    errEl.textContent = String(e.message || e);
+    errEl.style.display = "block";
+  }
+}
+
+async function doSignOut(){
+  if(!sb) return;
+  await sb.auth.signOut();
+  showToast(t("account_signed_out"));
+}
+
+async function syncPushRecord(rec){
+  if(!sb || !currentUser) return;
+  try{
+    const {data, error} = await sb.from("records").insert({
+      local_id: rec.id,
+      tipo: rec.tipo,
+      codigo: rec.data.codigo || null,
+      fecha: rec.fecha,
+      gps: rec.gps,
+      data: rec.data,
+      created_by_email: currentUser.email
+    }).select().single();
+    if(!error && data){ rec.supabase_id = data.id; }
+  }catch(e){ /* queda solo local; se reintenta en la próxima sincronización */ }
+}
+
+async function doSyncNow(){
+  if(!sb || !currentUser || syncing) return;
+  syncing = true;
+  const statusEl = document.getElementById("syncStatus");
+  if(statusEl) statusEl.textContent = t("account_syncing");
+  try{
+    const unsynced = records.filter(r=>!r.supabase_id);
+    for(const rec of unsynced){ await syncPushRecord(rec); }
+
+    const {data, error} = await sb.from("records").select("*").order("created_at", {ascending:true});
+    if(error) throw error;
+
+    const knownSupaIds = new Set(records.filter(r=>r.supabase_id).map(r=>r.supabase_id));
+    let added = 0;
+    (data||[]).forEach(row=>{
+      if(knownSupaIds.has(row.id)) return;
+      records.push({
+        id: idCounter++,
+        supabase_id: row.id,
+        tipo: row.tipo,
+        fecha: row.fecha,
+        gps: row.gps,
+        data: row.data || {}
+      });
+      added++;
+    });
+    updateBadges();
+    renderList();
+    if(statusEl) statusEl.textContent = t("account_sync_done") + " · " + new Date().toLocaleTimeString();
+    if(added) showToast(added + " " + t("account_new_records"));
+  }catch(e){
+    if(statusEl) statusEl.textContent = t("account_sync_error");
+  }
+  syncing = false;
+}
+
+
+const I18N = {
+  es: {
+    settings_btn_aria:"Configuración", settings_title:"Configuración",
+    settings_theme:"Tema de colores", theme_papel:"Papel", theme_oscuro:"Oscuro", theme_contraste:"Alto contraste",
+    settings_theme_note:"\"Alto contraste\" facilita leer la pantalla bajo sol fuerte en campo.",
+    settings_fontsize:"Tamaño de letra",
+    settings_language:"Idioma / Language",
+    settings_lang_note:"La traducción cubre los textos de la interfaz. Los archivos CSV/SHP exportados mantienen nombres de campo fijos en español para no romper compatibilidad con datos ya exportados.",
+    settings_persist_note:"Estas preferencias se guardan en este navegador y se recuerdan la próxima vez que abras la app.",
+    nav_pozo:"Pozos", nav_manantial:"Manantiales", nav_manantial_short:"Manantial", nav_calidad:"Calidad", nav_geologia:"Geología", nav_mapa:"Mapa", nav_registros:"Registros", nav_datos:"Datos",
+    header_sub:"CAPTURA Y VISUALIZACIÓN HIDROGEOLÓGICA · OFFLINE",
+    pozo_title:"Pozo / piezómetro", pozo_hint:"Nivel freático, construcción y litología del punto.",
+    label_codigo:"Código de punto", label_profundidad:'Profundidad total <span class="unit">(m)</span>', label_diametro:'Diámetro <span class="unit">(in)</span>',
+    label_nivel_estatico:'Nivel estático <span class="unit">(m)</span>', label_nivel_dinamico:'Nivel dinámico <span class="unit">(m)</span>',
+    label_uso:"Uso del agua", label_litologia:"Litología / perfil resumido", label_obs:"Observaciones",
+    btn_limpiar:"Limpiar", btn_guardar:"Guardar registro",
+    manantial_title:"Manantial / fuente superficial", manantial_hint:"Afloramientos, caudal y características del agua.",
+    label_caudal:'Caudal estimado <span class="unit">(L/s)</span>', label_temp_agua:'Temp. del agua <span class="unit">(°C)</span>',
+    label_metodo:"Método de aforo", label_tipo_aflor:"Tipo de afloramiento", label_vegetacion:"Vegetación / entorno asociado",
+    calidad_title:"Calidad de agua in situ", calidad_hint:"Parámetros fisicoquímicos medidos en campo.",
+    label_od:'Oxígeno disuelto <span class="unit">(mg/L)</span>', label_turbidez:'Turbidez <span class="unit">(NTU)</span>',
+    geologia_title:"Punto geológico", geologia_hint:"Afloramientos, formación y estructura.",
+    label_formacion:"Formación / unidad", label_litologia_principal:"Litología principal",
+    label_rumbo:'Rumbo <span class="unit">(°)</span>', label_buzamiento:'Buzamiento <span class="unit">(°)</span>', label_estructuras:"Estructuras observadas",
+    map_zone_auto:"Zona UTM automática", map_centrar:"Centrar",
+    map_hint:"Los puntos GPS se proyectan a UTM en la zona elegida. La capa CAD y la imagen se muestran asumiendo que ya están en ese mismo sistema.",
+    map_empty:"Captura puntos con GPS para verlos aquí.", map_layers_title:"Capas",
+    dxf_layer_default:"Capa CAD", img_layer_default:"Imagen de fondo",
+    filter_todos:"Todos", filter_placeholder:"Buscar por código...",
+    datos_backup_title:"Respaldo de la sesión", datos_backup_hint:"Esta app no guarda datos en el teléfono entre sesiones. Exporta antes de cerrar el navegador y vuelve a importar para continuar otro día.",
+    btn_export_json:"Descargar respaldo completo (.json)", btn_import_json:"Importar respaldo (.json)",
+    datos_csv_title:"Importar CSV o TXT", datos_csv_hint:"Trae coordenadas o inventarios de otra fuente. Se detectan columnas de código/latitud/longitud automáticamente, pero puedes corregirlas antes de importar.",
+    btn_choose_csv:"Elegir archivo .csv / .txt",
+    datos_dxf_title:"Capa CAD (vectorial)", datos_dxf_hint:"Importa líneas, polilíneas, puntos y círculos desde un DXF (AutoCAD ASCII) como referencia en el mapa. Si tienes .dwg, expórtalo primero a .dxf desde AutoCAD o QGIS — el binario propietario de .dwg no se puede leer aquí. Se asume que el DXF ya está en la misma zona UTM elegida en la pestaña Mapa.",
+    btn_choose_dxf:"Elegir archivo .dxf",
+    datos_img_title:"Imagen topográfica georreferenciada", datos_img_hint:"Importa un plano, ortofoto o topografía escaneada (PNG/JPG) junto a su archivo world (.tfw, .jgw o .wld) para ubicarla en coordenadas reales. Si tienes un GeoTIFF, expórtalo antes como imagen + world file (por ejemplo desde QGIS: Exportar → Imagen georreferenciada).",
+    btn_choose_img:"1. Elegir imagen (.png / .jpg)", btn_choose_world:"2. Elegir archivo world (.tfw / .jgw / .wld)",
+    datos_export_title:"Exportar por tipo", datos_export_hint:"CSV para hojas de cálculo · SHP comprimido en .zip (con .shp/.shx/.dbf/.prj/.cpg) listo para QGIS o ArcGIS, en la zona UTM elegida en la pestaña Mapa.",
+    export_todos:"Todos unificados",
+    datos_reset_title:"Borrar sesión", datos_reset_hint:"Elimina todos los registros capturados en este dispositivo. No se puede deshacer.", btn_reset:"Borrar todos los registros",
+    empty_list:"Sin registros todavía.<br>Captura un punto o impórtalo desde la pestaña Datos.",
+    toast_count_suffix_one:" registro", toast_count_suffix_many:" registros",
+    sat_panel_title:"Ubicación satelital", sat_panel_empty:"Captura el GPS para ver la ubicación aquí.",
+    sat_panel_offline:"Mapa satelital no disponible sin conexión a internet.",
+    sat_panel_tile_error:"No se pudo cargar la imagen satelital. Prueba agregando una clave gratuita de Esri en Configuración.",
+    settings_esri_key:"Clave API de Esri (opcional)",
+    settings_esri_key_note:"Sin clave, el panel satelital usa el acceso gratuito sin registro, que Esri puede limitar. Con una clave gratuita (developers.arcgis.com, sin tarjeta) la imagen carga de forma confiable.",
+    settings_esri_key_saved:"Clave guardada",
+    nav_estadistica:"Estadística", nav_account:"Cuenta", nav_config:"Configuración",
+    account_title:"Cuenta de equipo",
+    account_intro:"Inicia sesión para sincronizar tus puntos con tu equipo desde cualquier dispositivo. Requiere conexión a internet y un proyecto gratuito de Supabase.",
+    account_supa_url:"URL de tu proyecto Supabase", account_supa_key:"Clave pública (anon / publishable)",
+    account_supa_save:"Guardar y conectar",
+    account_supa_help:"Necesitas crear un proyecto gratuito en supabase.com (sin tarjeta), y crear una tabla \"records\" con la estructura que te indicó Claude en el chat. La URL y la clave están en tu proyecto, en Settings → API.",
+    account_supa_missing:"Completa la URL y la clave de Supabase",
+    account_supa_connected:"Conectado a Supabase", account_supa_error:"No se pudo conectar. Revisa la URL y la clave.",
+    account_email:"Correo", account_password:"Contraseña",
+    account_signin:"Iniciar sesión", account_no_account:"¿No tienes cuenta?", account_create_link:"Créala aquí",
+    account_signup:"Crear cuenta", account_back_login:"Volver a iniciar sesión",
+    account_signup_success:"Cuenta creada. Si tu proyecto pide confirmación, revisa tu correo y luego inicia sesión.",
+    account_signed_in_as:"Sesión iniciada como",
+    account_sync_now:"Sincronizar ahora", account_signout:"Cerrar sesión",
+    account_reconfigure:"Cambiar configuración de Supabase", account_reconfigure_hint:"Úsalo solo si necesitas conectar esta app a otro proyecto de Supabase.",
+    account_reconfigure_btn:"Olvidar conexión actual", account_reconfigure_confirm:"¿Olvidar la conexión actual a Supabase? Tendrás que volver a iniciar sesión.",
+    account_fill_fields:"Completa correo y contraseña", account_welcome:"Bienvenido de nuevo",
+    account_password_short:"La contraseña debe tener al menos 6 caracteres", account_signed_out:"Sesión cerrada",
+    account_syncing:"Sincronizando...", account_sync_done:"Sincronizado", account_sync_error:"No se pudo sincronizar. Revisa tu conexión.",
+    account_new_records:"registros nuevos del equipo",
+    stats_total:"Puntos totales", stats_with_gps:"Con GPS", stats_without_gps:"Sin GPS", stats_types_used:"Tipos usados", stats_date_range:"Rango de fechas",
+    stats_bar_title:"Puntos por tipo", stats_pie_title:"Proporción por tipo",
+    stats_xy_title:"Dispersión X / Y", stats_xy_hint:"Compara dos variables numéricas de un mismo tipo de punto.",
+    stats_xy_tipo:"Tipo", stats_xy_x:"Eje X", stats_xy_y:"Eje Y",
+    stats_xy_empty:"No hay suficientes datos numéricos para graficar todavía."
+  },
+  en: {
+    settings_btn_aria:"Settings", settings_title:"Settings",
+    settings_theme:"Color theme", theme_papel:"Paper", theme_oscuro:"Dark", theme_contraste:"High contrast",
+    settings_theme_note:"\"High contrast\" makes the screen easier to read under strong sunlight in the field.",
+    settings_fontsize:"Text size",
+    settings_language:"Idioma / Language",
+    settings_lang_note:"Translation covers the interface text. Exported CSV/SHP files keep fixed field names in Spanish to avoid breaking compatibility with data you've already exported.",
+    settings_persist_note:"These preferences are saved in this browser and remembered next time you open the app.",
+    nav_pozo:"Wells", nav_manantial:"Springs", nav_manantial_short:"Spring", nav_calidad:"Water quality", nav_geologia:"Geology", nav_mapa:"Map", nav_registros:"Records", nav_datos:"Data",
+    header_sub:"HYDROGEOLOGICAL FIELD CAPTURE · OFFLINE",
+    pozo_title:"Well / piezometer", pozo_hint:"Water table, construction and lithology of the point.",
+    label_codigo:"Point code", label_profundidad:'Total depth <span class="unit">(m)</span>', label_diametro:'Diameter <span class="unit">(in)</span>',
+    label_nivel_estatico:'Static level <span class="unit">(m)</span>', label_nivel_dinamico:'Dynamic level <span class="unit">(m)</span>',
+    label_uso:"Water use", label_litologia:"Lithology / summary profile", label_obs:"Notes",
+    btn_limpiar:"Clear", btn_guardar:"Save record",
+    manantial_title:"Spring / surface water source", manantial_hint:"Outcrops, flow rate and water characteristics.",
+    label_caudal:'Estimated flow <span class="unit">(L/s)</span>', label_temp_agua:'Water temperature <span class="unit">(°C)</span>',
+    label_metodo:"Gauging method", label_tipo_aflor:"Outcrop type", label_vegetacion:"Vegetation / associated environment",
+    calidad_title:"In-situ water quality", calidad_hint:"Physicochemical parameters measured in the field.",
+    label_od:'Dissolved oxygen <span class="unit">(mg/L)</span>', label_turbidez:'Turbidity <span class="unit">(NTU)</span>',
+    geologia_title:"Geological point", geologia_hint:"Outcrops, formation and structure.",
+    label_formacion:"Formation / unit", label_litologia_principal:"Main lithology",
+    label_rumbo:'Strike <span class="unit">(°)</span>', label_buzamiento:'Dip <span class="unit">(°)</span>', label_estructuras:"Observed structures",
+    map_zone_auto:"Automatic UTM zone", map_centrar:"Center",
+    map_hint:"GPS points are projected to UTM in the chosen zone. The CAD layer and image are shown assuming they are already in that same system.",
+    map_empty:"Capture points with GPS to see them here.", map_layers_title:"Layers",
+    dxf_layer_default:"CAD layer", img_layer_default:"Background image",
+    filter_todos:"All", filter_placeholder:"Search by code...",
+    datos_backup_title:"Session backup", datos_backup_hint:"This app doesn't keep data on the phone between sessions. Export before closing the browser and import again to continue another day.",
+    btn_export_json:"Download full backup (.json)", btn_import_json:"Import backup (.json)",
+    datos_csv_title:"Import CSV or TXT", datos_csv_hint:"Bring in coordinates or inventories from another source. Code/latitude/longitude columns are auto-detected, but you can correct them before importing.",
+    btn_choose_csv:"Choose .csv / .txt file",
+    datos_dxf_title:"CAD layer (vector)", datos_dxf_hint:"Import lines, polylines, points and circles from a DXF (AutoCAD ASCII) as a reference layer on the map. If you have a .dwg, export it to .dxf first from AutoCAD or QGIS — the proprietary .dwg binary can't be read here. It's assumed the DXF is already in the same UTM zone selected on the Map tab.",
+    btn_choose_dxf:"Choose .dxf file",
+    datos_img_title:"Georeferenced topographic image", datos_img_hint:"Import a map, orthophoto or scanned topography (PNG/JPG) together with its world file (.tfw, .jgw or .wld) to place it at real coordinates. If you have a GeoTIFF, export it first as an image + world file (for example from QGIS: Export → Georeferenced image).",
+    btn_choose_img:"1. Choose image (.png / .jpg)", btn_choose_world:"2. Choose world file (.tfw / .jgw / .wld)",
+    datos_export_title:"Export by type", datos_export_hint:"CSV for spreadsheets · SHP zipped (with .shp/.shx/.dbf/.prj/.cpg) ready for QGIS or ArcGIS, in the UTM zone chosen on the Map tab.",
+    export_todos:"All combined",
+    datos_reset_title:"Clear session", datos_reset_hint:"Deletes all records captured on this device. This cannot be undone.", btn_reset:"Delete all records",
+    empty_list:"No records yet.<br>Capture a point or import one from the Data tab.",
+    toast_count_suffix_one:" record", toast_count_suffix_many:" records",
+    sat_panel_title:"Satellite location", sat_panel_empty:"Capture the GPS to see the location here.",
+    sat_panel_offline:"Satellite map unavailable without an internet connection.",
+    sat_panel_tile_error:"Couldn't load satellite imagery. Try adding a free Esri key in Settings.",
+    settings_esri_key:"Esri API key (optional)",
+    settings_esri_key_note:"Without a key, the satellite panel uses free unregistered access, which Esri may limit. With a free key (developers.arcgis.com, no card needed) imagery loads reliably.",
+    settings_esri_key_saved:"Key saved",
+    nav_estadistica:"Statistics", nav_account:"Account", nav_config:"Settings",
+    account_title:"Team account",
+    account_intro:"Sign in to sync your points with your team from any device. Requires an internet connection and a free Supabase project.",
+    account_supa_url:"Your Supabase project URL", account_supa_key:"Public key (anon / publishable)",
+    account_supa_save:"Save and connect",
+    account_supa_help:"You need a free project at supabase.com (no card needed), and a \"records\" table with the structure Claude gave you in chat. The URL and key are in your project under Settings → API.",
+    account_supa_missing:"Fill in the Supabase URL and key",
+    account_supa_connected:"Connected to Supabase", account_supa_error:"Couldn't connect. Check the URL and key.",
+    account_email:"Email", account_password:"Password",
+    account_signin:"Sign in", account_no_account:"Don't have an account?", account_create_link:"Create one here",
+    account_signup:"Create account", account_back_login:"Back to sign in",
+    account_signup_success:"Account created. If your project requires confirmation, check your email, then sign in.",
+    account_signed_in_as:"Signed in as",
+    account_sync_now:"Sync now", account_signout:"Sign out",
+    account_reconfigure:"Change Supabase configuration", account_reconfigure_hint:"Only use this if you need to connect this app to a different Supabase project.",
+    account_reconfigure_btn:"Forget current connection", account_reconfigure_confirm:"Forget the current Supabase connection? You'll need to sign in again.",
+    account_fill_fields:"Fill in email and password", account_welcome:"Welcome back",
+    account_password_short:"Password must be at least 6 characters", account_signed_out:"Signed out",
+    account_syncing:"Syncing...", account_sync_done:"Synced", account_sync_error:"Couldn't sync. Check your connection.",
+    account_new_records:"new records from the team",
+    stats_total:"Total points", stats_with_gps:"With GPS", stats_without_gps:"Without GPS", stats_types_used:"Types used", stats_date_range:"Date range",
+    stats_bar_title:"Points by type", stats_pie_title:"Proportion by type",
+    stats_xy_title:"X / Y scatter", stats_xy_hint:"Compare two numeric variables from the same point type.",
+    stats_xy_tipo:"Type", stats_xy_x:"X axis", stats_xy_y:"Y axis",
+    stats_xy_empty:"Not enough numeric data to chart yet."
+  }
+};
+
+let appLang = "es";
+let appTheme = "papel";
+let appFontScale = 1;
+
+function t(key){
+  return (I18N[appLang] && I18N[appLang][key]) || (I18N.es[key]) || key;
+}
+
+function applyLanguage(){
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    el.innerHTML = t(el.getAttribute("data-i18n"));
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
+    el.placeholder = t(el.getAttribute("data-i18n-placeholder"));
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach(el=>{
+    el.setAttribute("aria-label", t(el.getAttribute("data-i18n-aria")));
+  });
+  document.documentElement.lang = appLang;
+  updateBadges();
+  renderList();
+  if(satCurrentTipo) updateSatPanel(satCurrentTipo);
+}
+
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme", appTheme);
+}
+
+function applyFontScale(){
+  document.documentElement.style.fontSize = (16*appFontScale)+"px";
+}
+
+function saveSettings(){
+  try{
+    localStorage.setItem("hidrocampo_settings", JSON.stringify({lang:appLang, theme:appTheme, fontScale:appFontScale, esriApiKey, supaUrl, supaKey}));
+  }catch(e){}
+}
+
+function loadSettings(){
+  try{
+    const raw = localStorage.getItem("hidrocampo_settings");
+    if(raw){
+      const s = JSON.parse(raw);
+      if(s.lang) appLang = s.lang;
+      if(s.theme) appTheme = s.theme;
+      if(s.fontScale) appFontScale = s.fontScale;
+      if(s.esriApiKey) esriApiKey = s.esriApiKey;
+      if(s.supaUrl) supaUrl = s.supaUrl;
+      if(s.supaKey) supaKey = s.supaKey;
+    }
+  }catch(e){}
+}
+
+function applyEsriKey(){
+  esriApiKey = document.getElementById("esriKeyInput").value.trim();
+  saveSettings();
+  satTileErrorSeen = false;
+  if(satTileLayer){
+    satTileLayer.setUrl(esriTileUrl());
+  } else if(satMap){
+    initSatMap();
+  }
+  if(satCurrentTipo) updateSatPanel(satCurrentTipo);
+  showToast(t("settings_esri_key_saved"));
+}
+document.getElementById("esriKeyInput").addEventListener("change", applyEsriKey);
+
+function refreshSegmented(){
+  document.querySelectorAll("#themeSegmented button").forEach(b=>b.classList.toggle("active", b.dataset.value===appTheme));
+  document.querySelectorAll("#fontSegmented button").forEach(b=>b.classList.toggle("active", parseFloat(b.dataset.value)===appFontScale));
+  document.querySelectorAll("#langSegmented button").forEach(b=>b.classList.toggle("active", b.dataset.value===appLang));
+}
+
+document.getElementById("themeSegmented").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  appTheme = b.dataset.value; applyTheme(); refreshSegmented(); saveSettings();
+});
+document.getElementById("fontSegmented").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  appFontScale = parseFloat(b.dataset.value); applyFontScale(); refreshSegmented(); saveSettings();
+});
+document.getElementById("langSegmented").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  appLang = b.dataset.value; applyLanguage(); refreshSegmented(); saveSettings();
+});
+
+/* ======================================================================
    INICIO
    ====================================================================== */
-updateBadges();
+loadSettings();
+applyTheme();
+applyFontScale();
+applyLanguage();
+moveSatPanelTo("pozo");
+if(supaUrl && supaKey) initSupabaseClient();
 
 if("serviceWorker" in navigator){
   window.addEventListener("load", ()=>{

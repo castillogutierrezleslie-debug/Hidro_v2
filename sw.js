@@ -1,7 +1,7 @@
 // Hidrocampo — service worker: cachea la app en la primera visita
 // para que después funcione sin conexión (estrategia cache-first).
 
-const CACHE_NAME = "hidrocampo-cache-v1";
+const CACHE_NAME = "hidrocampo-cache-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -9,10 +9,19 @@ const APP_SHELL = [
   "./icon-192.png",
   "./icon-512.png"
 ];
+const OPTIONAL_SHELL = [
+  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css",
+  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
+];
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL))
+    caches.open(CACHE_NAME).then(cache =>
+      cache.addAll(APP_SHELL).then(() =>
+        // Recursos opcionales (CDN externo): si alguno falla, no debe romper la instalación
+        Promise.allSettled(OPTIONAL_SHELL.map(url => cache.add(url)))
+      )
+    )
   );
   self.skipWaiting();
 });
