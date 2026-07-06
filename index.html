@@ -204,6 +204,15 @@
   .chart-card{flex:1 1 320px; margin-bottom:0;}
   .chart-box{position:relative; height:260px;}
 
+  .point-picker-list{max-height:220px; overflow-y:auto; border:1px solid var(--line); border-radius:8px; padding:8px; background:var(--paper);}
+  .point-picker-item{display:flex; align-items:center; gap:8px; padding:5px 4px; font-size:0.8125rem; cursor:pointer; border-radius:5px;}
+  .point-picker-item:hover{background:var(--paper-2);}
+  .point-picker-item input{width:auto;}
+  .color-row{display:flex; align-items:center; gap:9px; padding:6px 0; font-size:0.8125rem; border-bottom:1px solid var(--line);}
+  .color-row:last-child{border-bottom:none;}
+  .color-row input[type="color"]{width:32px; height:32px; padding:0; border:1px solid var(--line); border-radius:6px; cursor:pointer; flex:0 0 auto;}
+  .color-row span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
   .export-actions{display:flex; flex-direction:column; gap:9px;}
   .export-actions button{width:100%; text-align:left; display:flex; justify-content:space-between; align-items:center;}
 
@@ -553,7 +562,65 @@
 
     <!-- ESTADISTICA -->
     <section class="panel" id="panel-estadistica">
-      <div class="stats-grid" id="statsGeneralGrid"></div>
+
+      <div class="card">
+        <h2 data-i18n="stats_builder_title">Constructor de gráficos</h2>
+        <p class="hint" data-i18n="stats_builder_hint">Elige el tipo de gráfico, la variable y qué puntos incluir.</p>
+
+        <div class="field"><label data-i18n="stats_step1">1. Tipo de gráfico</label>
+          <select id="chartBuilderType">
+            <option value="hidrograma" data-i18n="stats_type_hidrograma">Hidrograma — tendencia del nivel en el tiempo</option>
+            <option value="dispersion" data-i18n="stats_type_dispersion">Dispersión — correlación entre dos variables</option>
+            <option value="barras" data-i18n="stats_type_barras">Comparación por barras entre puntos</option>
+          </select>
+        </div>
+
+        <div class="field"><label data-i18n="stats_step2">2. Tipo de punto</label>
+          <select id="chartBuilderTipo"></select>
+        </div>
+
+        <div id="chartBuilderFieldsSingle" class="field">
+          <label data-i18n="stats_step3_single">3. Variable a graficar</label>
+          <select id="chartBuilderFieldY"></select>
+        </div>
+        <div id="chartBuilderFieldsXY" class="row2" style="display:none;">
+          <div class="field"><label data-i18n="stats_step3_x">3. Eje X</label><select id="chartBuilderFieldX"></select></div>
+          <div class="field"><label data-i18n="stats_step3_y">Eje Y</label><select id="chartBuilderFieldY2"></select></div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="stats_step4">4. Puntos a incluir</label> <span class="unit" id="pointPickerCount"></span>
+          <input type="text" id="pointPickerSearch" data-i18n-placeholder="filter_placeholder" placeholder="Buscar por código..." oninput="renderPointPicker()" style="margin-top:6px;">
+          <div class="save-row" style="margin:8px 0;">
+            <button class="btn small ghost" onclick="pointPickerSelectAll()" data-i18n="stats_select_visible">Seleccionar visibles</button>
+            <button class="btn small ghost" onclick="pointPickerClear()" data-i18n="stats_clear_selection">Quitar todos</button>
+          </div>
+          <div id="pointPickerList" class="point-picker-list"></div>
+        </div>
+
+        <button class="btn primary" onclick="buildCustomChart()" style="width:100%; margin-top:10px;" data-i18n="stats_generate">Generar gráfico</button>
+      </div>
+
+      <div class="chart-row" id="customChartRow" style="display:none;">
+        <div class="card chart-card" style="flex:2 1 480px;">
+          <h2 id="customChartTitle" data-i18n="stats_step4">Gráfico</h2>
+          <div class="chart-box" style="height:340px;"><canvas id="chartCustom"></canvas></div>
+        </div>
+        <div class="card" style="flex:1 1 220px;">
+          <h2 data-i18n="stats_colors_title">Colores</h2>
+          <div id="colorPickerList"></div>
+        </div>
+      </div>
+
+      <div class="card" id="customSummaryCard" style="display:none;">
+        <h2 data-i18n="stats_summary_title">Resumen</h2>
+        <div class="stats-grid" id="customSummaryGrid"></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="stats_overview_title">Vista general</h2>
+        <div class="stats-grid" id="statsGeneralGrid"></div>
+      </div>
 
       <div class="chart-row">
         <div class="card chart-card">
@@ -564,21 +631,6 @@
           <h2 data-i18n="stats_pie_title">Proporción por tipo</h2>
           <div class="chart-box"><canvas id="chartPie"></canvas></div>
         </div>
-      </div>
-
-      <div class="card">
-        <h2 data-i18n="stats_xy_title">Dispersión X / Y</h2>
-        <p class="hint" data-i18n="stats_xy_hint">Compara dos variables numéricas de un mismo tipo de punto.</p>
-        <div class="row3">
-          <div class="field"><label data-i18n="stats_xy_tipo">Tipo</label>
-            <select id="xyTipo" onchange="populateXyFields(); renderStats();"></select></div>
-          <div class="field"><label data-i18n="stats_xy_x">Eje X</label>
-            <select id="xyFieldX" onchange="renderStats()"></select></div>
-          <div class="field"><label data-i18n="stats_xy_y">Eje Y</label>
-            <select id="xyFieldY" onchange="renderStats()"></select></div>
-        </div>
-        <div class="chart-box"><canvas id="chartXY"></canvas></div>
-        <p class="hint" id="xyEmptyMsg" style="display:none;" data-i18n="stats_xy_empty">No hay suficientes datos numéricos para graficar todavía.</p>
       </div>
     </section>
 
@@ -632,6 +684,14 @@
         <h2 data-i18n="account_title">Cuenta de equipo</h2>
         <p class="hint" data-i18n="account_intro">Inicia sesión para sincronizar tus puntos con tu equipo desde cualquier dispositivo. Requiere conexión a internet y un proyecto gratuito de Supabase.</p>
 
+        <div class="settings-group">
+          <label data-i18n="account_backend_mode">Tipo de conexión</label>
+          <div class="segmented" id="backendModeSegmented">
+            <button data-value="supabase" data-i18n="account_mode_supabase">Supabase (nube)</button>
+            <button data-value="local" data-i18n="account_mode_local">Servidor local (mi red)</button>
+          </div>
+        </div>
+
         <div id="supaSetupSection">
           <div class="field"><label data-i18n="account_supa_url">URL de tu proyecto Supabase</label>
             <input type="text" id="supaUrlInput" placeholder="https://xxxxx.supabase.co" autocomplete="off" spellcheck="false"></div>
@@ -639,6 +699,13 @@
             <input type="text" id="supaKeyInput" placeholder="eyJhbGciOi..." autocomplete="off" spellcheck="false"></div>
           <button class="btn primary" onclick="saveSupabaseConfig()" style="width:100%;" data-i18n="account_supa_save">Guardar y conectar</button>
           <p class="hint" style="margin-top:12px;" data-i18n="account_supa_help">Necesitas crear un proyecto gratuito en supabase.com (sin tarjeta), y crear una tabla "records" con la estructura que te indicó Claude en el chat. La URL y la clave están en tu proyecto, en Settings → API.</p>
+        </div>
+
+        <div id="localSetupSection" style="display:none;">
+          <div class="field"><label data-i18n="account_local_url">URL de tu servidor local</label>
+            <input type="text" id="localUrlInput" placeholder="http://192.168.1.50:3000" autocomplete="off" spellcheck="false"></div>
+          <button class="btn primary" onclick="saveLocalConfig()" style="width:100%;" data-i18n="account_local_save">Guardar y conectar</button>
+          <p class="hint" style="margin-top:12px;" data-i18n="account_local_help">Necesitas tener corriendo el servidor Hidrocampo (Node.js) en esa laptop, conectado a tu SQL Server. En esta misma laptop usa http://localhost:3000; desde otro equipo de tu red, usa la IP local de la laptop (ej. http://192.168.1.50:3000).</p>
         </div>
 
         <div id="authSection" style="display:none;">
@@ -676,7 +743,7 @@
       <div class="card">
         <h2 data-i18n="account_reconfigure">Cambiar configuración de Supabase</h2>
         <p class="hint" data-i18n="account_reconfigure_hint">Úsalo solo si necesitas conectar esta app a otro proyecto de Supabase.</p>
-        <button class="btn ghost" onclick="resetSupabaseConfig()" style="width:100%;" data-i18n="account_reconfigure_btn">Olvidar conexión actual</button>
+        <button class="btn ghost" onclick="resetBackendConfig()" style="width:100%;" data-i18n="account_reconfigure_btn">Olvidar conexión actual</button>
       </div>
     </section>
 
@@ -747,7 +814,7 @@ function switchPanel(name){
     renderMap();
   }
   if(name==="estadistica"){
-    populateXyFields();
+    initChartBuilder();
     renderStats();
   }
   if(name==="config"){
@@ -757,7 +824,8 @@ function switchPanel(name){
   if(name==="cuenta"){
     document.getElementById("supaUrlInput").value = supaUrl;
     document.getElementById("supaKeyInput").value = supaKey;
-    renderAccountPanel();
+    document.getElementById("localUrlInput").value = localServerUrl;
+    refreshBackendModeUI();
   }
   if(TYPES.includes(name)){
     moveSatPanelTo(name);
@@ -860,7 +928,8 @@ function saveRecord(tipo){
   showToast("Registro " + data.codigo + " guardado");
   clearForm(tipo);
   updateBadges();
-  if(sb && currentUser) syncPushRecord(rec);
+  if(backendMode==="local"){ if(localToken) localPushRecord(rec); }
+  else { if(sb && currentUser) syncPushRecord(rec); }
 }
 
 function clearForm(tipo){
@@ -2025,9 +2094,9 @@ function updateSatPanel(tipo){
 
 
 /* ======================================================================
-   ESTADÍSTICA: tarjetas generales + gráficos (Chart.js)
+   ESTADÍSTICA: tarjetas generales + constructor de gráficos (Chart.js)
    ====================================================================== */
-let chartBar = null, chartPie = null, chartXY = null;
+let chartBar = null, chartPie = null, customChart = null;
 const CHART_COLORS = { pozo:"#1B5D8E", manantial:"#3C8C9C", calidad:"#3C5A66", geologia:"#B05A2A" };
 const TYPE_I18N_KEY = { pozo:"nav_pozo", manantial:"nav_manantial", calidad:"nav_calidad", geologia:"nav_geologia" };
 const NUMERIC_FIELDS_BY_TYPE = {
@@ -2043,6 +2112,10 @@ const FIELD_LABEL_KEY = {
   od:"label_od", turbidez:"label_turbidez"
 };
 const FIELD_LABEL_PLAIN = { ph:"pH", ce:"CE", std:"STD" };
+const CHART_PALETTE = ["#1B5D8E","#B05A2A","#3C8C9C","#7A3D1B","#3C5A66","#9C3B2E","#4FA3D9","#D98452","#00594D","#8E44AD","#16A085","#C0392B","#2C3E50","#F39C12","#27AE60","#8E5B3F","#5D6D7E","#B03060","#556B2F","#4682B4"];
+
+let pointPickerSelected = new Set();
+let pointColors = new Map();
 
 function plainLabel(key){
   return t(key).replace(/<[^>]+>/g,"").trim();
@@ -2051,6 +2124,32 @@ function fieldLabel(field){
   if(FIELD_LABEL_KEY[field]) return plainLabel(FIELD_LABEL_KEY[field]);
   if(FIELD_LABEL_PLAIN[field]) return FIELD_LABEL_PLAIN[field];
   return field;
+}
+
+/* Campos numéricos disponibles para un tipo: los propios de la app +
+   cualquier columna importada (CSV) que resulte numérica en los datos reales. */
+function getFieldsForType(tipo){
+  const canon = NUMERIC_FIELDS_BY_TYPE[tipo] || [];
+  const keys = new Set(canon);
+  records.filter(r=>r.tipo===tipo).forEach(r=>{
+    Object.keys(r.data).forEach(k=>{
+      if(k==="codigo" || k==="obs") return;
+      const v = r.data[k];
+      if(v!=="" && v!=null && !isNaN(parseFloat(v))) keys.add(k);
+    });
+  });
+  return Array.from(keys).map(k=>({key:k, label: fieldLabel(k)}));
+}
+
+function colorForPoint(id, index){
+  if(pointColors.has(id)) return pointColors.get(id);
+  const color = CHART_PALETTE[index % CHART_PALETTE.length];
+  pointColors.set(id, color);
+  return color;
+}
+function setPointColor(id, hex){
+  pointColors.set(id, hex);
+  buildCustomChart();
 }
 
 function renderGeneralStats(){
@@ -2105,86 +2204,235 @@ function renderBarPie(){
   });
 }
 
-function populateXyFields(){
-  const tipoSel = document.getElementById("xyTipo");
-  if(!tipoSel) return;
-  const validTypes = TYPES.filter(ty => (NUMERIC_FIELDS_BY_TYPE[ty]||[]).length >= 2);
-  const prevTipo = tipoSel.value;
-  tipoSel.innerHTML = validTypes.map(ty=>`<option value="${ty}">${t(TYPE_I18N_KEY[ty])}</option>`).join("");
-  if(validTypes.includes(prevTipo)) tipoSel.value = prevTipo;
-
-  const tipo = tipoSel.value;
-  const xSel = document.getElementById("xyFieldX");
-  const ySel = document.getElementById("xyFieldY");
-  if(!tipo){ xSel.innerHTML = ""; ySel.innerHTML = ""; return; }
-
-  const fields = NUMERIC_FIELDS_BY_TYPE[tipo] || [];
-  const prevX = xSel.value, prevY = ySel.value;
-  const optsHtml = fields.map(f=>`<option value="${f}">${fieldLabel(f)}</option>`).join("");
-  xSel.innerHTML = optsHtml;
-  ySel.innerHTML = optsHtml;
-  xSel.value = fields.includes(prevX) ? prevX : fields[0];
-  ySel.value = fields.includes(prevY) ? prevY : fields[Math.min(1, fields.length-1)];
+/* ---- Constructor de gráficos personalizados ---- */
+function populateChartBuilderTipo(){
+  const sel = document.getElementById("chartBuilderTipo");
+  if(!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = TYPES.map(ty=>`<option value="${ty}">${t(TYPE_I18N_KEY[ty])}</option>`).join("");
+  sel.value = TYPES.includes(prev) ? prev : TYPES[0];
 }
 
-function renderXY(){
-  const tipoSel = document.getElementById("xyTipo");
-  const canvas = document.getElementById("chartXY");
-  const emptyMsg = document.getElementById("xyEmptyMsg");
-  if(!tipoSel || !canvas) return;
-  const tipo = tipoSel.value;
-  const fx = document.getElementById("xyFieldX").value;
-  const fy = document.getElementById("xyFieldY").value;
+function updateChartBuilderFieldsUI(){
+  const type = document.getElementById("chartBuilderType").value;
+  document.getElementById("chartBuilderFieldsSingle").style.display = (type==="dispersion") ? "none" : "block";
+  document.getElementById("chartBuilderFieldsXY").style.display = (type==="dispersion") ? "flex" : "none";
+}
 
-  const clearChart = ()=>{
-    if(chartXY){ chartXY.destroy(); chartXY = null; }
-    canvas.style.display = "none";
-    if(emptyMsg) emptyMsg.style.display = "block";
-  };
-
-  if(!tipo || !fx || !fy || typeof Chart === "undefined"){ clearChart(); return; }
-
-  const points = records.filter(r=>r.tipo===tipo).map(r=>{
-    const x = parseFloat(r.data[fx]), y = parseFloat(r.data[fy]);
-    return (!isNaN(x) && !isNaN(y)) ? {x, y, codigo: r.data.codigo||""} : null;
-  }).filter(Boolean);
-
-  if(points.length===0){ clearChart(); return; }
-
-  if(emptyMsg) emptyMsg.style.display = "none";
-  canvas.style.display = "block";
-  if(chartXY) chartXY.destroy();
-  chartXY = new Chart(canvas, {
-    type: "scatter",
-    data: { datasets: [{ label: fieldLabel(fx)+" / "+fieldLabel(fy), data: points, backgroundColor: CHART_COLORS[tipo] || "#1B5D8E" }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => (ctx.raw.codigo || "") + ": (" + ctx.raw.x + ", " + ctx.raw.y + ")" } }
-      },
-      scales: {
-        x: { title: { display: true, text: fieldLabel(fx) } },
-        y: { title: { display: true, text: fieldLabel(fy) } }
-      }
-    }
+function populateChartBuilderFields(){
+  const tipo = document.getElementById("chartBuilderTipo").value;
+  const fields = getFieldsForType(tipo);
+  const optsHtml = fields.length
+    ? fields.map(f=>`<option value="${f.key}">${escapeHtml(f.label)}</option>`).join("")
+    : `<option value="">${t("stats_no_numeric_data")}</option>`;
+  ["chartBuilderFieldY","chartBuilderFieldX","chartBuilderFieldY2"].forEach(id=>{
+    document.getElementById(id).innerHTML = optsHtml;
   });
+  if(fields.length>1) document.getElementById("chartBuilderFieldY2").selectedIndex = 1;
+}
+
+function renderPointPicker(){
+  const tipo = document.getElementById("chartBuilderTipo").value;
+  const search = document.getElementById("pointPickerSearch").value.trim().toLowerCase();
+  const recs = records.filter(r=>r.tipo===tipo && r.data.codigo);
+  const filtered = search ? recs.filter(r=>r.data.codigo.toLowerCase().includes(search)) : recs;
+
+  const list = document.getElementById("pointPickerList");
+  list.innerHTML = filtered.length
+    ? filtered.map(r=>{
+        const checked = pointPickerSelected.has(r.id) ? "checked" : "";
+        return `<label class="point-picker-item"><input type="checkbox" ${checked} onchange="togglePointPicker(${r.id})">${escapeHtml(r.data.codigo)}</label>`;
+      }).join("")
+    : `<p class="hint" style="margin:0;">${t("stats_no_points")}</p>`;
+
+  const countEl = document.getElementById("pointPickerCount");
+  if(countEl) countEl.textContent = "(" + pointPickerSelected.size + " " + t("stats_selected") + ")";
+}
+
+function togglePointPicker(id){
+  if(pointPickerSelected.has(id)) pointPickerSelected.delete(id);
+  else pointPickerSelected.add(id);
+  const countEl = document.getElementById("pointPickerCount");
+  if(countEl) countEl.textContent = "(" + pointPickerSelected.size + " " + t("stats_selected") + ")";
+}
+
+function pointPickerSelectAll(){
+  const tipo = document.getElementById("chartBuilderTipo").value;
+  const search = document.getElementById("pointPickerSearch").value.trim().toLowerCase();
+  records.filter(r=>r.tipo===tipo && r.data.codigo && (!search || r.data.codigo.toLowerCase().includes(search)))
+    .forEach(r=>pointPickerSelected.add(r.id));
+  renderPointPicker();
+}
+function pointPickerClear(){
+  pointPickerSelected.clear();
+  renderPointPicker();
+}
+
+function renderColorPickers(selectedRecs){
+  const list = document.getElementById("colorPickerList");
+  list.innerHTML = selectedRecs.map((r,i)=>{
+    const color = colorForPoint(r.id, i);
+    return `<div class="color-row">
+      <input type="color" value="${color}" onchange="setPointColor(${r.id}, this.value)">
+      <span>${escapeHtml(r.data.codigo||"")}</span>
+    </div>`;
+  }).join("");
+}
+
+function renderCustomSummary(values, labelText){
+  const card = document.getElementById("customSummaryCard");
+  const grid = document.getElementById("customSummaryGrid");
+  if(!values || values.length===0){ card.style.display = "none"; return; }
+  card.style.display = "block";
+  const sum = values.reduce((a,b)=>a+b, 0);
+  const avg = sum/values.length;
+  const cards = [
+    {n: values.length, l: t("stats_summary_n")},
+    {n: avg.toFixed(2), l: t("stats_summary_avg") + (labelText ? " — " + labelText : "")},
+    {n: Math.min(...values).toFixed(2), l: t("stats_summary_min")},
+    {n: Math.max(...values).toFixed(2), l: t("stats_summary_max")}
+  ];
+  grid.innerHTML = cards.map(c=>`<div class="stat"><div class="n">${c.n}</div><div class="l">${c.l}</div></div>`).join("");
+}
+
+function buildCustomChart(){
+  if(typeof Chart === "undefined") return;
+  const type = document.getElementById("chartBuilderType").value;
+  const selectedIds = Array.from(pointPickerSelected);
+  if(selectedIds.length===0){ showToast(t("stats_pick_points")); return; }
+  const selectedRecs = records.filter(r=>selectedIds.includes(r.id));
+
+  const canvas = document.getElementById("chartCustom");
+  if(customChart){ customChart.destroy(); customChart = null; }
+  document.getElementById("customChartRow").style.display = "flex";
+  renderColorPickers(selectedRecs);
+
+  if(type === "hidrograma"){
+    const field = document.getElementById("chartBuilderFieldY").value;
+    if(!field){ showToast(t("stats_no_numeric_data")); return; }
+    const byCodigo = {};
+    selectedRecs.forEach(r=>{
+      const cod = r.data.codigo || ("#"+r.id);
+      const val = parseFloat(r.data[field]);
+      if(isNaN(val)) return;
+      const dateLabel = new Date(r.fecha).toISOString().slice(0,10);
+      if(!byCodigo[cod]) byCodigo[cod] = {};
+      byCodigo[cod][dateLabel] = val;
+    });
+    const codigos = Object.keys(byCodigo);
+    const allDates = Array.from(new Set(selectedRecs.map(r=>new Date(r.fecha).toISOString().slice(0,10)))).sort();
+    if(codigos.length===0){ showToast(t("stats_no_numeric_data")); return; }
+
+    const datasets = codigos.map((cod,i)=>{
+      const recForColor = selectedRecs.find(r=>(r.data.codigo||("#"+r.id))===cod);
+      const color = colorForPoint(recForColor.id, i);
+      return {
+        label: cod,
+        data: allDates.map(d => byCodigo[cod][d] !== undefined ? byCodigo[cod][d] : null),
+        borderColor: color, backgroundColor: color,
+        spanGaps: true, tension: 0.15, pointRadius: 4
+      };
+    });
+    customChart = new Chart(canvas, {
+      type: "line",
+      data: { labels: allDates, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position:"bottom", labels:{boxWidth:12, font:{size:10}} } },
+        scales: { y: { title: { display:true, text: fieldLabel(field) } } }
+      }
+    });
+    const allVals = Object.values(byCodigo).flatMap(o=>Object.values(o));
+    renderCustomSummary(allVals, fieldLabel(field));
+
+  } else if(type === "dispersion"){
+    const fx = document.getElementById("chartBuilderFieldX").value;
+    const fy = document.getElementById("chartBuilderFieldY2").value;
+    if(!fx || !fy){ showToast(t("stats_no_numeric_data")); return; }
+    const points = [], colors = [];
+    selectedRecs.forEach((r,i)=>{
+      const x = parseFloat(r.data[fx]), y = parseFloat(r.data[fy]);
+      if(!isNaN(x) && !isNaN(y)){
+        points.push({x, y, codigo: r.data.codigo||""});
+        colors.push(colorForPoint(r.id, i));
+      }
+    });
+    if(points.length===0){ showToast(t("stats_no_numeric_data")); return; }
+    customChart = new Chart(canvas, {
+      type: "scatter",
+      data: { datasets: [{ data: points, backgroundColor: colors, pointRadius: 6 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display:false },
+          tooltip: { callbacks: { label: ctx => (ctx.raw.codigo||"") + ": (" + ctx.raw.x + ", " + ctx.raw.y + ")" } }
+        },
+        scales: {
+          x: { title: { display:true, text: fieldLabel(fx) } },
+          y: { title: { display:true, text: fieldLabel(fy) } }
+        }
+      }
+    });
+    renderCustomSummary(points.map(p=>p.y), fieldLabel(fy));
+
+  } else if(type === "barras"){
+    const field = document.getElementById("chartBuilderFieldY").value;
+    if(!field){ showToast(t("stats_no_numeric_data")); return; }
+    const labels = [], data = [], colors = [];
+    selectedRecs.forEach((r,i)=>{
+      const val = parseFloat(r.data[field]);
+      if(isNaN(val)) return;
+      labels.push(r.data.codigo || ("#"+r.id));
+      data.push(val);
+      colors.push(colorForPoint(r.id, i));
+    });
+    if(data.length===0){ showToast(t("stats_no_numeric_data")); return; }
+    customChart = new Chart(canvas, {
+      type: "bar",
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display:false } },
+        scales: { y: { title: { display:true, text: fieldLabel(field) } } }
+      }
+    });
+    renderCustomSummary(data, fieldLabel(field));
+  }
+}
+
+function initChartBuilder(){
+  populateChartBuilderTipo();
+  populateChartBuilderFields();
+  updateChartBuilderFieldsUI();
+  renderPointPicker();
 }
 
 function renderStats(){
   renderGeneralStats();
   renderBarPie();
-  renderXY();
 }
 
 
 /* ======================================================================
+
    CUENTA: autenticación y sincronización con Supabase (opcional, en línea)
    ====================================================================== */
 let sb = null;
 let supaUrl = "", supaKey = "";
 let currentUser = null;
 let syncing = false;
+
+let backendMode = "supabase"; // "supabase" | "local"
+let localServerUrl = "";
+let localToken = null;
+let localUserEmail = null;
+
+const LOCAL_FIELD_MAP = {
+  pozo: {profundidad:"Profundidad", diametro:"Diametro", nivel_estatico:"NivelEstatico", nivel_dinamico:"NivelDinamico", uso:"Uso", litologia:"Litologia", obs:"Obs"},
+  manantial: {caudal:"Caudal", temp:"Temp", metodo:"Metodo", tipo_aflor:"TipoAflor", vegetacion:"Vegetacion", obs:"Obs"},
+  calidad: {ph:"PH", ce:"CE", temp:"Temp", od:"OD", std:"STD", turbidez:"Turbidez", obs:"Obs"},
+  geologia: {formacion:"Formacion", litologia:"Litologia", rumbo:"Rumbo", buzamiento:"Buzamiento", estructuras:"Estructuras", obs:"Obs"}
+};
 
 function initSupabaseClient(){
   if(typeof window.supabase === "undefined" || !supaUrl || !supaKey) return false;
@@ -2197,7 +2445,7 @@ function initSupabaseClient(){
     sb.auth.getSession().then(({data})=>{
       currentUser = data.session ? data.session.user : null;
       renderAccountPanel();
-      if(currentUser) doSyncNow();
+      if(currentUser) supaSyncNow();
     });
     return true;
   }catch(e){
@@ -2218,31 +2466,69 @@ function saveSupabaseConfig(){
   renderAccountPanel();
 }
 
-function resetSupabaseConfig(){
+async function saveLocalConfig(){
+  const url = document.getElementById("localUrlInput").value.trim().replace(/\/$/, "");
+  if(!url){ showToast(t("account_local_missing")); return; }
+  localServerUrl = url;
+  saveSettings();
+  try{
+    const res = await fetch(url + "/api/health");
+    if(!res.ok) throw new Error();
+    showToast(t("account_local_connected"));
+  }catch(e){
+    showToast(t("account_local_conn_error"));
+  }
+  renderAccountPanel();
+}
+
+function resetBackendConfig(){
   if(!confirm(t("account_reconfigure_confirm"))) return;
-  if(sb){ try{ sb.auth.signOut(); }catch(e){} }
-  supaUrl = ""; supaKey = ""; sb = null; currentUser = null;
+  if(backendMode === "local"){
+    localServerUrl = ""; localToken = null; localUserEmail = null;
+  } else {
+    if(sb){ try{ sb.auth.signOut(); }catch(e){} }
+    supaUrl = ""; supaKey = ""; sb = null; currentUser = null;
+  }
   saveSettings();
   renderAccountPanel();
 }
 
+function refreshBackendModeUI(){
+  document.querySelectorAll("#backendModeSegmented button").forEach(b=>b.classList.toggle("active", b.dataset.value===backendMode));
+  renderAccountPanel();
+}
+
 function renderAccountPanel(){
-  const setupSection = document.getElementById("supaSetupSection");
+  const supaSetup = document.getElementById("supaSetupSection");
+  const localSetup = document.getElementById("localSetupSection");
   const authSection = document.getElementById("authSection");
   const loggedInSection = document.getElementById("loggedInSection");
-  if(!setupSection) return;
-  if(!sb){
-    setupSection.style.display = "block";
+  if(!supaSetup) return;
+
+  let configured, loggedIn, email;
+  if(backendMode === "supabase"){
+    configured = !!sb;
+    loggedIn = !!currentUser;
+    email = currentUser ? currentUser.email : "";
+  } else {
+    configured = !!localServerUrl;
+    loggedIn = !!localToken;
+    email = localUserEmail || "";
+  }
+
+  supaSetup.style.display = (backendMode==="supabase" && !configured) ? "block" : "none";
+  localSetup.style.display = (backendMode==="local" && !configured) ? "block" : "none";
+
+  if(!configured){
     authSection.style.display = "none";
     loggedInSection.style.display = "none";
     return;
   }
-  setupSection.style.display = "none";
-  if(currentUser){
+  if(loggedIn){
     authSection.style.display = "none";
     loggedInSection.style.display = "block";
     const emailEl = document.getElementById("loggedInEmail");
-    if(emailEl) emailEl.textContent = currentUser.email;
+    if(emailEl) emailEl.textContent = email;
   } else {
     authSection.style.display = "block";
     loggedInSection.style.display = "none";
@@ -2258,7 +2544,14 @@ function showLoginForm(){
   document.getElementById("loginForm").style.display = "block";
 }
 
-async function doSignIn(){
+/* ---- Despachadores: eligen Supabase o servidor local según el modo activo ---- */
+async function doSignIn(){ return backendMode==="local" ? localSignIn() : supaSignIn(); }
+async function doSignUp(){ return backendMode==="local" ? localSignUp() : supaSignUp(); }
+async function doSignOut(){ return backendMode==="local" ? localSignOut() : supaSignOut(); }
+async function doSyncNow(){ return backendMode==="local" ? localSyncNow() : supaSyncNow(); }
+
+/* ---- Supabase (nube) ---- */
+async function supaSignIn(){
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
   const errEl = document.getElementById("loginError");
@@ -2274,7 +2567,7 @@ async function doSignIn(){
   }
 }
 
-async function doSignUp(){
+async function supaSignUp(){
   const email = document.getElementById("signupEmail").value.trim();
   const password = document.getElementById("signupPassword").value;
   const errEl = document.getElementById("signupError");
@@ -2292,7 +2585,7 @@ async function doSignUp(){
   }
 }
 
-async function doSignOut(){
+async function supaSignOut(){
   if(!sb) return;
   await sb.auth.signOut();
   showToast(t("account_signed_out"));
@@ -2314,7 +2607,7 @@ async function syncPushRecord(rec){
   }catch(e){ /* queda solo local; se reintenta en la próxima sincronización */ }
 }
 
-async function doSyncNow(){
+async function supaSyncNow(){
   if(!sb || !currentUser || syncing) return;
   syncing = true;
   const statusEl = document.getElementById("syncStatus");
@@ -2339,6 +2632,131 @@ async function doSyncNow(){
         data: row.data || {}
       });
       added++;
+    });
+    updateBadges();
+    renderList();
+    if(statusEl) statusEl.textContent = t("account_sync_done") + " · " + new Date().toLocaleTimeString();
+    if(added) showToast(added + " " + t("account_new_records"));
+  }catch(e){
+    if(statusEl) statusEl.textContent = t("account_sync_error");
+  }
+  syncing = false;
+}
+
+/* ---- Servidor local (SQL Server en tu red) ---- */
+async function localSignIn(){
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const errEl = document.getElementById("loginError");
+  errEl.style.display = "none";
+  if(!localServerUrl){ showToast(t("account_local_missing")); return; }
+  if(!email || !password){ showToast(t("account_fill_fields")); return; }
+  try{
+    const res = await fetch(localServerUrl + "/api/auth/login", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({email, password})
+    });
+    const json = await res.json();
+    if(!res.ok){ errEl.textContent = json.error || t("account_local_conn_error"); errEl.style.display = "block"; return; }
+    localToken = json.token; localUserEmail = json.email;
+    saveSettings();
+    renderAccountPanel();
+    showToast(t("account_welcome"));
+    localSyncNow();
+  }catch(e){
+    errEl.textContent = t("account_local_conn_error");
+    errEl.style.display = "block";
+  }
+}
+
+async function localSignUp(){
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value;
+  const errEl = document.getElementById("signupError");
+  const okEl = document.getElementById("signupSuccess");
+  errEl.style.display = "none"; okEl.style.display = "none";
+  if(!localServerUrl){ showToast(t("account_local_missing")); return; }
+  if(!email || !password){ showToast(t("account_fill_fields")); return; }
+  if(password.length < 6){ errEl.textContent = t("account_password_short"); errEl.style.display = "block"; return; }
+  try{
+    const res = await fetch(localServerUrl + "/api/auth/register", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({email, password})
+    });
+    const json = await res.json();
+    if(!res.ok){ errEl.textContent = json.error || t("account_local_conn_error"); errEl.style.display = "block"; return; }
+    okEl.style.display = "block";
+  }catch(e){
+    errEl.textContent = t("account_local_conn_error");
+    errEl.style.display = "block";
+  }
+}
+
+function localSignOut(){
+  localToken = null; localUserEmail = null;
+  saveSettings();
+  renderAccountPanel();
+  showToast(t("account_signed_out"));
+}
+
+async function localPushRecord(rec){
+  if(!localServerUrl || !localToken) return;
+  try{
+    const res = await fetch(localServerUrl + "/api/records/" + rec.tipo, {
+      method:"POST",
+      headers:{"Content-Type":"application/json", "Authorization":"Bearer " + localToken},
+      body: JSON.stringify(Object.assign({
+        local_id: rec.id,
+        codigo: rec.data.codigo || null,
+        fecha: rec.fecha,
+        lat: rec.gps ? rec.gps.lat : null,
+        lon: rec.gps ? rec.gps.lon : null,
+        alt: rec.gps ? rec.gps.alt : null,
+        precision: rec.gps ? rec.gps.accuracy : null
+      }, rec.data))
+    });
+    if(res.ok){
+      const json = await res.json();
+      rec.local_server_id = json.id;
+    }
+  }catch(e){ /* queda solo local; se reintenta en la próxima sincronización */ }
+}
+
+async function localSyncNow(){
+  if(!localServerUrl || !localToken || syncing) return;
+  syncing = true;
+  const statusEl = document.getElementById("syncStatus");
+  if(statusEl) statusEl.textContent = t("account_syncing");
+  try{
+    const unsynced = records.filter(r=>!r.local_server_id && !r.supabase_id);
+    for(const rec of unsynced){ await localPushRecord(rec); }
+
+    const res = await fetch(localServerUrl + "/api/records", {
+      headers:{"Authorization":"Bearer " + localToken}
+    });
+    if(!res.ok) throw new Error("sync failed");
+    const byType = await res.json();
+
+    const knownIds = new Set(records.filter(r=>r.local_server_id).map(r=>r.local_server_id));
+    let added = 0;
+    Object.entries(byType).forEach(([tipo, rows])=>{
+      const fieldMap = LOCAL_FIELD_MAP[tipo] || {};
+      (rows||[]).forEach(row=>{
+        if(knownIds.has(row.Id)) return;
+        const data = {codigo: row.Codigo || ""};
+        Object.entries(fieldMap).forEach(([appKey, sqlCol])=>{
+          data[appKey] = row[sqlCol] !== null && row[sqlCol] !== undefined ? String(row[sqlCol]) : "";
+        });
+        records.push({
+          id: idCounter++,
+          local_server_id: row.Id,
+          tipo,
+          fecha: row.Fecha,
+          gps: (row.Lat!=null && row.Lon!=null) ? {lat:row.Lat, lon:row.Lon, alt:row.Alt, accuracy:row.Precision} : null,
+          data
+        });
+        added++;
+      });
     });
     updateBadges();
     renderList();
@@ -2407,6 +2825,11 @@ const I18N = {
     account_supa_help:"Necesitas crear un proyecto gratuito en supabase.com (sin tarjeta), y crear una tabla \"records\" con la estructura que te indicó Claude en el chat. La URL y la clave están en tu proyecto, en Settings → API.",
     account_supa_missing:"Completa la URL y la clave de Supabase",
     account_supa_connected:"Conectado a Supabase", account_supa_error:"No se pudo conectar. Revisa la URL y la clave.",
+    account_backend_mode:"Tipo de conexión", account_mode_supabase:"Supabase (nube)", account_mode_local:"Servidor local (mi red)",
+    account_local_url:"URL de tu servidor local", account_local_save:"Guardar y conectar",
+    account_local_help:"Necesitas tener corriendo el servidor Hidrocampo (Node.js) en esa laptop, conectado a tu SQL Server. En esta misma laptop usa http://localhost:3000; desde otro equipo de tu red, usa la IP local de la laptop (ej. http://192.168.1.50:3000).",
+    account_local_missing:"Completa la URL del servidor local",
+    account_local_connected:"Conectado al servidor local", account_local_conn_error:"No se pudo conectar al servidor local. Revisa que esté corriendo y la URL sea correcta.",
     account_email:"Correo", account_password:"Contraseña",
     account_signin:"Iniciar sesión", account_no_account:"¿No tienes cuenta?", account_create_link:"Créala aquí",
     account_signup:"Crear cuenta", account_back_login:"Volver a iniciar sesión",
@@ -2421,6 +2844,18 @@ const I18N = {
     account_new_records:"registros nuevos del equipo",
     stats_total:"Puntos totales", stats_with_gps:"Con GPS", stats_without_gps:"Sin GPS", stats_types_used:"Tipos usados", stats_date_range:"Rango de fechas",
     stats_bar_title:"Puntos por tipo", stats_pie_title:"Proporción por tipo",
+    stats_builder_title:"Constructor de gráficos", stats_builder_hint:"Elige el tipo de gráfico, la variable y qué puntos incluir.",
+    stats_step1:"1. Tipo de gráfico", stats_step2:"2. Tipo de punto", stats_step3_single:"3. Variable a graficar",
+    stats_step3_x:"3. Eje X", stats_step3_y:"Eje Y", stats_step4:"4. Puntos a incluir",
+    stats_type_hidrograma:"Hidrograma — tendencia del nivel en el tiempo",
+    stats_type_dispersion:"Dispersión — correlación entre dos variables",
+    stats_type_barras:"Comparación por barras entre puntos",
+    stats_select_visible:"Seleccionar visibles", stats_clear_selection:"Quitar todos", stats_selected:"seleccionados",
+    stats_generate:"Generar gráfico", stats_colors_title:"Colores", stats_summary_title:"Resumen",
+    stats_overview_title:"Vista general",
+    stats_summary_n:"Cantidad", stats_summary_avg:"Promedio", stats_summary_min:"Mínimo", stats_summary_max:"Máximo",
+    stats_pick_points:"Elige al menos un punto", stats_no_numeric_data:"No hay datos numéricos suficientes para esta variable",
+    stats_no_points:"No hay puntos de este tipo todavía",
     stats_xy_title:"Dispersión X / Y", stats_xy_hint:"Compara dos variables numéricas de un mismo tipo de punto.",
     stats_xy_tipo:"Tipo", stats_xy_x:"Eje X", stats_xy_y:"Eje Y",
     stats_xy_empty:"No hay suficientes datos numéricos para graficar todavía."
@@ -2480,6 +2915,11 @@ const I18N = {
     account_supa_help:"You need a free project at supabase.com (no card needed), and a \"records\" table with the structure Claude gave you in chat. The URL and key are in your project under Settings → API.",
     account_supa_missing:"Fill in the Supabase URL and key",
     account_supa_connected:"Connected to Supabase", account_supa_error:"Couldn't connect. Check the URL and key.",
+    account_backend_mode:"Connection type", account_mode_supabase:"Supabase (cloud)", account_mode_local:"Local server (my network)",
+    account_local_url:"Your local server URL", account_local_save:"Save and connect",
+    account_local_help:"You need the Hidrocampo server (Node.js) running on that laptop, connected to your SQL Server. On that same laptop use http://localhost:3000; from another device on your network, use the laptop's local IP (e.g. http://192.168.1.50:3000).",
+    account_local_missing:"Fill in the local server URL",
+    account_local_connected:"Connected to local server", account_local_conn_error:"Couldn't connect to the local server. Check that it's running and the URL is correct.",
     account_email:"Email", account_password:"Password",
     account_signin:"Sign in", account_no_account:"Don't have an account?", account_create_link:"Create one here",
     account_signup:"Create account", account_back_login:"Back to sign in",
@@ -2494,6 +2934,18 @@ const I18N = {
     account_new_records:"new records from the team",
     stats_total:"Total points", stats_with_gps:"With GPS", stats_without_gps:"Without GPS", stats_types_used:"Types used", stats_date_range:"Date range",
     stats_bar_title:"Points by type", stats_pie_title:"Proportion by type",
+    stats_builder_title:"Chart builder", stats_builder_hint:"Choose the chart type, the variable, and which points to include.",
+    stats_step1:"1. Chart type", stats_step2:"2. Point type", stats_step3_single:"3. Variable to plot",
+    stats_step3_x:"3. X axis", stats_step3_y:"Y axis", stats_step4:"4. Points to include",
+    stats_type_hidrograma:"Hydrograph — level trend over time",
+    stats_type_dispersion:"Scatter — correlation between two variables",
+    stats_type_barras:"Bar comparison between points",
+    stats_select_visible:"Select visible", stats_clear_selection:"Clear all", stats_selected:"selected",
+    stats_generate:"Generate chart", stats_colors_title:"Colors", stats_summary_title:"Summary",
+    stats_overview_title:"Overview",
+    stats_summary_n:"Count", stats_summary_avg:"Average", stats_summary_min:"Minimum", stats_summary_max:"Maximum",
+    stats_pick_points:"Choose at least one point", stats_no_numeric_data:"Not enough numeric data for this variable",
+    stats_no_points:"No points of this type yet",
     stats_xy_title:"X / Y scatter", stats_xy_hint:"Compare two numeric variables from the same point type.",
     stats_xy_tipo:"Type", stats_xy_x:"X axis", stats_xy_y:"Y axis",
     stats_xy_empty:"Not enough numeric data to chart yet."
@@ -2534,7 +2986,10 @@ function applyFontScale(){
 
 function saveSettings(){
   try{
-    localStorage.setItem("hidrocampo_settings", JSON.stringify({lang:appLang, theme:appTheme, fontScale:appFontScale, esriApiKey, supaUrl, supaKey}));
+    localStorage.setItem("hidrocampo_settings", JSON.stringify({
+      lang:appLang, theme:appTheme, fontScale:appFontScale, esriApiKey,
+      supaUrl, supaKey, backendMode, localServerUrl, localToken, localUserEmail
+    }));
   }catch(e){}
 }
 
@@ -2549,6 +3004,10 @@ function loadSettings(){
       if(s.esriApiKey) esriApiKey = s.esriApiKey;
       if(s.supaUrl) supaUrl = s.supaUrl;
       if(s.supaKey) supaKey = s.supaKey;
+      if(s.backendMode) backendMode = s.backendMode;
+      if(s.localServerUrl) localServerUrl = s.localServerUrl;
+      if(s.localToken) localToken = s.localToken;
+      if(s.localUserEmail) localUserEmail = s.localUserEmail;
     }
   }catch(e){}
 }
@@ -2585,6 +3044,18 @@ document.getElementById("langSegmented").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
   appLang = b.dataset.value; applyLanguage(); refreshSegmented(); saveSettings();
 });
+document.getElementById("backendModeSegmented").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  backendMode = b.dataset.value;
+  saveSettings();
+  refreshBackendModeUI();
+});
+document.getElementById("chartBuilderType").addEventListener("change", updateChartBuilderFieldsUI);
+document.getElementById("chartBuilderTipo").addEventListener("change", ()=>{
+  pointPickerSelected.clear();
+  populateChartBuilderFields();
+  renderPointPicker();
+});
 
 /* ======================================================================
    INICIO
@@ -2594,7 +3065,8 @@ applyTheme();
 applyFontScale();
 applyLanguage();
 moveSatPanelTo("pozo");
-if(supaUrl && supaKey) initSupabaseClient();
+if(backendMode==="supabase" && supaUrl && supaKey) initSupabaseClient();
+if(backendMode==="local" && localServerUrl && localToken) localSyncNow();
 
 if("serviceWorker" in navigator){
   window.addEventListener("load", ()=>{
