@@ -198,7 +198,7 @@
   .rec .rec-code{font-family:var(--mono); font-weight:700; font-size:0.8438rem;}
   .rec .rec-tipo{font-size:0.6562rem; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft);}
   .rec .rec-meta{font-family:var(--mono); font-size:0.6875rem; color:var(--ink-soft); margin-top:4px;}
-  .rec .rec-actions{display:flex; gap:6px; margin-top:8px;}
+  .rec .rec-actions{display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;}
 
   .empty{text-align:center; padding:34px 16px; color:var(--ink-soft);}
   .empty .glyph{font-size:1.875rem; margin-bottom:6px; opacity:0.5;}
@@ -230,6 +230,11 @@
   .photo-preview{margin-top:8px; display:flex; align-items:center; gap:10px;}
   .photo-preview img{width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--line);}
   .rec-thumb{width:40px; height:40px; object-fit:cover; border-radius:6px; margin-left:8px; vertical-align:middle;}
+  .obs-row{display:flex; gap:8px; align-items:flex-start;}
+  .obs-row textarea{flex:1;}
+  .mic-btn{flex:0 0 auto; font-size:1rem; padding:8px 10px; height:38px;}
+  .mic-btn.recording{background:var(--danger); border-color:var(--danger); color:#fff; animation:mic-pulse 1s infinite;}
+  @keyframes mic-pulse{0%,100%{opacity:1;} 50%{opacity:0.5;}}
 
   body.density-compacta .card{padding:11px 12px;}
   body.density-compacta .field{margin-bottom:8px;}
@@ -251,6 +256,17 @@
   .pin-overlay input{max-width:180px; text-align:center; font-size:1.5rem; letter-spacing:6px; font-family:var(--mono);}
   .pin-overlay .pin-box{background:var(--paper); border-radius:14px; padding:26px; width:90%; max-width:320px; text-align:center;}
   .pin-overlay .pin-box p{color:var(--ink-soft); font-size:0.8125rem;}
+
+  .v3d-locator{position:absolute; left:10px; bottom:10px; width:110px; height:90px; border-radius:8px; overflow:hidden; border:2px solid rgba(255,255,255,0.5); box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+  .v3d-legend{position:absolute; right:10px; bottom:10px; background:rgba(20,24,31,0.85); color:#fff; padding:8px 10px; border-radius:8px; font-size:0.6875rem; min-width:120px;}
+  .v3d-legend .grad{height:10px; border-radius:4px; margin:4px 0; background:linear-gradient(to right, #1B5D8E, #B05A2A);}
+  .v3d-legend .grad-labels{display:flex; justify-content:space-between; font-size:0.625rem; color:#ccc;}
+  .v3d-info-row{display:flex; justify-content:space-between; gap:8px; padding:5px 0; border-bottom:1px solid var(--line); font-size:0.8125rem;}
+  .v3d-info-row:last-child{border-bottom:none;}
+  .v3d-info-row .k{color:var(--ink-soft);}
+  .v3d-orient-group{display:flex; gap:3px;}
+  .v3d-orient-group .btn{padding:0; width:28px; height:28px; font-size:0.75rem; font-weight:700;}
+  #lineDrawBtn.active{background:var(--teal); border-color:var(--teal-d); color:#fff;}
 
   .export-actions{display:flex; flex-direction:column; gap:9px;}
   .export-actions button{width:100%; text-align:left; display:flex; justify-content:space-between; align-items:center;}
@@ -319,7 +335,10 @@
     font-family:var(--sans); font-size:0.75rem; font-weight:600; color:var(--ink-soft);
     padding:9px 12px; border-bottom:1px solid var(--line); background:var(--paper-2);
     text-transform:uppercase; letter-spacing:0.4px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
   }
+  .sat-layer-toggle{display:flex; align-items:center; gap:5px; text-transform:none; font-weight:500; font-size:0.6875rem; cursor:pointer;}
+  .sat-layer-toggle input{width:auto;}
   .sat-map{flex:1 1 auto; width:100%; background:var(--map-bg);}
   .sat-overlay{
     position:absolute; left:0; right:0; bottom:0; top:33px;
@@ -388,8 +407,13 @@
           <div class="field"><label data-i18n="label_diametro">Diámetro <span class="unit">(in)</span></label><input type="number" step="0.1" id="pozo-diametro"></div>
         </div>
         <div class="row2">
-          <div class="field"><label data-i18n="label_nivel_estatico">Nivel estático <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-estatico"></div>
-          <div class="field"><label data-i18n="label_nivel_dinamico">Nivel dinámico <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-dinamico"></div>
+          <div class="field"><label data-i18n="label_nivel_estatico">Nivel estático <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-estatico" oninput="updateSpecificCapacity()"></div>
+          <div class="field"><label data-i18n="label_nivel_dinamico">Nivel dinámico <span class="unit">(m)</span></label><input type="number" step="0.01" id="pozo-nivel-dinamico" oninput="updateSpecificCapacity()"></div>
+        </div>
+        <div class="field"><label data-i18n="label_caudal_bombeo">Caudal de bombeo (opcional) <span class="unit">(L/s)</span></label><input type="number" step="0.01" id="pozo-caudal-bombeo" oninput="updateSpecificCapacity()"></div>
+        <div class="field" id="specificCapacityBox" style="display:none;">
+          <label data-i18n="label_capacidad_especifica">Capacidad específica (calculada)</label>
+          <input type="text" id="specificCapacityDisplay" readonly style="background:var(--paper-2); font-weight:600;">
         </div>
         <div class="field"><label data-i18n="label_uso">Uso del agua</label>
           <select id="pozo-uso">
@@ -397,7 +421,11 @@
             <option>Pecuario</option><option>Industrial</option><option>Monitoreo</option><option>Sin uso</option>
           </select></div>
         <div class="field"><label data-i18n="label_litologia">Litología / perfil resumido</label><textarea id="pozo-litologia" placeholder="Ej: 0-5m arena fina, 5-20m arcilla, 20-35m grava..."></textarea></div>
-        <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="pozo-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_obs">Observaciones</label>
+          <div class="obs-row"><textarea id="pozo-obs"></textarea>
+            <button type="button" class="btn small ghost mic-btn" id="pozo-voice-btn" onclick="startVoiceDictation('pozo')" title="Dictar">🎤</button>
+          </div>
+        </div>
         <div class="field"><label data-i18n="label_foto">Fotografía de campo (opcional)</label>
           <input type="file" accept="image/*" capture="environment" id="pozo-foto-input" onchange="handlePhotoCapture('pozo', this)">
           <div id="pozo-foto-preview" class="photo-preview" style="display:none;">
@@ -439,7 +467,11 @@
             <option>Depresión / ladera</option><option>Difuso</option>
           </select></div>
         <div class="field"><label data-i18n="label_vegetacion">Vegetación / entorno asociado</label><input type="text" id="manantial-vegetacion" placeholder="Ej: bofedal, totora, pastizal..."></div>
-        <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="manantial-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_obs">Observaciones</label>
+          <div class="obs-row"><textarea id="manantial-obs"></textarea>
+            <button type="button" class="btn small ghost mic-btn" id="manantial-voice-btn" onclick="startVoiceDictation('manantial')" title="Dictar">🎤</button>
+          </div>
+        </div>
         <div class="field"><label data-i18n="label_foto">Fotografía de campo (opcional)</label>
           <input type="file" accept="image/*" capture="environment" id="manantial-foto-input" onchange="handlePhotoCapture('manantial', this)">
           <div id="manantial-foto-preview" class="photo-preview" style="display:none;">
@@ -476,7 +508,23 @@
           <div class="field"><label>STD <span class="unit">(ppm)</span></label><input type="number" step="0.1" id="calidad-std"></div>
         </div>
         <div class="field"><label data-i18n="label_turbidez">Turbidez <span class="unit">(NTU)</span></label><input type="number" step="0.1" id="calidad-turbidez"></div>
-        <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="calidad-obs"></textarea></div>
+        <p class="hint" style="margin-top:10px; margin-bottom:6px;" data-i18n="label_iones_hint">Iones mayoritarios (opcional, en mg/L) — habilitan los diagramas Piper, Stiff y Schoeller en Estadística.</p>
+        <div class="row3">
+          <div class="field"><label>Ca²⁺ <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-ca"></div>
+          <div class="field"><label>Mg²⁺ <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-mg"></div>
+          <div class="field"><label>Na⁺ <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-na"></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>K⁺ <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-k"></div>
+          <div class="field"><label>HCO₃⁻ <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-hco3"></div>
+          <div class="field"><label>Cl⁻ <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-cl"></div>
+        </div>
+        <div class="field"><label>SO₄²⁻ <span class="unit">(mg/L)</span></label><input type="number" step="0.01" id="calidad-so4"></div>
+        <div class="field"><label data-i18n="label_obs">Observaciones</label>
+          <div class="obs-row"><textarea id="calidad-obs"></textarea>
+            <button type="button" class="btn small ghost mic-btn" id="calidad-voice-btn" onclick="startVoiceDictation('calidad')" title="Dictar">🎤</button>
+          </div>
+        </div>
         <div class="field"><label data-i18n="label_foto">Fotografía de campo (opcional)</label>
           <input type="file" accept="image/*" capture="environment" id="calidad-foto-input" onchange="handlePhotoCapture('calidad', this)">
           <div id="calidad-foto-preview" class="photo-preview" style="display:none;">
@@ -510,7 +558,11 @@
           <div class="field"><label data-i18n="label_buzamiento">Buzamiento <span class="unit">(°)</span></label><input type="text" id="geologia-buzamiento" placeholder="30°SE"></div>
         </div>
         <div class="field"><label data-i18n="label_estructuras">Estructuras observadas</label><input type="text" id="geologia-estructuras" placeholder="Fallas, fracturas, pliegues..."></div>
-        <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="geologia-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_obs">Observaciones</label>
+          <div class="obs-row"><textarea id="geologia-obs"></textarea>
+            <button type="button" class="btn small ghost mic-btn" id="geologia-voice-btn" onclick="startVoiceDictation('geologia')" title="Dictar">🎤</button>
+          </div>
+        </div>
         <div class="field"><label data-i18n="label_foto">Fotografía de campo (opcional)</label>
           <input type="file" accept="image/*" capture="environment" id="geologia-foto-input" onchange="handlePhotoCapture('geologia', this)">
           <div id="geologia-foto-preview" class="photo-preview" style="display:none;">
@@ -585,22 +637,70 @@
       <div class="card" style="padding:0; overflow:hidden;">
         <div class="map-toolbar">
           <button class="btn small ghost" onclick="reset3dView()" data-i18n="v3d_center">Centrar vista</button>
+          <div class="v3d-orient-group">
+            <button class="btn map-zoom-btn ghost" onclick="set3dOrientation('n')" title="Norte">N</button>
+            <button class="btn map-zoom-btn ghost" onclick="set3dOrientation('s')" title="Sur">S</button>
+            <button class="btn map-zoom-btn ghost" onclick="set3dOrientation('e')" title="Este">E</button>
+            <button class="btn map-zoom-btn ghost" onclick="set3dOrientation('o')" title="Oeste">O</button>
+            <button class="btn map-zoom-btn ghost" onclick="set3dOrientation('top')" title="Vista superior">⬇</button>
+          </div>
           <label style="display:flex; align-items:center; gap:6px; font-size:0.6875rem; margin-left:auto;">
             <span data-i18n="v3d_exaggeration">Exageración vertical</span>
             <input type="range" id="vertExaggInput" min="1" max="6" step="0.5" value="1.5" oninput="update3dExaggeration()" style="width:100px;">
           </label>
         </div>
-        <div style="position:relative; height:420px; background:#0d1b1a;">
+        <div class="map-toolbar" style="border-top:1px solid var(--line);">
+          <label style="display:flex; align-items:center; gap:6px; font-size:0.6875rem;">
+            <span data-i18n="v3d_color_by">Colorear pozos por</span>
+            <select id="colorByAttrSelect" onchange="render3dWells()" style="width:auto; font-size:0.75rem; padding:5px 7px;">
+              <option value="tipo" data-i18n="v3d_color_tipo">Tipo de punto</option>
+              <option value="profundidad" data-i18n="label_profundidad">Profundidad</option>
+              <option value="nivel_estatico" data-i18n="label_nivel_estatico">Nivel estático</option>
+              <option value="litologia" data-i18n="v3d_color_litologia">Litología (por categoría)</option>
+              <option value="formacion" data-i18n="v3d_color_formacion">Formación geológica (por categoría)</option>
+            </select>
+          </label>
+          <button class="btn small ghost" id="lineDrawBtn" onclick="toggleLineDrawMode()" style="margin-left:auto;" data-i18n="v3d_draw_line">Dibujar línea de corte</button>
+          <button class="btn small ghost" onclick="clearSectionLine()" data-i18n="v3d_clear_line">Borrar línea</button>
+        </div>
+        <p class="hint" id="lineDrawHint" style="padding:0 12px; margin:8px 0 0; min-height:14px;"></p>
+        <div style="position:relative; height:420px; background:#0d1b1a; margin-top:8px;">
           <canvas id="canvas3d" style="width:100%; height:100%; display:block;"></canvas>
           <div class="map-empty" id="viewer3dEmpty" style="background:transparent; color:#CFE4DD;" data-i18n="v3d_empty">Carga un DEM para comenzar.</div>
+          <div id="v3dLocatorMini" class="v3d-locator"></div>
+          <div id="v3dLegend" class="v3d-legend" style="display:none;"></div>
         </div>
       </div>
 
-      <div class="card">
-        <h2 data-i18n="map_layers_title">Capas</h2>
-        <label class="toggle-row"><input type="checkbox" id="show3dWells" checked onchange="render3dWells()"><span data-i18n="v3d_show_wells">Mostrar pozos</span></label>
-        <label class="toggle-row" style="margin-top:8px;"><input type="checkbox" id="show3dWaterTable" checked onchange="render3dWells()"><span data-i18n="v3d_show_water">Mostrar nivel freático</span></label>
+      <div class="card" id="sectionCard" style="display:none;">
+        <h2 data-i18n="v3d_section_title">Sección transversal</h2>
+        <p class="hint" data-i18n="v3d_section_hint">Generada a partir de la línea de corte, con los pozos cercanos ordenados a lo largo de la línea.</p>
+        <div class="chart-box" style="height:280px;"><div id="sectionSvgHolder" style="width:100%; height:100%;"></div></div>
       </div>
+
+      <div class="chart-row">
+        <div class="card" style="flex:1 1 260px;">
+          <h2 data-i18n="map_layers_title">Capas</h2>
+          <label class="toggle-row"><input type="checkbox" id="show3dTerrain" checked onchange="render3dLayerVis()"><span data-i18n="v3d_layer_terrain">Terreno (DEM)</span></label>
+          <label class="toggle-row" style="margin-top:7px;"><input type="checkbox" id="show3dOrtho" checked onchange="render3dLayerVis()"><span data-i18n="v3d_layer_ortho">Ortofoto</span></label>
+          <p class="hint" style="margin:12px 0 6px;" data-i18n="v3d_layer_points">Puntos capturados</p>
+          <label class="toggle-row"><input type="checkbox" id="show3d-pozo" checked onchange="render3dWells()"><span class="dot c-pozo"></span><span data-i18n="nav_pozo">Pozos</span></label>
+          <label class="toggle-row" style="margin-top:7px;"><input type="checkbox" id="show3d-manantial" checked onchange="render3dWells()"><span class="dot c-manantial"></span><span data-i18n="nav_manantial">Manantiales</span></label>
+          <label class="toggle-row" style="margin-top:7px;"><input type="checkbox" id="show3d-calidad" checked onchange="render3dWells()"><span class="dot c-calidad"></span><span data-i18n="nav_calidad">Calidad</span></label>
+          <label class="toggle-row" style="margin-top:7px;"><input type="checkbox" id="show3d-geologia" checked onchange="render3dWells()"><span class="dot c-geologia"></span><span data-i18n="nav_geologia">Geología</span></label>
+          <label class="toggle-row" style="margin-top:7px;"><input type="checkbox" id="show3dWaterTable" checked onchange="render3dWells()"><span data-i18n="v3d_show_water">Mostrar nivel freático</span></label>
+        </div>
+        <div class="card" style="flex:1 1 260px;">
+          <h2 data-i18n="v3d_info_title">Ficha del punto</h2>
+          <div id="v3dInfoPanel"><p class="hint" data-i18n="v3d_info_hint">Haz clic en un punto del modelo 3D para ver su información aquí.</p></div>
+        </div>
+        <div class="card" style="flex:1 1 220px;">
+          <h2 data-i18n="v3d_legend_title">Leyenda de colores</h2>
+          <div id="v3dLegendCard"><p class="hint" data-i18n="v3d_legend_hint">Elige "Litología" o "Formación geológica" arriba para ver aquí cada categoría con su color.</p></div>
+        </div>
+      </div>
+
+      <p class="hint" style="text-align:center;" data-i18n="v3d_legal_note">Modelo generado a partir de tus propios datos de campo. No reemplaza un estudio geotécnico certificado ni un levantamiento topográfico oficial.</p>
     </section>
 
     <!-- REGISTROS -->
@@ -686,6 +786,10 @@
             <option value="hidrograma" data-i18n="stats_type_hidrograma">Hidrograma — tendencia del nivel en el tiempo</option>
             <option value="dispersion" data-i18n="stats_type_dispersion">Dispersión — correlación entre dos variables</option>
             <option value="barras" data-i18n="stats_type_barras">Comparación por barras entre puntos</option>
+            <option value="piper" data-i18n="stats_type_piper">Diagrama de Piper (iones mayoritarios)</option>
+            <option value="stiff" data-i18n="stats_type_stiff">Diagrama de Stiff (iones mayoritarios)</option>
+            <option value="schoeller" data-i18n="stats_type_schoeller">Diagrama de Schoeller (iones mayoritarios)</option>
+            <option value="perfil" data-i18n="stats_type_perfil">Perfil correlacionado entre pozos</option>
           </select>
         </div>
 
@@ -696,6 +800,9 @@
         <div id="chartBuilderFieldsSingle" class="field">
           <label data-i18n="stats_step3_single">3. Variable a graficar</label>
           <select id="chartBuilderFieldY"></select>
+        </div>
+        <div id="rainOverlayField" class="field" style="display:none;">
+          <label class="toggle-row"><input type="checkbox" id="rainOverlayToggle"><span data-i18n="stats_rain_overlay">Mostrar precipitación (Open-Meteo, requiere internet)</span></label>
         </div>
         <div id="chartBuilderFieldsXY" class="row2" style="display:none;">
           <div class="field"><label data-i18n="stats_step3_x">3. Eje X</label><select id="chartBuilderFieldX"></select></div>
@@ -718,7 +825,10 @@
       <div class="chart-row" id="customChartRow" style="display:none;">
         <div class="card chart-card" style="flex:2 1 480px;">
           <h2 id="customChartTitle" data-i18n="stats_step4">Gráfico</h2>
-          <div class="chart-box" style="height:340px;"><canvas id="chartCustom"></canvas></div>
+          <div class="chart-box" style="height:340px;">
+            <canvas id="chartCustom"></canvas>
+            <div id="chartCustomSvgHolder" style="display:none; width:100%; height:100%; overflow:auto;"></div>
+          </div>
         </div>
         <div class="card" style="flex:1 1 220px;">
           <h2 data-i18n="stats_colors_title">Colores</h2>
@@ -994,10 +1104,44 @@
   </div>
 </div>
 
+<div class="pin-overlay" id="qrOverlay" style="display:none;" onclick="if(event.target===this) closeQrModal()">
+  <div class="pin-box" style="background:var(--card); color:var(--ink);">
+    <h2 style="font-family:var(--serif); margin-top:0; color:var(--ink);" id="qrModalTitle">QR</h2>
+    <div id="qrCanvasHolder" style="display:flex; justify-content:center; margin:10px 0;"></div>
+    <p class="hint" data-i18n="qr_hint">Escanéalo con cualquier cámara para ver el código y las coordenadas del punto, incluso sin esta app.</p>
+    <div class="save-row" style="margin-top:10px;">
+      <button class="btn primary" onclick="downloadQr()" data-i18n="qr_download">Descargar PNG</button>
+      <button class="btn ghost" onclick="closeQrModal()" data-i18n="qr_close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="pin-overlay" id="editOverlay" style="display:none;" onclick="if(event.target===this) closeEditRecord()">
+  <div class="pin-box" style="background:var(--card); color:var(--ink); max-width:420px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h2 style="font-family:var(--serif); margin-top:0; color:var(--ink);" id="editModalTitle">Editar</h2>
+    <div id="editFieldsHolder"></div>
+    <div class="save-row" style="margin-top:14px;">
+      <button class="btn primary" onclick="saveEditRecord()" data-i18n="edit_save">Guardar cambios</button>
+      <button class="btn ghost" onclick="closeEditRecord()" data-i18n="qr_close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="pin-overlay" id="historyOverlay" style="display:none;" onclick="if(event.target===this) closeHistoryModal()">
+  <div class="pin-box" style="background:var(--card); color:var(--ink); max-width:420px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h2 style="font-family:var(--serif); margin-top:0; color:var(--ink);" id="historyModalTitle">Historial</h2>
+    <div id="historyListHolder"></div>
+    <div class="save-row" style="margin-top:14px;">
+      <button class="btn ghost" onclick="closeHistoryModal()" style="width:100%;" data-i18n="qr_close">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 
 <div id="satPanel" class="sat-panel">
   <div class="sat-header">
     <span id="satHeaderText" data-i18n="sat_panel_title">Ubicación satelital</span>
+    <label class="sat-layer-toggle"><input type="checkbox" id="ingemmetLayerToggle" onchange="toggleIngemmetLayer()"><span data-i18n="sat_ingemmet_layer">Hidrogeología INGEMMET</span></label>
   </div>
   <div id="satMapEl" class="sat-map"></div>
   <div id="satOverlay" class="sat-overlay">
@@ -1007,6 +1151,9 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
@@ -1030,9 +1177,9 @@ let mapInitialized = false;
 let currentViewBox = {x:0,y:0,w:100,h:100};
 
 const FIELD_TYPES = {
-  pozo: { profundidad:"N", diametro:"N", nivel_estatico:"N", nivel_dinamico:"N", uso:"C", litologia:"C", obs:"C" },
+  pozo: { profundidad:"N", diametro:"N", nivel_estatico:"N", nivel_dinamico:"N", caudal_bombeo:"N", capacidad_especifica:"N", uso:"C", litologia:"C", obs:"C" },
   manantial: { caudal:"N", temp:"N", metodo:"C", tipo_aflor:"C", vegetacion:"C", obs:"C" },
-  calidad: { ph:"N", ce:"N", temp:"N", od:"N", std:"N", turbidez:"N", obs:"C" },
+  calidad: { ph:"N", ce:"N", temp:"N", od:"N", std:"N", turbidez:"N", ca:"N", mg:"N", na:"N", k:"N", hco3:"N", cl:"N", so4:"N", obs:"C" },
   geologia: { formacion:"C", litologia:"C", rumbo:"C", buzamiento:"C", estructuras:"C", obs:"C" }
 };
 
@@ -1161,9 +1308,9 @@ function captureGps(tipo){
 
 function fieldIds(tipo){
   const map = {
-    pozo: ["codigo","profundidad","diametro","nivel-estatico","nivel-dinamico","uso","litologia","obs"],
+    pozo: ["codigo","profundidad","diametro","nivel-estatico","nivel-dinamico","caudal-bombeo","uso","litologia","obs"],
     manantial: ["codigo","caudal","temp","metodo","tipo-aflor","vegetacion","obs"],
-    calidad: ["codigo","ph","ce","temp","od","std","turbidez","obs"],
+    calidad: ["codigo","ph","ce","temp","od","std","turbidez","ca","mg","na","k","hco3","cl","so4","obs"],
     geologia: ["codigo","formacion","litologia","rumbo","buzamiento","estructuras","obs"]
   };
   return map[tipo];
@@ -1220,12 +1367,21 @@ function saveRecord(tipo){
     const el = document.getElementById(tipo+"-"+f);
     data[f.replace(/-/g,"_")] = el.value.trim();
   });
+  if(tipo==="pozo"){
+    const ne = parseFloat(data.nivel_estatico), nd = parseFloat(data.nivel_dinamico), q = parseFloat(data.caudal_bombeo);
+    const abat = nd - ne;
+    if(!isNaN(ne) && !isNaN(nd) && !isNaN(q) && abat > 0){
+      data.capacidad_especifica = (q/abat).toFixed(3);
+    }
+  }
   const rec = {
     id: idCounter++,
     tipo,
     fecha: new Date().toISOString(),
     gps: gpsState[tipo] ? {...gpsState[tipo]} : null,
     foto: pendingPhoto[tipo] || null,
+    createdBy: currentUserLabel(),
+    history: [],
     data
   };
   records.push(rec);
@@ -1237,6 +1393,194 @@ function saveRecord(tipo){
   else { if(sb && currentUser) syncPushRecord(rec); }
 }
 
+let currentEditId = null;
+
+function currentUserLabel(){
+  if(backendMode==="local") return localUserEmail || "local";
+  if(currentUser) return currentUser.email;
+  return "local";
+}
+
+function openEditRecord(id){
+  const rec = records.find(r=>r.id===id);
+  if(!rec) return;
+  currentEditId = id;
+  document.getElementById("editModalTitle").textContent = (TYPE_LABEL[rec.tipo]||rec.tipo) + " — " + (rec.data.codigo||"");
+  const holder = document.getElementById("editFieldsHolder");
+  const keys = fieldIds(rec.tipo);
+  holder.innerHTML = keys.map(f=>{
+    const key = f.replace(/-/g,"_");
+    const label = key==="codigo" ? t("label_codigo") : (key==="obs" ? t("label_obs") : fieldLabel(key));
+    const val = rec.data[key] !== undefined ? rec.data[key] : "";
+    return `<div class="field"><label>${escapeHtml(label)}</label><input type="text" data-editkey="${key}" value="${escapeHtml(val)}"></div>`;
+  }).join("");
+  document.getElementById("editOverlay").style.display = "flex";
+}
+
+function closeEditRecord(){
+  document.getElementById("editOverlay").style.display = "none";
+  currentEditId = null;
+}
+
+function saveEditRecord(){
+  const rec = records.find(r=>r.id===currentEditId);
+  if(!rec) return;
+  const inputs = document.querySelectorAll('#editFieldsHolder input[data-editkey]');
+  const changes = [];
+  inputs.forEach(inp=>{
+    const key = inp.dataset.editkey;
+    const newVal = inp.value.trim();
+    const oldVal = rec.data[key] !== undefined ? rec.data[key] : "";
+    if(newVal !== oldVal){
+      changes.push({field:key, old:oldVal, nuevo:newVal});
+      rec.data[key] = newVal;
+    }
+  });
+  if(changes.length){
+    if(!rec.history) rec.history = [];
+    rec.history.push({at: new Date().toISOString(), by: currentUserLabel(), changes});
+    showToast(changes.length + " " + t("edit_changes_saved"));
+    renderList();
+  } else {
+    showToast(t("edit_no_changes"));
+  }
+  closeEditRecord();
+}
+
+function showHistory(id){
+  const rec = records.find(r=>r.id===id);
+  if(!rec) return;
+  const holder = document.getElementById("historyListHolder");
+  document.getElementById("historyModalTitle").textContent = t("btn_history") + " — " + (rec.data.codigo||"");
+  const events = [{at: rec.fecha, by: currentUserLabelForRecord(rec), changes: null}].concat(rec.history || []);
+  holder.innerHTML = events.map(ev=>{
+    const dateTxt = new Date(ev.at).toLocaleString();
+    if(!ev.changes){
+      return `<div class="val-item val-info">${t("edit_created")} — ${dateTxt} (${escapeHtml(ev.by)})</div>`;
+    }
+    const changesTxt = ev.changes.map(c=>escapeHtml(fieldLabel(c.field)) + ': "' + escapeHtml(c.old) + '" → "' + escapeHtml(c.nuevo) + '"').join("<br>");
+    return `<div class="val-item val-warn">${dateTxt} (${escapeHtml(ev.by)})<br>${changesTxt}</div>`;
+  }).join("");
+  document.getElementById("historyOverlay").style.display = "flex";
+}
+function currentUserLabelForRecord(rec){
+  return rec.createdBy || "—";
+}
+function closeHistoryModal(){
+  document.getElementById("historyOverlay").style.display = "none";
+}
+
+function generatePdfReport(id){
+  const rec = records.find(r=>r.id===id);
+  if(!rec) return;
+  if(typeof window.jspdf === "undefined"){ showToast(t("pdf_not_available")); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 20;
+  doc.setFontSize(16);
+  doc.text("Hidrocampo - Ficha de campo", 15, y); y += 10;
+  doc.setFontSize(11);
+  doc.text((TYPE_LABEL[rec.tipo]||rec.tipo) + ": " + (rec.data.codigo||""), 15, y); y += 8;
+  doc.text("Fecha: " + new Date(rec.fecha).toLocaleString(), 15, y); y += 8;
+  if(rec.gps){
+    doc.text("Coordenadas: " + rec.gps.lat.toFixed(6) + ", " + rec.gps.lon.toFixed(6), 15, y); y += 8;
+    if(rec.gps.alt!==null && rec.gps.alt!==undefined){ doc.text("Altitud: " + rec.gps.alt + " m", 15, y); y += 8; }
+  }
+  y += 4;
+  const keys = fieldIds(rec.tipo).filter(k=>k!=="codigo" && k!=="obs").map(k=>k.replace(/-/g,"_"));
+  keys.forEach(k=>{
+    const val = rec.data[k];
+    if(val){
+      const lines = doc.splitTextToSize(fieldLabel(k) + ": " + val, 180);
+      doc.text(lines, 15, y);
+      y += lines.length*6 + 1;
+      if(y>270){ doc.addPage(); y=20; }
+    }
+  });
+  if(rec.data.obs){
+    y += 4;
+    doc.text(t("btn_obs_pdf") + ":", 15, y); y += 7;
+    const lines = doc.splitTextToSize(rec.data.obs, 180);
+    doc.text(lines, 15, y);
+    y += lines.length*6;
+  }
+  if(rec.foto){
+    if(y>200){ doc.addPage(); y=20; }
+    try{ doc.addImage(rec.foto, "JPEG", 15, y+6, 80, 60); }catch(e){}
+  }
+  doc.save("ficha_" + (rec.data.codigo || rec.id) + ".pdf");
+}
+
+let currentQrRecordId = null;
+
+function showQrForRecord(id){
+  const rec = records.find(r=>r.id===id);
+  if(!rec) return;
+  if(typeof QRCode === "undefined"){ showToast(t("qr_not_available")); return; }
+  currentQrRecordId = id;
+  const holder = document.getElementById("qrCanvasHolder");
+  holder.innerHTML = "";
+  const gpsTxt = rec.gps ? rec.gps.lat.toFixed(6)+","+rec.gps.lon.toFixed(6) : "sin GPS";
+  const text = "Hidrocampo | " + (TYPE_LABEL[rec.tipo]||rec.tipo) + " " + (rec.data.codigo||"") + " | " + gpsTxt;
+  try{
+    new QRCode(holder, {text, width:220, height:220});
+  }catch(e){ showToast(t("qr_not_available")); return; }
+  document.getElementById("qrModalTitle").textContent = rec.data.codigo || ("#"+rec.id);
+  document.getElementById("qrOverlay").style.display = "flex";
+}
+
+function closeQrModal(){
+  document.getElementById("qrOverlay").style.display = "none";
+}
+
+function downloadQr(){
+  const canvas = document.querySelector("#qrCanvasHolder canvas");
+  if(!canvas) return;
+  const link = document.createElement("a");
+  link.download = "qr_" + (currentQrRecordId || "punto") + ".png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+function startVoiceDictation(tipo){
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRec){ showToast(t("voice_not_supported")); return; }
+  const btn = document.getElementById(tipo+"-voice-btn");
+  if(btn.classList.contains("recording")) return;
+  let recognition;
+  try{
+    recognition = new SpeechRec();
+  }catch(e){ showToast(t("voice_not_supported")); return; }
+  recognition.lang = appLang === "en" ? "en-US" : "es-PE";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  btn.classList.add("recording");
+  recognition.onresult = (e)=>{
+    const text = e.results[0][0].transcript;
+    const textarea = document.getElementById(tipo+"-obs");
+    textarea.value = (textarea.value.trim() ? textarea.value.trim() + " " : "") + text;
+  };
+  recognition.onerror = ()=>{ showToast(t("voice_error")); };
+  recognition.onend = ()=>{ btn.classList.remove("recording"); };
+  try{ recognition.start(); }catch(e){ btn.classList.remove("recording"); showToast(t("voice_error")); }
+}
+
+function updateSpecificCapacity(){
+  const ne = parseFloat(document.getElementById("pozo-nivel-estatico").value);
+  const nd = parseFloat(document.getElementById("pozo-nivel-dinamico").value);
+  const q = parseFloat(document.getElementById("pozo-caudal-bombeo").value);
+  const box = document.getElementById("specificCapacityBox");
+  const disp = document.getElementById("specificCapacityDisplay");
+  const abatimiento = nd - ne;
+  if(!isNaN(ne) && !isNaN(nd) && !isNaN(q) && abatimiento > 0){
+    const cs = q / abatimiento;
+    disp.value = cs.toFixed(3) + " L/s por metro de abatimiento (" + abatimiento.toFixed(2) + " m)";
+    box.style.display = "block";
+  } else {
+    box.style.display = "none";
+  }
+}
+
 function clearForm(tipo){
   fieldIds(tipo).forEach(f=>{
     document.getElementById(tipo+"-"+f).value = "";
@@ -1246,6 +1590,9 @@ function clearForm(tipo){
   initGpsBox(tipo);
   updateSatPanel(tipo);
   applyLastValues(tipo);
+  if(tipo==="pozo"){
+    document.getElementById("specificCapacityBox").style.display = "none";
+  }
 }
 
 function updateBadges(){
@@ -1295,7 +1642,11 @@ function renderList(){
       </div>
       <div class="rec-meta">${fTxt} · ${gpsTxt}</div>
       <div class="rec-actions">
-        <button class="btn small ghost" onclick="deleteRecord(${r.id})">Eliminar</button>
+        <button class="btn small ghost" onclick="openEditRecord(${r.id})">${t("btn_edit")}</button>
+        <button class="btn small ghost" onclick="showHistory(${r.id})">${t("btn_history")}</button>
+        <button class="btn small ghost" onclick="showQrForRecord(${r.id})">${t("btn_qr")}</button>
+        <button class="btn small ghost" onclick="generatePdfReport(${r.id})">${t("btn_pdf")}</button>
+        <button class="btn small ghost" onclick="deleteRecord(${r.id})">${t("btn_delete")}</button>
       </div>
     </div>`;
   }).join("");
@@ -2112,10 +2463,12 @@ const DBF_ABBR = {
   lat:"LAT", lon:"LON", alt:"ALT", precision:"PRECISION",
   profundidad:"PROFUND", diametro:"DIAMETRO",
   nivel_estatico:"NIV_ESTAT", nivel_dinamico:"NIV_DINAM", uso:"USO",
+  caudal_bombeo:"Q_BOMBEO", capacidad_especifica:"CAP_ESP",
   litologia:"LITOLOGIA", obs:"OBS",
   caudal:"CAUDAL", temp:"TEMP", metodo:"METODO", tipo_aflor:"TIPO_AFL",
   vegetacion:"VEGETACION",
   ph:"PH", ce:"CE", od:"OD", std:"STD", turbidez:"TURBIDEZ",
+  ca:"CA", mg:"MG", na:"NA", k:"K", hco3:"HCO3", cl:"CL", so4:"SO4",
   formacion:"FORMACION", rumbo:"RUMBO", buzamiento:"BUZAMIENTO",
   estructuras:"ESTRUCTURA"
 };
@@ -2316,6 +2669,33 @@ let satTileErrorSeen = false;
 let satCurrentTipo = null;
 let satLeafletReady = (typeof L !== "undefined");
 let esriApiKey = "";
+let ingemmetLayer = null;
+
+const INGEMMET_HIDROGEOLOGIA_URL = "https://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_HIDROGEOLOGIA_PERU/MapServer";
+
+function toggleIngemmetLayer(){
+  const on = document.getElementById("ingemmetLayerToggle").checked;
+  if(!satMap || typeof L === "undefined" || typeof L.esri === "undefined"){
+    showToast(t("sat_ingemmet_error"));
+    document.getElementById("ingemmetLayerToggle").checked = false;
+    return;
+  }
+  if(on){
+    if(!ingemmetLayer){
+      try{
+        ingemmetLayer = L.esri.dynamicMapLayer({ url: INGEMMET_HIDROGEOLOGIA_URL, opacity: 0.55 });
+      }catch(e){
+        showToast(t("sat_ingemmet_error"));
+        document.getElementById("ingemmetLayerToggle").checked = false;
+        return;
+      }
+    }
+    ingemmetLayer.addTo(satMap);
+    showToast(t("sat_ingemmet_on"));
+  } else if(ingemmetLayer){
+    satMap.removeLayer(ingemmetLayer);
+  }
+}
 
 function esriTileUrl(){
   if(esriApiKey && esriApiKey.trim()){
@@ -2407,18 +2787,19 @@ let chartBar = null, chartPie = null, customChart = null;
 const CHART_COLORS = { pozo:"#1B5D8E", manantial:"#3C8C9C", calidad:"#3C5A66", geologia:"#B05A2A" };
 const TYPE_I18N_KEY = { pozo:"nav_pozo", manantial:"nav_manantial", calidad:"nav_calidad", geologia:"nav_geologia" };
 const NUMERIC_FIELDS_BY_TYPE = {
-  pozo: ["profundidad","diametro","nivel_estatico","nivel_dinamico"],
+  pozo: ["profundidad","diametro","nivel_estatico","nivel_dinamico","caudal_bombeo","capacidad_especifica"],
   manantial: ["caudal","temp"],
-  calidad: ["ph","ce","temp","od","std","turbidez"],
+  calidad: ["ph","ce","temp","od","std","turbidez","ca","mg","na","k","hco3","cl","so4"],
   geologia: []
 };
 const FIELD_LABEL_KEY = {
   profundidad:"label_profundidad", diametro:"label_diametro",
   nivel_estatico:"label_nivel_estatico", nivel_dinamico:"label_nivel_dinamico",
   caudal:"label_caudal", temp:"label_temp_agua",
-  od:"label_od", turbidez:"label_turbidez"
+  od:"label_od", turbidez:"label_turbidez",
+  caudal_bombeo:"label_caudal_bombeo", capacidad_especifica:"label_capacidad_especifica"
 };
-const FIELD_LABEL_PLAIN = { ph:"pH", ce:"CE", std:"STD" };
+const FIELD_LABEL_PLAIN = { ph:"pH", ce:"CE", std:"STD", ca:"Ca2+ (mg/L)", mg:"Mg2+ (mg/L)", na:"Na+ (mg/L)", k:"K+ (mg/L)", hco3:"HCO3- (mg/L)", cl:"Cl- (mg/L)", so4:"SO4 2- (mg/L)" };
 const CHART_PALETTE = ["#1B5D8E","#B05A2A","#3C8C9C","#7A3D1B","#3C5A66","#9C3B2E","#4FA3D9","#D98452","#00594D","#8E44AD","#16A085","#C0392B","#2C3E50","#F39C12","#27AE60","#8E5B3F","#5D6D7E","#B03060","#556B2F","#4682B4"];
 
 let pointPickerSelected = new Set();
@@ -2553,8 +2934,20 @@ function populateChartBuilderTipo(){
 
 function updateChartBuilderFieldsUI(){
   const type = document.getElementById("chartBuilderType").value;
-  document.getElementById("chartBuilderFieldsSingle").style.display = (type==="dispersion") ? "none" : "block";
+  const isIonChart = (type==="piper" || type==="stiff" || type==="schoeller");
+  const isPerfil = (type==="perfil");
+  document.getElementById("chartBuilderFieldsSingle").style.display = (type==="dispersion" || isIonChart || isPerfil) ? "none" : "block";
   document.getElementById("chartBuilderFieldsXY").style.display = (type==="dispersion") ? "flex" : "none";
+  document.getElementById("rainOverlayField").style.display = (type==="hidrograma") ? "block" : "none";
+  const forceTipo = isIonChart ? "calidad" : (isPerfil ? "pozo" : null);
+  if(forceTipo){
+    const tipoSel = document.getElementById("chartBuilderTipo");
+    if(tipoSel.value !== forceTipo && Array.from(tipoSel.options).some(o=>o.value===forceTipo)){
+      tipoSel.value = forceTipo;
+      pointPickerSelected.clear();
+      renderPointPicker();
+    }
+  }
 }
 
 function populateChartBuilderFields(){
@@ -2633,7 +3026,185 @@ function renderCustomSummary(values, labelText){
   grid.innerHTML = cards.map(c=>`<div class="stat"><div class="n">${c.n}</div><div class="l">${c.l}</div></div>`).join("");
 }
 
-function buildCustomChart(){
+async function fetchRainfallData(lat, lon, startDate, endDate){
+  try{
+    const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=${startDate}&end_date=${endDate}&daily=precipitation_sum&timezone=auto`;
+    const res = await fetch(url);
+    if(!res.ok) return null;
+    const json = await res.json();
+    if(!json.daily || !json.daily.time) return null;
+    return json.daily;
+  }catch(e){ return null; }
+}
+
+const ION_EQ_WEIGHT = { ca:20.04, mg:12.15, na:22.99, k:39.10, hco3:61.02, cl:35.45, so4:48.03 };
+function toMeqL(field, mgL){
+  if(isNaN(mgL)) return NaN;
+  return mgL / ION_EQ_WEIGHT[field];
+}
+function getIonMeq(r){
+  return {
+    ca: toMeqL("ca", parseFloat(r.data.ca)),
+    mg: toMeqL("mg", parseFloat(r.data.mg)),
+    na: toMeqL("na", parseFloat(r.data.na)),
+    k: toMeqL("k", parseFloat(r.data.k)),
+    hco3: toMeqL("hco3", parseFloat(r.data.hco3)),
+    cl: toMeqL("cl", parseFloat(r.data.cl)),
+    so4: toMeqL("so4", parseFloat(r.data.so4))
+  };
+}
+
+function ternaryPoint(p1, p2, p3, size, ox, oy){
+  const x = ox + (p2 + p3*0.5) * size;
+  const y = oy - p3 * size * (Math.sqrt(3)/2);
+  return {x, y};
+}
+
+function buildPiperSVG(selectedRecs){
+  const size = 200, catOx = 40, catOy = 280, anOx = 340, anOy = 280;
+  function triPath(ox, oy){
+    return `M${ox},${oy} L${ox+size},${oy} L${ox+size/2},${oy-size*Math.sqrt(3)/2} Z`;
+  }
+  let dots = "";
+  let any = false;
+  selectedRecs.forEach((r,i)=>{
+    const ion = getIonMeq(r);
+    const catSum = ion.ca+ion.mg+ion.na+ion.k;
+    const anSum = ion.cl+ion.so4+ion.hco3;
+    if(isNaN(catSum) || isNaN(anSum) || catSum<=0 || anSum<=0) return;
+    any = true;
+    const color = colorForPoint(r.id, i);
+    const cp = ternaryPoint(ion.ca/catSum, (ion.na+ion.k)/catSum, ion.mg/catSum, size, catOx, catOy);
+    const ap = ternaryPoint(ion.cl/anSum, ion.so4/anSum, ion.hco3/anSum, size, anOx, anOy);
+    const label = escapeHtml(r.data.codigo||"");
+    dots += `<circle cx="${cp.x.toFixed(1)}" cy="${cp.y.toFixed(1)}" r="5" fill="${color}" stroke="#fff" stroke-width="1"><title>${label}</title></circle>`;
+    dots += `<circle cx="${ap.x.toFixed(1)}" cy="${ap.y.toFixed(1)}" r="5" fill="${color}" stroke="#fff" stroke-width="1"><title>${label}</title></circle>`;
+  });
+  if(!any) return null;
+  const tri = '#8a8a8a';
+  let svg = `<svg viewBox="0 0 580 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; font-family:sans-serif;">`;
+  svg += `<path d="${triPath(catOx,catOy)}" fill="none" stroke="${tri}" stroke-width="1"/>`;
+  svg += `<path d="${triPath(anOx,anOy)}" fill="none" stroke="${tri}" stroke-width="1"/>`;
+  svg += `<text x="${catOx-6}" y="${catOy+14}" font-size="11" text-anchor="end">Ca</text>`;
+  svg += `<text x="${catOx+size+6}" y="${catOy+14}" font-size="11">Na+K</text>`;
+  svg += `<text x="${catOx+size/2}" y="${catOy-size*0.866-8}" font-size="11" text-anchor="middle">Mg</text>`;
+  svg += `<text x="${anOx-6}" y="${anOy+14}" font-size="11" text-anchor="end">Cl</text>`;
+  svg += `<text x="${anOx+size+6}" y="${anOy+14}" font-size="11">SO4</text>`;
+  svg += `<text x="${anOx+size/2}" y="${anOy-size*0.866-8}" font-size="11" text-anchor="middle">HCO3</text>`;
+  svg += dots;
+  svg += `</svg>`;
+  return svg;
+}
+
+function buildStiffSVG(selectedRecs){
+  const cellW = 170, cellH = 130, cols = 3;
+  const validRecs = selectedRecs.filter(r=>{
+    const ion = getIonMeq(r);
+    return [ion.ca,ion.mg,ion.na,ion.k,ion.cl,ion.so4,ion.hco3].some(v=>!isNaN(v) && v>0);
+  });
+  if(validRecs.length===0) return null;
+  const rowsCount = Math.ceil(validRecs.length/cols);
+  let body = "";
+  validRecs.forEach((r,i)=>{
+    const ion = getIonMeq(r);
+    const naK = (isNaN(ion.na)?0:ion.na) + (isNaN(ion.k)?0:ion.k);
+    const ca = isNaN(ion.ca)?0:ion.ca, mg = isNaN(ion.mg)?0:ion.mg;
+    const cl = isNaN(ion.cl)?0:ion.cl, so4 = isNaN(ion.so4)?0:ion.so4, hco3 = isNaN(ion.hco3)?0:ion.hco3;
+    const maxVal = Math.max(naK, cl, ca, hco3, mg, so4, 1);
+    const cx = (i%cols)*cellW + cellW/2;
+    const cy = Math.floor(i/cols)*cellH + cellH/2;
+    const scale = (cellW/2 - 20) / maxVal;
+    const rowGap = 24;
+    const rows = [[naK,cl],[ca,hco3],[mg,so4]];
+    const leftPts = [], rightPts = [];
+    rows.forEach((pair, ri)=>{
+      const y = cy - rowGap + ri*rowGap;
+      leftPts.push({x: cx - pair[0]*scale, y});
+      rightPts.push({x: cx + pair[1]*scale, y});
+    });
+    const pts = leftPts.concat(rightPts.reverse());
+    const d = "M" + pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" L") + " Z";
+    const color = colorForPoint(r.id, i);
+    body += `<path d="${d}" fill="${color}" fill-opacity="0.45" stroke="${color}" stroke-width="1.5"/>`;
+    body += `<line x1="${cx}" y1="${cy-rowGap-8}" x2="${cx}" y2="${cy+rowGap+8}" stroke="#ccc" stroke-width="0.5"/>`;
+    body += `<text x="${cx}" y="${cy+rowGap+22}" font-size="10" text-anchor="middle">${escapeHtml(r.data.codigo||"")}</text>`;
+  });
+  const labelsLeft = ["Na+K","Ca","Mg"], labelsRight = ["Cl","HCO3","SO4"];
+  let svg = `<svg viewBox="0 0 ${cellW*cols} ${cellH*rowsCount+20}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; font-family:sans-serif;">`;
+  svg += body;
+  svg += `</svg>`;
+  return svg;
+}
+
+function buildSchoellerChart(canvas, selectedRecs){
+  if(typeof Chart === "undefined") return null;
+  const labels = ["Ca","Mg","Na+K","Cl","SO4","HCO3"];
+  const datasets = [];
+  selectedRecs.forEach((r,i)=>{
+    const ion = getIonMeq(r);
+    const vals = [ion.ca, ion.mg, (ion.na||0)+(ion.k||0), ion.cl, ion.so4, ion.hco3]
+      .map(v=>(isNaN(v) || v<=0) ? null : v);
+    if(vals.every(v=>v===null)) return;
+    const color = colorForPoint(r.id, i);
+    datasets.push({ label: r.data.codigo || ("#"+r.id), data: vals, borderColor: color, backgroundColor: color, spanGaps:true, pointRadius:4 });
+  });
+  if(datasets.length===0) return null;
+  return new Chart(canvas, {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      scales: { y: { type:"logarithmic", title:{display:true, text:"meq/L"} } },
+      plugins: { legend: { position:"bottom", labels:{boxWidth:12, font:{size:10}} } }
+    }
+  });
+}
+
+function buildPerfilSVG(selectedRecs){
+  const valid = selectedRecs.filter(r=>{
+    const p = parseFloat(r.data.profundidad);
+    return !isNaN(p) && p>0;
+  });
+  if(valid.length===0) return null;
+  const maxDepth = Math.max(...valid.map(r=>parseFloat(r.data.profundidad)));
+  const colW = 90, chartH = 260, marginTop = 24, marginBottom = 46, marginLeft = 50;
+  const W = marginLeft + colW*valid.length + 20;
+  const H = marginTop + chartH + marginBottom;
+  const scale = chartH/maxDepth;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; font-family:sans-serif;">`;
+  const steps = 5;
+  for(let i=0;i<=steps;i++){
+    const d = (maxDepth/steps)*i;
+    const y = marginTop + d*scale;
+    svg += `<line x1="${marginLeft-5}" y1="${y.toFixed(1)}" x2="${W-10}" y2="${y.toFixed(1)}" stroke="#eee" stroke-width="1"/>`;
+    svg += `<text x="${marginLeft-8}" y="${(y+3).toFixed(1)}" font-size="9" text-anchor="end">${d.toFixed(0)}m</text>`;
+  }
+
+  valid.forEach((r,i)=>{
+    const x = marginLeft + i*colW + 10;
+    const prof = parseFloat(r.data.profundidad);
+    const ne = parseFloat(r.data.nivel_estatico);
+    const color = colorForPoint(r.id, i);
+    const barH = prof*scale;
+    svg += `<rect x="${x}" y="${marginTop}" width="${colW-20}" height="${barH.toFixed(1)}" fill="${color}" fill-opacity="0.25" stroke="${color}" stroke-width="1.5"/>`;
+    if(!isNaN(ne)){
+      const wy = marginTop + ne*scale;
+      svg += `<line x1="${x}" y1="${wy.toFixed(1)}" x2="${x+colW-20}" y2="${wy.toFixed(1)}" stroke="#1B5D8E" stroke-width="2" stroke-dasharray="4,2"/>`;
+    }
+    svg += `<text x="${x+(colW-20)/2}" y="${marginTop+chartH+18}" font-size="10" text-anchor="middle">${escapeHtml(r.data.codigo||"")}</text>`;
+    const litRaw = r.data.litologia || "";
+    if(litRaw){
+      const litTxt = litRaw.slice(0,38) + (litRaw.length>38 ? "…" : "");
+      svg += `<text x="${x+(colW-20)/2}" y="${marginTop+chartH+32}" font-size="7" text-anchor="middle" fill="#888">${escapeHtml(litTxt)}</text>`;
+    }
+  });
+  svg += `<text x="${marginLeft-8}" y="${marginTop-8}" font-size="9" text-anchor="end">0m</text>`;
+  svg += `</svg>`;
+  return svg;
+}
+
+async function buildCustomChart(){
   if(typeof Chart === "undefined") return;
   const type = document.getElementById("chartBuilderType").value;
   const selectedIds = Array.from(pointPickerSelected);
@@ -2641,9 +3212,44 @@ function buildCustomChart(){
   const selectedRecs = records.filter(r=>selectedIds.includes(r.id));
 
   const canvas = document.getElementById("chartCustom");
+  const svgHolder = document.getElementById("chartCustomSvgHolder");
   if(customChart){ customChart.destroy(); customChart = null; }
   document.getElementById("customChartRow").style.display = "flex";
   renderColorPickers(selectedRecs);
+
+  const isIonChart = (type==="piper" || type==="stiff" || type==="perfil");
+  canvas.style.display = isIonChart ? "none" : "block";
+  svgHolder.style.display = isIonChart ? "block" : "none";
+  if(!isIonChart) svgHolder.innerHTML = "";
+
+  if(type === "piper"){
+    const svg = buildPiperSVG(selectedRecs);
+    if(!svg){ showToast(t("stats_no_numeric_data")); return; }
+    svgHolder.innerHTML = svg;
+    renderCustomSummary(null, null);
+    return;
+  }
+  if(type === "stiff"){
+    const svg = buildStiffSVG(selectedRecs);
+    if(!svg){ showToast(t("stats_no_numeric_data")); return; }
+    svgHolder.innerHTML = svg;
+    renderCustomSummary(null, null);
+    return;
+  }
+  if(type === "perfil"){
+    const svg = buildPerfilSVG(selectedRecs);
+    if(!svg){ showToast(t("stats_no_numeric_data")); return; }
+    svgHolder.innerHTML = svg;
+    renderCustomSummary(null, null);
+    return;
+  }
+  if(type === "schoeller"){
+    const built = buildSchoellerChart(canvas, selectedRecs);
+    if(!built){ showToast(t("stats_no_numeric_data")); return; }
+    customChart = built;
+    renderCustomSummary(null, null);
+    return;
+  }
 
   if(type === "hidrograma"){
     const field = document.getElementById("chartBuilderFieldY").value;
@@ -2659,8 +3265,31 @@ function buildCustomChart(){
       byCodigo[cod][dateLabel] = converted;
     });
     const codigos = Object.keys(byCodigo);
-    const allDates = Array.from(new Set(selectedRecs.map(r=>new Date(r.fecha).toISOString().slice(0,10)))).sort();
+    let allDates = Array.from(new Set(selectedRecs.map(r=>new Date(r.fecha).toISOString().slice(0,10)))).sort();
     if(codigos.length===0){ showToast(t("stats_no_numeric_data")); return; }
+
+    const scales = { y: { title: { display:true, text: fieldLabel(field) } } };
+    let rainByDate = null;
+
+    if(document.getElementById("rainOverlayToggle").checked){
+      const withGps = selectedRecs.filter(r=>r.gps);
+      if(withGps.length){
+        const lat = withGps.reduce((s,r)=>s+r.gps.lat,0)/withGps.length;
+        const lon = withGps.reduce((s,r)=>s+r.gps.lon,0)/withGps.length;
+        const startDate = allDates[0], endDate = allDates[allDates.length-1];
+        showToast(t("stats_rain_loading"));
+        const rain = await fetchRainfallData(lat, lon, startDate, endDate);
+        if(rain && rain.time){
+          rainByDate = {};
+          rain.time.forEach((d,i)=>{ rainByDate[d] = rain.precipitation_sum[i]; });
+          allDates = Array.from(new Set([...allDates, ...rain.time])).sort();
+        } else {
+          showToast(t("stats_rain_error"));
+        }
+      } else {
+        showToast(t("stats_rain_no_gps"));
+      }
+    }
 
     const datasets = codigos.map((cod,i)=>{
       const recForColor = selectedRecs.find(r=>(r.data.codigo||("#"+r.id))===cod);
@@ -2669,16 +3298,27 @@ function buildCustomChart(){
         label: cod,
         data: allDates.map(d => byCodigo[cod][d] !== undefined ? byCodigo[cod][d] : null),
         borderColor: color, backgroundColor: color,
-        spanGaps: true, tension: 0.15, pointRadius: 4
+        spanGaps: true, tension: 0.15, pointRadius: 4, yAxisID: "y"
       };
     });
+
+    if(rainByDate){
+      datasets.push({
+        type: "bar", label: t("stats_rain_label"),
+        data: allDates.map(d => rainByDate[d] !== undefined ? rainByDate[d] : null),
+        backgroundColor: "rgba(60,140,190,0.35)",
+        yAxisID: "y1", order: 99
+      });
+      scales.y1 = { position:"right", title:{display:true, text:"mm"}, grid:{drawOnChartArea:false} };
+    }
+
     customChart = new Chart(canvas, {
       type: "line",
       data: { labels: allDates, datasets },
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { position:"bottom", labels:{boxWidth:12, font:{size:10}} } },
-        scales: { y: { title: { display:true, text: fieldLabel(field) } } }
+        scales
       }
     });
     const allVals = Object.values(byCodigo).flatMap(o=>Object.values(o));
@@ -2868,9 +3508,9 @@ let localToken = null;
 let localUserEmail = null;
 
 const LOCAL_FIELD_MAP = {
-  pozo: {profundidad:"Profundidad", diametro:"Diametro", nivel_estatico:"NivelEstatico", nivel_dinamico:"NivelDinamico", uso:"Uso", litologia:"Litologia", obs:"Obs"},
+  pozo: {profundidad:"Profundidad", diametro:"Diametro", nivel_estatico:"NivelEstatico", nivel_dinamico:"NivelDinamico", caudal_bombeo:"CaudalBombeo", capacidad_especifica:"CapacidadEspecifica", uso:"Uso", litologia:"Litologia", obs:"Obs"},
   manantial: {caudal:"Caudal", temp:"Temp", metodo:"Metodo", tipo_aflor:"TipoAflor", vegetacion:"Vegetacion", obs:"Obs"},
-  calidad: {ph:"PH", ce:"CE", temp:"Temp", od:"OD", std:"STD", turbidez:"Turbidez", obs:"Obs"},
+  calidad: {ph:"PH", ce:"CE", temp:"Temp", od:"OD", std:"STD", turbidez:"Turbidez", ca:"Ca", mg:"Mg", na:"Na", k:"K", hco3:"Hco3", cl:"Cl", so4:"So4", obs:"Obs"},
   geologia: {formacion:"Formacion", litologia:"Litologia", rumbo:"Rumbo", buzamiento:"Buzamiento", estructuras:"Estructuras", obs:"Obs"}
 };
 
@@ -3286,6 +3926,10 @@ async function changePassword(){
    ====================================================================== */
 let scene3d = null, camera3d = null, renderer3d = null, controls3d = null;
 let terrainMesh3d = null, wellsGroup3d = null;
+let wellMeshRegistry = [];
+let lineDrawMode = false;
+let lineDrawPoints = [];
+let sectionLine3d = null;
 let dem3d = null;
 let pendingOrtho3dImg = null;
 let ortho3d = null;
@@ -3356,6 +4000,7 @@ function init3dScene(){
     if(renderer3d && scene3d && camera3d) renderer3d.render(scene3d, camera3d);
   }
   animate3d();
+  setup3dRaycasting();
   viewer3dInitialized = true;
 }
 
@@ -3365,6 +4010,14 @@ function utmToLocal3d(utmX, utmY){
   const x = (utmX - dem3d.xll) - width/2;
   const z = ((dem3d.yll + depth) - utmY) - depth/2;
   return {x, z};
+}
+
+function localToUtm3d(x, z){
+  const width = (dem3d.ncols-1)*dem3d.cellsize;
+  const depth = (dem3d.nrows-1)*dem3d.cellsize;
+  const utmX = x + dem3d.xll + width/2;
+  const utmY = (dem3d.yll + depth) - (z + depth/2);
+  return {x: utmX, y: utmY};
 }
 
 function sampleTerrainHeight(utmX, utmY){
@@ -3416,43 +4069,207 @@ function buildTerrainMesh(){
   scene3d.add(terrainMesh3d);
 }
 
+const CATEGORICAL_ATTRS = ["litologia","formacion"];
+
+function colorForAttrValue(val, min, max){
+  if(max===min) return 0x1B5D8E;
+  const t = Math.max(0, Math.min(1, (val-min)/(max-min)));
+  const c1 = {r:0x1B,g:0x5D,b:0x8E}, c2 = {r:0xB0,g:0x5A,b:0x2A};
+  const r = Math.round(c1.r + (c2.r-c1.r)*t);
+  const g = Math.round(c1.g + (c2.g-c1.g)*t);
+  const b = Math.round(c1.b + (c2.b-c1.b)*t);
+  return (r<<16)|(g<<8)|b;
+}
+
+function buildCategoryColorMap(attr){
+  const map = new Map();
+  const seen = new Set();
+  records.filter(r=>r.gps).forEach(r=>{
+    const raw = (r.data[attr]||"").trim();
+    if(!raw) return;
+    const key = raw.toLowerCase();
+    if(!seen.has(key)){
+      seen.add(key);
+      const hex = CHART_PALETTE[map.size % CHART_PALETTE.length];
+      map.set(key, {label: raw, colorHex: hex, colorInt: parseInt(hex.replace("#","0x"))});
+    }
+  });
+  return map;
+}
+
+function updateV3dLegend(mode, a, b, categoryMap){
+  const overlay = document.getElementById("v3dLegend");
+  const card = document.getElementById("v3dLegendCard");
+  if(mode==="tipo"){
+    overlay.style.display = "none";
+    card.innerHTML = `<p class="hint" data-i18n="v3d_legend_hint">${t("v3d_legend_hint")}</p>`;
+    return;
+  }
+  if(mode==="numeric"){
+    overlay.style.display = "block";
+    overlay.innerHTML = `<div>${fieldLabel(a)}</div><div class="grad"></div><div class="grad-labels"><span>${b.min.toFixed(1)}</span><span>${b.max.toFixed(1)}</span></div>`;
+    card.innerHTML = `<p class="hint">${fieldLabel(a)}: ${b.min.toFixed(1)} – ${b.max.toFixed(1)}</p><div class="grad" style="height:14px;"></div>`;
+    return;
+  }
+  overlay.style.display = "none";
+  if(!categoryMap || categoryMap.size===0){
+    card.innerHTML = `<p class="hint">${t("v3d_legend_empty")}</p>`;
+    return;
+  }
+  card.innerHTML = Array.from(categoryMap.values()).map(c=>
+    `<div class="v3d-info-row"><span style="display:flex; align-items:center; gap:7px;"><span class="dot" style="background:${c.colorHex};"></span>${escapeHtml(c.label)}</span></div>`
+  ).join("");
+}
+
 function render3dWells(){
   if(!scene3d || !dem3d) return;
   if(wellsGroup3d) scene3d.remove(wellsGroup3d);
   wellsGroup3d = new THREE.Group();
   scene3d.add(wellsGroup3d);
+  wellMeshRegistry = [];
 
-  const showWellsEl = document.getElementById("show3dWells");
-  if(!showWellsEl || !showWellsEl.checked) return;
   const showWater = document.getElementById("show3dWaterTable").checked;
-
+  const colorAttr = document.getElementById("colorByAttrSelect").value;
   const zoneInfo = getActiveUtmZone();
-  records.filter(r=>r.tipo==="pozo" && r.gps).forEach(r=>{
-    const p = latLonToUTM(r.gps.lat, r.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
-    const local = utmToLocal3d(p.x, p.y);
-    const groundY = sampleTerrainHeight(p.x, p.y);
-    const depth = parseFloat(r.data.profundidad) || 5;
-    const scaledDepth = Math.max(depth * vertExaggeration, dem3d.cellsize*0.5);
-    const radius = Math.max(dem3d.cellsize*0.15, 0.5);
+  const isCategorical = CATEGORICAL_ATTRS.includes(colorAttr);
 
-    const cyl = new THREE.Mesh(
-      new THREE.CylinderGeometry(radius, radius, scaledDepth, 10),
-      new THREE.MeshStandardMaterial({color: 0x1B5D8E})
-    );
-    cyl.position.set(local.x, groundY - scaledDepth/2, local.z);
-    wellsGroup3d.add(cyl);
+  let minAttr = Infinity, maxAttr = -Infinity, categoryMap = null;
+  if(isCategorical){
+    categoryMap = buildCategoryColorMap(colorAttr);
+    updateV3dLegend("category", colorAttr, null, categoryMap);
+  } else if(colorAttr !== "tipo"){
+    records.filter(r=>r.gps).forEach(r=>{
+      const v = parseFloat(r.data[colorAttr]);
+      if(!isNaN(v)){ if(v<minAttr) minAttr=v; if(v>maxAttr) maxAttr=v; }
+    });
+    if(minAttr===Infinity){ minAttr=0; maxAttr=1; }
+    updateV3dLegend("numeric", colorAttr, {min:minAttr, max:maxAttr});
+  } else {
+    updateV3dLegend("tipo");
+  }
 
-    const nivelEst = parseFloat(r.data.nivel_estatico);
-    if(showWater && !isNaN(nivelEst)){
-      const waterY = groundY - nivelEst*vertExaggeration;
-      const disc = new THREE.Mesh(
-        new THREE.CylinderGeometry(radius*1.5, radius*1.5, Math.max(dem3d.cellsize*0.05,0.2), 10),
-        new THREE.MeshStandardMaterial({color: 0x4FA3D9, transparent:true, opacity:0.85})
-      );
-      disc.position.set(local.x, waterY, local.z);
-      wellsGroup3d.add(disc);
+  TYPES.forEach(tipo=>{
+    const showEl = document.getElementById("show3d-"+tipo);
+    if(!showEl || !showEl.checked) return;
+
+    records.filter(r=>r.tipo===tipo && r.gps).forEach(r=>{
+      const p = latLonToUTM(r.gps.lat, r.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
+      const local = utmToLocal3d(p.x, p.y);
+      const groundY = sampleTerrainHeight(p.x, p.y);
+      const radius = Math.max(dem3d.cellsize*0.15, 0.5);
+
+      let color = CHART_COLORS[tipo] ? parseInt(CHART_COLORS[tipo].replace("#","0x")) : 0x1B5D8E;
+      if(isCategorical){
+        const raw = (r.data[colorAttr]||"").trim().toLowerCase();
+        if(raw && categoryMap.has(raw)) color = categoryMap.get(raw).colorInt;
+      } else if(colorAttr !== "tipo"){
+        const v = parseFloat(r.data[colorAttr]);
+        if(!isNaN(v)) color = colorForAttrValue(v, minAttr, maxAttr);
+      }
+
+      let mesh;
+      if(tipo === "pozo"){
+        const depth = parseFloat(r.data.profundidad) || 5;
+        const scaledDepth = Math.max(depth * vertExaggeration, dem3d.cellsize*0.5);
+        mesh = new THREE.Mesh(
+          new THREE.CylinderGeometry(radius, radius, scaledDepth, 10),
+          new THREE.MeshStandardMaterial({color})
+        );
+        mesh.position.set(local.x, groundY - scaledDepth/2, local.z);
+
+        const nivelEst = parseFloat(r.data.nivel_estatico);
+        if(showWater && !isNaN(nivelEst)){
+          const waterY = groundY - nivelEst*vertExaggeration;
+          const disc = new THREE.Mesh(
+            new THREE.CylinderGeometry(radius*1.5, radius*1.5, Math.max(dem3d.cellsize*0.05,0.2), 10),
+            new THREE.MeshStandardMaterial({color: 0x4FA3D9, transparent:true, opacity:0.85})
+          );
+          disc.position.set(local.x, waterY, local.z);
+          wellsGroup3d.add(disc);
+        }
+      } else {
+        mesh = new THREE.Mesh(
+          new THREE.SphereGeometry(radius*1.3, 12, 12),
+          new THREE.MeshStandardMaterial({color})
+        );
+        mesh.position.set(local.x, groundY + radius*1.3, local.z);
+      }
+      wellsGroup3d.add(mesh);
+      wellMeshRegistry.push({mesh, recordId: r.id});
+    });
+  });
+}
+
+function show3dInfo(id){
+  const rec = records.find(r=>r.id===id);
+  const panel = document.getElementById("v3dInfoPanel");
+  if(!panel) return;
+  if(!rec){ panel.innerHTML = `<p class="hint">${t("v3d_info_hint")}</p>`; return; }
+  const rows = [[t("label_codigo"), rec.data.codigo||""], ["Tipo", TYPE_LABEL[rec.tipo]||rec.tipo], ["Fecha", new Date(rec.fecha).toLocaleDateString()]];
+  if(rec.gps) rows.push(["GPS", rec.gps.lat.toFixed(5)+", "+rec.gps.lon.toFixed(5)]);
+  fieldIds(rec.tipo).forEach(f=>{
+    const key = f.replace(/-/g,"_");
+    if(key==="codigo" || key==="obs") return;
+    const val = rec.data[key];
+    if(val) rows.push([fieldLabel(key), val]);
+  });
+  panel.innerHTML = rows.map(([k,v])=>`<div class="v3d-info-row"><span class="k">${escapeHtml(k)}</span><span>${escapeHtml(String(v))}</span></div>`).join("");
+}
+
+function setup3dRaycasting(){
+  if(!renderer3d) return;
+  const raycaster = new THREE.Raycaster();
+  const mouseV = new THREE.Vector2();
+  renderer3d.domElement.addEventListener("click", (event)=>{
+    const rect = renderer3d.domElement.getBoundingClientRect();
+    mouseV.x = ((event.clientX-rect.left)/rect.width)*2-1;
+    mouseV.y = -((event.clientY-rect.top)/rect.height)*2+1;
+    raycaster.setFromCamera(mouseV, camera3d);
+
+    if(lineDrawMode){
+      if(!terrainMesh3d) return;
+      const hits = raycaster.intersectObject(terrainMesh3d);
+      if(!hits.length) return;
+      const pt = hits[0].point;
+      lineDrawPoints.push({x: pt.x, z: pt.z});
+      if(lineDrawPoints.length===2){
+        finishLineDraw();
+      } else {
+        document.getElementById("lineDrawHint").textContent = t("v3d_line_hint_second");
+      }
+      return;
+    }
+
+    if(!wellMeshRegistry.length) return;
+    const intersects = raycaster.intersectObjects(wellMeshRegistry.map(w=>w.mesh));
+    if(intersects.length){
+      const entry = wellMeshRegistry.find(w=>w.mesh===intersects[0].object);
+      if(entry) show3dInfo(entry.recordId);
     }
   });
+}
+
+function render3dLayerVis(){
+  if(terrainMesh3d) terrainMesh3d.visible = document.getElementById("show3dTerrain").checked;
+  const showOrtho = document.getElementById("show3dOrtho").checked;
+  if(terrainMesh3d && terrainMesh3d.material && terrainMesh3d.material.map){
+    terrainMesh3d.material.wireframe = false;
+  }
+}
+
+let locatorMap3d = null;
+function renderLocatorMini(lat, lon){
+  const el = document.getElementById("v3dLocatorMini");
+  if(!el || typeof L === "undefined") return;
+  if(!locatorMap3d){
+    locatorMap3d = L.map(el, {zoomControl:false, attributionControl:false, dragging:false, scrollWheelZoom:false, doubleClickZoom:false, touchZoom:false});
+    L.tileLayer(esriTileUrl(), {maxZoom:19}).addTo(locatorMap3d);
+    locatorMap3d.marker = L.marker([lat,lon]).addTo(locatorMap3d);
+  } else {
+    locatorMap3d.marker.setLatLng([lat,lon]);
+  }
+  locatorMap3d.setView([lat,lon], 11);
+  setTimeout(()=>locatorMap3d.invalidateSize(), 50);
 }
 
 function reset3dView(){
@@ -3463,6 +4280,171 @@ function reset3dView(){
   camera3d.position.set(maxDim*0.6, maxDim*0.6, maxDim*0.6);
   controls3d.target.set(0,0,0);
   controls3d.update();
+}
+
+function set3dOrientation(dir){
+  if(!camera3d || !controls3d || !dem3d) return;
+  const width = (dem3d.ncols-1)*dem3d.cellsize;
+  const depth = (dem3d.nrows-1)*dem3d.cellsize;
+  const maxDim = Math.max(width, depth, 10);
+  const d = maxDim*0.95;
+  const target = controls3d.target;
+  const positions = {
+    n: [0, maxDim*0.35, -d],
+    s: [0, maxDim*0.35, d],
+    e: [d, maxDim*0.35, 0],
+    o: [-d, maxDim*0.35, 0],
+    top: [0.01, d*1.3, 0.01]
+  };
+  const p = positions[dir];
+  if(!p) return;
+  camera3d.position.set(target.x+p[0], target.y+p[1], target.z+p[2]);
+  controls3d.update();
+}
+
+/* ---- Línea de corte / sección transversal ---- */
+function toggleLineDrawMode(){
+  if(!dem3d){ showToast(t("v3d_empty")); return; }
+  lineDrawMode = !lineDrawMode;
+  lineDrawPoints = [];
+  document.getElementById("lineDrawBtn").classList.toggle("active", lineDrawMode);
+  document.getElementById("lineDrawHint").textContent = lineDrawMode ? t("v3d_line_hint_first") : "";
+}
+
+function clearSectionLine(){
+  lineDrawMode = false;
+  lineDrawPoints = [];
+  document.getElementById("lineDrawBtn").classList.remove("active");
+  document.getElementById("lineDrawHint").textContent = "";
+  if(sectionLine3d && scene3d){ scene3d.remove(sectionLine3d); sectionLine3d = null; }
+  document.getElementById("sectionCard").style.display = "none";
+}
+
+function pointToSegmentDistance(px,pz, x1,z1, x2,z2){
+  const dx=x2-x1, dz=z2-z1;
+  const lenSq = dx*dx+dz*dz;
+  const t = lenSq>0 ? ((px-x1)*dx+(pz-z1)*dz)/lenSq : 0;
+  const tClamped = Math.max(0, Math.min(1,t));
+  const cx = x1+tClamped*dx, cz = z1+tClamped*dz;
+  const dist = Math.sqrt((px-cx)*(px-cx)+(pz-cz)*(pz-cz));
+  return {dist, t};
+}
+
+function finishLineDraw(){
+  lineDrawMode = false;
+  document.getElementById("lineDrawBtn").classList.remove("active");
+  document.getElementById("lineDrawHint").textContent = "";
+
+  const [p1, p2] = lineDrawPoints;
+  const u1 = localToUtm3d(p1.x, p1.z), u2 = localToUtm3d(p2.x, p2.z);
+  const h1 = sampleTerrainHeight(u1.x, u1.y), h2 = sampleTerrainHeight(u2.x, u2.y);
+
+  if(typeof THREE.BufferGeometry === "function" && typeof THREE.Line === "function"){
+    try{
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(p1.x, h1+2, p1.z),
+        new THREE.Vector3(p2.x, h2+2, p2.z)
+      ]);
+      const material = new THREE.LineBasicMaterial({color:0xFFD400, linewidth:3});
+      if(sectionLine3d) scene3d.remove(sectionLine3d);
+      sectionLine3d = new THREE.Line(geometry, material);
+      scene3d.add(sectionLine3d);
+    }catch(e){}
+  }
+
+  buildCrossSection(p1, p2);
+}
+
+function buildCrossSection(p1, p2){
+  const lineLen = Math.sqrt((p2.x-p1.x)*(p2.x-p1.x) + (p2.z-p1.z)*(p2.z-p1.z));
+  if(lineLen < 1){ showToast(t("v3d_line_too_short")); return; }
+
+  const zoneInfo = getActiveUtmZone();
+  const bufferDist = dem3d.cellsize * 5;
+
+  const candidates = [];
+  records.filter(r=>r.tipo==="pozo" && r.gps).forEach(r=>{
+    const p = latLonToUTM(r.gps.lat, r.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
+    const local = utmToLocal3d(p.x, p.y);
+    const res = pointToSegmentDistance(local.x, local.z, p1.x, p1.z, p2.x, p2.z);
+    if(res.dist <= bufferDist && res.t >= 0 && res.t <= 1){
+      candidates.push({rec:r, distAlong: res.t*lineLen});
+    }
+  });
+  candidates.sort((a,b)=>a.distAlong-b.distAlong);
+
+  if(candidates.length===0){
+    showToast(t("v3d_line_no_wells"));
+    document.getElementById("sectionCard").style.display = "none";
+    return;
+  }
+
+  const steps = 30;
+  const terrainProfile = [];
+  for(let i=0;i<=steps;i++){
+    const tt = i/steps;
+    const lx = p1.x + (p2.x-p1.x)*tt;
+    const lz = p1.z + (p2.z-p1.z)*tt;
+    const u = localToUtm3d(lx, lz);
+    terrainProfile.push({dist: tt*lineLen, h: sampleTerrainHeight(u.x, u.y)});
+  }
+
+  const svg = buildCrossSectionSVG(candidates, terrainProfile, lineLen);
+  document.getElementById("sectionSvgHolder").innerHTML = svg;
+  document.getElementById("sectionCard").style.display = "block";
+  showToast(candidates.length + " " + t("v3d_line_wells_found"));
+}
+
+function buildCrossSectionSVG(candidates, terrainProfile, lineLen){
+  const marginLeft=55, marginRight=20, marginTop=20, marginBottom=45;
+  const plotW = 560, plotH = 220;
+  const W = marginLeft+plotW+marginRight, H = marginTop+plotH+marginBottom;
+
+  const maxDepth = Math.max(...candidates.map(c=>parseFloat(c.rec.data.profundidad)||10), 10);
+  const terrainHs = terrainProfile.map(p=>p.h);
+  const maxH = Math.max(...terrainHs);
+  const minTerrainH = Math.min(...terrainHs);
+  const vMin = minTerrainH - maxDepth*1.15;
+  const vMax = maxH + (maxH-vMin)*0.08;
+  const vRange = Math.max(vMax-vMin, 1);
+
+  const xScale = plotW/lineLen;
+  const yScale = plotH/vRange;
+  const X = d => marginLeft + d*xScale;
+  const Y = h => marginTop + (vMax-h)*yScale;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; font-family:sans-serif;">`;
+
+  const terrainPath = "M" + terrainProfile.map(p=>`${X(p.dist).toFixed(1)},${Y(p.h).toFixed(1)}`).join(" L");
+  svg += `<path d="${terrainPath}" fill="none" stroke="#6b7a5e" stroke-width="2"/>`;
+  svg += `<text x="${marginLeft}" y="${marginTop-6}" font-size="9" fill="#888">${t("v3d_section_terrain")}</text>`;
+
+  candidates.forEach(c=>{
+    const r = c.rec;
+    let closest = terrainProfile[0];
+    terrainProfile.forEach(p=>{ if(Math.abs(p.dist-c.distAlong) < Math.abs(closest.dist-c.distAlong)) closest = p; });
+    const groundH = closest.h;
+    const prof = parseFloat(r.data.profundidad) || 0;
+    const ne = parseFloat(r.data.nivel_estatico);
+    const x = X(c.distAlong);
+    const yTop = Y(groundH);
+    const yBottom = Y(groundH - prof);
+    svg += `<line x1="${x.toFixed(1)}" y1="${yTop.toFixed(1)}" x2="${x.toFixed(1)}" y2="${yBottom.toFixed(1)}" stroke="${CHART_COLORS.pozo}" stroke-width="6" stroke-linecap="round"/>`;
+    if(!isNaN(ne)){
+      const yWater = Y(groundH-ne);
+      svg += `<circle cx="${x.toFixed(1)}" cy="${yWater.toFixed(1)}" r="4" fill="#4FA3D9"/>`;
+    }
+    svg += `<text x="${x.toFixed(1)}" y="${(yTop-8).toFixed(1)}" font-size="9" text-anchor="middle">${escapeHtml(r.data.codigo||"")}</text>`;
+  });
+
+  const steps5 = 5;
+  for(let i=0;i<=steps5;i++){
+    const d = (lineLen/steps5)*i;
+    svg += `<text x="${X(d).toFixed(1)}" y="${marginTop+plotH+16}" font-size="8" text-anchor="middle" fill="#888">${d.toFixed(0)}m</text>`;
+  }
+
+  svg += `</svg>`;
+  return svg;
 }
 
 function update3dExaggeration(){
@@ -3484,8 +4466,15 @@ function handleDemFile(evt){
       document.getElementById("viewer3dEmpty").style.display = "none";
       init3dScene();
       buildTerrainMesh();
+      render3dLayerVis();
       render3dWells();
       reset3dView();
+      const withGps = records.filter(r=>r.gps);
+      if(withGps.length){
+        const lat = withGps.reduce((s,r)=>s+r.gps.lat,0)/withGps.length;
+        const lon = withGps.reduce((s,r)=>s+r.gps.lon,0)/withGps.length;
+        renderLocatorMini(lat, lon);
+      }
       showToast(t("v3d_dem_loaded"));
     }catch(err){
       document.getElementById("demStatus").textContent = t("v3d_dem_error");
@@ -3625,6 +4614,33 @@ const I18N = {
     v3d_dem_loaded:"DEM cargado", v3d_dem_error:"No se pudo leer el archivo. Verifica que sea un ASCII Grid válido.",
     v3d_world_error:"Archivo world inválido o falta la imagen", v3d_ortho_applied:"Ortofoto aplicada al terreno",
     v3d_no_webgl:"El visualizador 3D no está disponible (sin WebGL o sin conexión para cargar Three.js).",
+    sat_ingemmet_layer:"Hidrogeología INGEMMET", sat_ingemmet_error:"No se pudo cargar la capa (revisa tu conexión)", sat_ingemmet_on:"Capa hidrogeológica activada",
+    label_caudal_bombeo:"Caudal de bombeo", label_capacidad_especifica:"Capacidad específica",
+    voice_not_supported:"El dictado por voz no está disponible en este navegador", voice_error:"No se pudo escuchar. Intenta de nuevo.",
+    btn_qr:"Código QR", qr_hint:"Escanéalo con cualquier cámara para ver el código y las coordenadas del punto, incluso sin esta app.",
+    qr_download:"Descargar PNG", qr_close:"Cerrar", qr_not_available:"El generador de QR no está disponible (revisa tu conexión)",
+    label_iones_hint:"Iones mayoritarios (opcional, en mg/L) — habilitan los diagramas Piper, Stiff y Schoeller en Estadística.",
+    stats_type_piper:"Diagrama de Piper (iones mayoritarios)", stats_type_stiff:"Diagrama de Stiff (iones mayoritarios)",
+    stats_type_schoeller:"Diagrama de Schoeller (iones mayoritarios)", stats_type_perfil:"Perfil correlacionado entre pozos",
+    stats_rain_overlay:"Mostrar precipitación (Open-Meteo, requiere internet)", stats_rain_loading:"Consultando lluvia histórica...",
+    stats_rain_label:"Precipitación (mm)", stats_rain_error:"No se pudo obtener la lluvia (revisa tu conexión)", stats_rain_no_gps:"Los puntos elegidos no tienen coordenadas GPS",
+    btn_pdf:"Reporte PDF", pdf_not_available:"El generador de PDF no está disponible (revisa tu conexión)", btn_obs_pdf:"Observaciones",
+    btn_edit:"Editar", btn_history:"Historial", btn_delete:"Eliminar",
+    edit_save:"Guardar cambios", edit_changes_saved:"cambio(s) guardado(s)", edit_no_changes:"No hubo cambios", edit_created:"Creado",
+    v3d_color_by:"Colorear pozos por", v3d_color_tipo:"Tipo de punto",
+    v3d_layer_terrain:"Terreno (DEM)", v3d_layer_ortho:"Ortofoto", v3d_layer_points:"Puntos capturados",
+    v3d_info_title:"Ficha del punto", v3d_info_hint:"Haz clic en un punto del modelo 3D para ver su información aquí.",
+    v3d_legal_note:"Modelo generado a partir de tus propios datos de campo. No reemplaza un estudio geotécnico certificado ni un levantamiento topográfico oficial.",
+    v3d_color_litologia:"Litología (por categoría)", v3d_color_formacion:"Formación geológica (por categoría)",
+    v3d_legend_title:"Leyenda de colores", v3d_legend_hint:"Elige \"Litología\" o \"Formación geológica\" arriba para ver aquí cada categoría con su color.",
+    v3d_legend_empty:"No hay valores de esta categoría capturados todavía.",
+    v3d_draw_line:"Dibujar línea de corte", v3d_clear_line:"Borrar línea",
+    v3d_line_hint_first:"Haz clic en el terreno para marcar el primer punto de la línea.",
+    v3d_line_hint_second:"Ahora haz clic para marcar el segundo punto.",
+    v3d_line_too_short:"La línea es demasiado corta", v3d_line_no_wells:"No hay pozos cerca de esa línea",
+    v3d_line_wells_found:"pozos encontrados a lo largo de la línea",
+    v3d_section_title:"Sección transversal", v3d_section_hint:"Generada a partir de la línea de corte, con los pozos cercanos ordenados a lo largo de la línea.",
+    v3d_section_terrain:"Perfil del terreno",
     nav_estadistica:"Estadística", nav_account:"Cuenta", nav_config:"Configuración",
     account_title:"Cuenta de equipo",
     account_intro:"Inicia sesión para sincronizar tus puntos con tu equipo desde cualquier dispositivo. Requiere conexión a internet y un proyecto gratuito de Supabase.",
@@ -3754,6 +4770,33 @@ const I18N = {
     v3d_dem_loaded:"DEM loaded", v3d_dem_error:"Couldn't read the file. Check that it's a valid ASCII Grid.",
     v3d_world_error:"Invalid world file or missing image", v3d_ortho_applied:"Orthophoto applied to terrain",
     v3d_no_webgl:"The 3D viewer isn't available (no WebGL, or no connection to load Three.js).",
+    sat_ingemmet_layer:"INGEMMET Hydrogeology", sat_ingemmet_error:"Couldn't load the layer (check your connection)", sat_ingemmet_on:"Hydrogeology layer enabled",
+    label_caudal_bombeo:"Pumping rate", label_capacidad_especifica:"Specific capacity",
+    voice_not_supported:"Voice dictation isn't available in this browser", voice_error:"Couldn't listen. Try again.",
+    btn_qr:"QR code", qr_hint:"Scan it with any camera to see the point's code and coordinates, even without this app.",
+    qr_download:"Download PNG", qr_close:"Close", qr_not_available:"QR generator isn't available (check your connection)",
+    label_iones_hint:"Major ions (optional, in mg/L) — enable the Piper, Stiff and Schoeller diagrams in Statistics.",
+    stats_type_piper:"Piper diagram (major ions)", stats_type_stiff:"Stiff diagram (major ions)",
+    stats_type_schoeller:"Schoeller diagram (major ions)", stats_type_perfil:"Correlated profile between wells",
+    stats_rain_overlay:"Show rainfall (Open-Meteo, requires internet)", stats_rain_loading:"Fetching historical rainfall...",
+    stats_rain_label:"Rainfall (mm)", stats_rain_error:"Couldn't fetch rainfall (check your connection)", stats_rain_no_gps:"The chosen points have no GPS coordinates",
+    btn_pdf:"PDF report", pdf_not_available:"PDF generator isn't available (check your connection)", btn_obs_pdf:"Notes",
+    btn_edit:"Edit", btn_history:"History", btn_delete:"Delete",
+    edit_save:"Save changes", edit_changes_saved:"change(s) saved", edit_no_changes:"No changes", edit_created:"Created",
+    v3d_color_by:"Color wells by", v3d_color_tipo:"Point type",
+    v3d_layer_terrain:"Terrain (DEM)", v3d_layer_ortho:"Orthophoto", v3d_layer_points:"Captured points",
+    v3d_info_title:"Point details", v3d_info_hint:"Click a point in the 3D model to see its info here.",
+    v3d_legal_note:"Model generated from your own field data. Does not replace a certified geotechnical study or an official topographic survey.",
+    v3d_color_litologia:"Lithology (by category)", v3d_color_formacion:"Geological formation (by category)",
+    v3d_legend_title:"Color legend", v3d_legend_hint:"Choose \"Lithology\" or \"Geological formation\" above to see each category with its color here.",
+    v3d_legend_empty:"No values for this category captured yet.",
+    v3d_draw_line:"Draw cut line", v3d_clear_line:"Clear line",
+    v3d_line_hint_first:"Click on the terrain to mark the line's first point.",
+    v3d_line_hint_second:"Now click to mark the second point.",
+    v3d_line_too_short:"The line is too short", v3d_line_no_wells:"No wells near that line",
+    v3d_line_wells_found:"wells found along the line",
+    v3d_section_title:"Cross section", v3d_section_hint:"Generated from the cut line, with nearby wells ordered along the line.",
+    v3d_section_terrain:"Terrain profile",
     nav_estadistica:"Statistics", nav_account:"Account", nav_config:"Settings",
     account_title:"Team account",
     account_intro:"Sign in to sync your points with your team from any device. Requires an internet connection and a free Supabase project.",
