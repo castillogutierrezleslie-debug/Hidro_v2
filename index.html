@@ -9,13 +9,16 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#0F3A5C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Hidrocampo">
 <style>
   :root, [data-theme="papel"]{
-    --paper:#F3EFE3;
-    --paper-2:#EAE3D2;
+    --paper:#FAFAFA;
+    --paper-2:#F0F1F3;
     --ink:#23241F;
     --ink-soft:#5B5A50;
     --line:#CFC6AC;
@@ -26,7 +29,7 @@
     --slate:#3C5A66;
     --manantial:#3C8C9C;
     --danger:#9C3B2E;
-    --card:#FFFDF7;
+    --card:#FFFFFF;
     --map-bg:#EDE7D6;
     --dxf-line:#8A7F63;
     --point-stroke:#FFFDF7;
@@ -76,23 +79,33 @@
   html{font-size:16px;}
   :root{
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --sans: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);}
-  .shell{display:flex; min-height:100vh; background:var(--paper);}
+
+  .app-topbar{
+    position:fixed; top:0; left:0; right:0; height:52px; z-index:60;
+    background:#14181F; color:#fff; display:flex; align-items:center; gap:12px; padding:0 16px;
+  }
+  .app-topbar-brand{font-family:var(--serif); font-weight:700; font-size:1.05rem; letter-spacing:0.2px;}
+  .app-topbar .badge-count{margin-left:auto; background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.18); color:#fff;}
+  .app-topbar .hamburger{color:#fff; border-color:rgba(255,255,255,0.25);}
+  .icon-btn-dark{background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; width:32px; height:32px; border-radius:50%; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+
+  .shell{display:flex; min-height:100vh; margin-top:52px; background:var(--paper);}
 
   .sidebar{
     width:224px; flex:0 0 224px; background:var(--teal-d); color:var(--paper);
-    display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:45;
+    display:flex; flex-direction:column; position:fixed; top:52px; left:0; bottom:0; z-index:45;
     transition:transform 0.25s ease;
   }
   .sidebar-brand{
-    font-family:var(--serif); font-weight:700; font-size:1.25rem; padding:22px 20px 16px;
+    padding:18px 20px;
     border-bottom:1px solid rgba(243,239,227,0.14);
   }
-  .sidebar-brand .sub{display:block; font-family:var(--mono); font-weight:400; font-size:0.575rem; color:var(--header-sub); margin-top:6px; letter-spacing:0.4px; line-height:1.4;}
+  .sidebar-brand .sub{display:block; font-family:var(--mono); font-weight:400; font-size:0.6875rem; color:var(--header-sub); margin-top:0; letter-spacing:0.4px; line-height:1.5;}
   .sidebar-nav{flex:1 1 auto; overflow-y:auto; padding:14px 12px;}
   .sidebar-nav button, .sidebar-footer button{
     display:flex; align-items:center; gap:11px; width:100%; text-align:left;
@@ -103,12 +116,11 @@
   .sidebar-nav button:hover, .sidebar-footer button:hover{background:rgba(243,239,227,0.08); color:var(--paper);}
   .sidebar-nav button.active, .sidebar-footer button.active{background:var(--teal); color:#fff;}
   .sidebar-footer{padding:12px; border-top:1px solid rgba(243,239,227,0.14);}
-  .sidebar-scrim{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:40;}
+  .sidebar-scrim{display:none; position:fixed; top:52px; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:40;}
 
   .main-area{flex:1 1 auto; min-width:0; margin-left:224px; display:flex; flex-direction:column;}
   .topbar{
-    position:sticky; top:0; z-index:20; background:var(--card); border-bottom:1px solid var(--line);
-    display:flex; align-items:center; gap:14px; padding:16px 26px;
+    background:var(--paper); display:flex; align-items:center; gap:14px; padding:20px 26px 6px;
   }
   .topbar h1{font-family:var(--serif); font-size:1.2rem; font-weight:700; margin:0; flex:1 1 auto; color:var(--ink);}
   .hamburger{display:none; background:transparent; border:1px solid var(--line); border-radius:8px; width:36px; height:36px; font-size:1rem; cursor:pointer; color:var(--ink); flex:0 0 auto;}
@@ -122,9 +134,9 @@
     .sidebar.open{transform:translateX(0);}
     .sidebar-scrim.show{display:block;}
     .main-area{margin-left:0;}
-    .hamburger{display:flex; align-items:center; justify-content:center;}
+    .app-topbar .hamburger{display:flex; align-items:center; justify-content:center;}
     main{padding:14px;}
-    .topbar{padding:12px 14px; gap:10px;}
+    .topbar{padding:14px 14px 4px;}
     .topbar h1{font-size:1.05rem;}
     .capture-map-col{min-width:0;}
     .sat-panel{height:320px;}
@@ -145,7 +157,7 @@
   .panel.active{display:block;}
 
   .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:14px;}
-  .card h2{font-family:var(--serif); font-size:1rem; margin:0 0 3px; color:var(--ink);}
+  .card h2{font-family:var(--serif); font-weight:700; font-size:1rem; margin:0 0 3px; color:var(--ink);}
   .card .hint{font-size:0.75rem; color:var(--ink-soft); margin:0 0 14px; line-height:1.45;}
 
   .field{margin-bottom:12px;}
@@ -212,6 +224,33 @@
   .color-row:last-child{border-bottom:none;}
   .color-row input[type="color"]{width:32px; height:32px; padding:0; border:1px solid var(--line); border-radius:6px; cursor:pointer; flex:0 0 auto;}
   .color-row span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+
+  .toggle-row{display:flex; align-items:center; gap:10px; cursor:pointer; font-size:0.875rem;}
+  .toggle-row input{width:auto;}
+  .photo-preview{margin-top:8px; display:flex; align-items:center; gap:10px;}
+  .photo-preview img{width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--line);}
+  .rec-thumb{width:40px; height:40px; object-fit:cover; border-radius:6px; margin-left:8px; vertical-align:middle;}
+
+  body.density-compacta .card{padding:11px 12px;}
+  body.density-compacta .field{margin-bottom:8px;}
+  body.density-compacta .settings-group{margin-bottom:12px;}
+  body.density-amplia .card{padding:22px 24px;}
+  body.density-amplia .field{margin-bottom:18px;}
+  body.density-amplia .settings-group{margin-bottom:26px;}
+
+  body.no-animations, body.no-animations *, body.no-animations *::before, body.no-animations *::after{
+    transition-duration:0s !important; animation-duration:0s !important;
+  }
+
+  .val-item{padding:9px 11px; border-radius:8px; margin-bottom:7px; font-size:0.8125rem; border-left:4px solid var(--line);}
+  .val-error{background:rgba(156,59,46,0.08); border-left-color:var(--danger);}
+  .val-warn{background:rgba(176,90,42,0.08); border-left-color:var(--clay);}
+  .val-info{background:rgba(60,90,102,0.08); border-left-color:var(--slate);}
+
+  .pin-overlay{position:fixed; inset:0; background:var(--teal-d); z-index:200; display:flex; align-items:center; justify-content:center; flex-direction:column; color:var(--paper);}
+  .pin-overlay input{max-width:180px; text-align:center; font-size:1.5rem; letter-spacing:6px; font-family:var(--mono);}
+  .pin-overlay .pin-box{background:var(--paper); border-radius:14px; padding:26px; width:90%; max-width:320px; text-align:center;}
+  .pin-overlay .pin-box p{color:var(--ink-soft); font-size:0.8125rem;}
 
   .export-actions{display:flex; flex-direction:column; gap:9px;}
   .export-actions button{width:100%; text-align:left; display:flex; justify-content:space-between; align-items:center;}
@@ -296,11 +335,16 @@
 </style>
 </head>
 <body>
+<header class="app-topbar">
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+  <span class="app-topbar-brand">Hidrocampo</span>
+  <div class="badge-count" id="totalBadge">0 registros</div>
+  <button class="icon-btn-dark" onclick="switchPanel('config')" aria-label="Configuración" data-i18n-aria="settings_btn_aria">⚙</button>
+</header>
 <div class="shell">
   <div class="sidebar-scrim" id="sidebarScrim" onclick="toggleSidebar()"></div>
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      Hidrocampo
       <span class="sub" data-i18n="header_sub">CAPTURA Y VISUALIZACIÓN HIDROGEOLÓGICA · OFFLINE</span>
     </div>
     <nav class="sidebar-nav" id="sidebarNav">
@@ -309,9 +353,11 @@
       <button data-panel="calidad"><span class="ic">⚗</span><span data-i18n="nav_calidad">Calidad</span></button>
       <button data-panel="geologia"><span class="ic">▲</span><span data-i18n="nav_geologia">Geología</span></button>
       <button data-panel="mapa"><span class="ic">⊞</span><span data-i18n="nav_mapa">Mapa</span></button>
+      <button data-panel="visor3d"><span class="ic">◭</span><span data-i18n="nav_3d">Visualizador 3D</span></button>
       <button data-panel="estadistica"><span class="ic">▤</span><span data-i18n="nav_estadistica">Estadística</span></button>
       <button data-panel="registros"><span class="ic">☰</span><span data-i18n="nav_registros">Registros</span></button>
       <button data-panel="datos"><span class="ic">⇅</span><span data-i18n="nav_datos">Datos</span></button>
+      <button data-panel="inteligencia"><span class="ic">✦</span><span data-i18n="nav_inteligencia">Inteligencia</span></button>
     </nav>
     <div class="sidebar-footer">
       <button data-panel="cuenta">
@@ -323,9 +369,7 @@
 
   <div class="main-area">
     <header class="topbar">
-      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menú">☰</button>
       <h1 id="pageTitle" data-i18n="nav_pozo">Pozos</h1>
-      <div class="badge-count" id="totalBadge">0 registros</div>
     </header>
 
   <main>
@@ -354,6 +398,13 @@
           </select></div>
         <div class="field"><label data-i18n="label_litologia">Litología / perfil resumido</label><textarea id="pozo-litologia" placeholder="Ej: 0-5m arena fina, 5-20m arcilla, 20-35m grava..."></textarea></div>
         <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="pozo-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_foto">Fotografía de campo (opcional)</label>
+          <input type="file" accept="image/*" capture="environment" id="pozo-foto-input" onchange="handlePhotoCapture('pozo', this)">
+          <div id="pozo-foto-preview" class="photo-preview" style="display:none;">
+            <img id="pozo-foto-img" alt="">
+            <button type="button" class="btn small ghost" onclick="clearPhoto('pozo')" data-i18n="btn_quitar_foto">Quitar foto</button>
+          </div>
+        </div>
         <div class="save-row">
           <button class="btn ghost" onclick="clearForm('pozo')" data-i18n="btn_limpiar">Limpiar</button>
           <button class="btn primary" onclick="saveRecord('pozo')" data-i18n="btn_guardar">Guardar registro</button>
@@ -389,6 +440,13 @@
           </select></div>
         <div class="field"><label data-i18n="label_vegetacion">Vegetación / entorno asociado</label><input type="text" id="manantial-vegetacion" placeholder="Ej: bofedal, totora, pastizal..."></div>
         <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="manantial-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_foto">Fotografía de campo (opcional)</label>
+          <input type="file" accept="image/*" capture="environment" id="manantial-foto-input" onchange="handlePhotoCapture('manantial', this)">
+          <div id="manantial-foto-preview" class="photo-preview" style="display:none;">
+            <img id="manantial-foto-img" alt="">
+            <button type="button" class="btn small ghost" onclick="clearPhoto('manantial')" data-i18n="btn_quitar_foto">Quitar foto</button>
+          </div>
+        </div>
         <div class="save-row">
           <button class="btn ghost" onclick="clearForm('manantial')" data-i18n="btn_limpiar">Limpiar</button>
           <button class="btn primary" onclick="saveRecord('manantial')" data-i18n="btn_guardar">Guardar registro</button>
@@ -419,6 +477,13 @@
         </div>
         <div class="field"><label data-i18n="label_turbidez">Turbidez <span class="unit">(NTU)</span></label><input type="number" step="0.1" id="calidad-turbidez"></div>
         <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="calidad-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_foto">Fotografía de campo (opcional)</label>
+          <input type="file" accept="image/*" capture="environment" id="calidad-foto-input" onchange="handlePhotoCapture('calidad', this)">
+          <div id="calidad-foto-preview" class="photo-preview" style="display:none;">
+            <img id="calidad-foto-img" alt="">
+            <button type="button" class="btn small ghost" onclick="clearPhoto('calidad')" data-i18n="btn_quitar_foto">Quitar foto</button>
+          </div>
+        </div>
         <div class="save-row">
           <button class="btn ghost" onclick="clearForm('calidad')" data-i18n="btn_limpiar">Limpiar</button>
           <button class="btn primary" onclick="saveRecord('calidad')" data-i18n="btn_guardar">Guardar registro</button>
@@ -446,6 +511,13 @@
         </div>
         <div class="field"><label data-i18n="label_estructuras">Estructuras observadas</label><input type="text" id="geologia-estructuras" placeholder="Fallas, fracturas, pliegues..."></div>
         <div class="field"><label data-i18n="label_obs">Observaciones</label><textarea id="geologia-obs"></textarea></div>
+        <div class="field"><label data-i18n="label_foto">Fotografía de campo (opcional)</label>
+          <input type="file" accept="image/*" capture="environment" id="geologia-foto-input" onchange="handlePhotoCapture('geologia', this)">
+          <div id="geologia-foto-preview" class="photo-preview" style="display:none;">
+            <img id="geologia-foto-img" alt="">
+            <button type="button" class="btn small ghost" onclick="clearPhoto('geologia')" data-i18n="btn_quitar_foto">Quitar foto</button>
+          </div>
+        </div>
         <div class="save-row">
           <button class="btn ghost" onclick="clearForm('geologia')" data-i18n="btn_limpiar">Limpiar</button>
           <button class="btn primary" onclick="saveRecord('geologia')" data-i18n="btn_guardar">Guardar registro</button>
@@ -486,6 +558,48 @@
         <div class="layer-toggle"><label><input type="checkbox" id="layer-geologia" checked onchange="renderMap()"><span class="dot c-geologia"></span><span data-i18n="nav_geologia">Geología</span></label></div>
         <div class="layer-toggle" id="dxfLayerRow" style="display:none;"><label><input type="checkbox" id="layer-dxf" checked onchange="renderMap()"><span class="dot" style="background:var(--dxf-line);"></span><span id="dxfLayerLabel" data-i18n="dxf_layer_default">Capa CAD</span></label></div>
         <div class="layer-toggle" id="imgLayerRow" style="display:none;"><label><input type="checkbox" id="layer-img" checked onchange="renderMap()"><span class="dot" style="background:var(--clay);"></span><span id="imgLayerLabel" data-i18n="img_layer_default">Imagen de fondo</span></label></div>
+      </div>
+    </section>
+
+    <!-- VISUALIZADOR 3D -->
+    <section class="panel" id="panel-visor3d">
+      <div class="card">
+        <h2 data-i18n="v3d_title">Visualizador 3D</h2>
+        <p class="hint" data-i18n="v3d_hint">Carga un modelo de elevación (DEM) en formato ASCII Grid (.asc) — se exporta fácilmente desde QGIS — y opcionalmente una ortofoto georreferenciada, para ver la topografía en 3D junto con tus pozos capturados y su nivel freático.</p>
+
+        <input type="file" id="demFileInput" accept=".asc,.txt" style="display:none" onchange="handleDemFile(event)">
+        <button class="btn" onclick="document.getElementById('demFileInput').click()" style="width:100%;" data-i18n="v3d_choose_dem">Elegir archivo DEM (.asc)</button>
+        <p class="hint" id="demStatus" style="margin-top:8px; margin-bottom:0;"></p>
+
+        <input type="file" id="ortho3dImgInput" accept="image/png,image/jpeg" style="display:none" onchange="handle3dImageFile(event)">
+        <button class="btn step-btn" onclick="document.getElementById('ortho3dImgInput').click()" style="width:100%;" data-i18n="v3d_choose_ortho">Elegir ortofoto (.png / .jpg)</button>
+        <div id="ortho3dWorldSection" style="display:none; margin-top:8px;">
+          <p class="hint" id="ortho3dImgStatus" style="margin-bottom:8px;"></p>
+          <input type="file" id="ortho3dWorldInput" accept=".tfw,.jgw,.wld,.txt" style="display:none" onchange="handle3dWorldFile(event)">
+          <button class="btn" onclick="document.getElementById('ortho3dWorldInput').click()" style="width:100%;" data-i18n="v3d_choose_world">Elegir archivo world de la ortofoto</button>
+        </div>
+
+        <p class="hint" style="margin-top:12px;" data-i18n="v3d_tin_note">¿Tienes un TIN (por ejemplo de Civil 3D)? Conviértelo primero a un DEM raster (.asc) desde tu software de origen o QGIS — importar mallas TIN irregulares directamente no está soportado todavía.</p>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div class="map-toolbar">
+          <button class="btn small ghost" onclick="reset3dView()" data-i18n="v3d_center">Centrar vista</button>
+          <label style="display:flex; align-items:center; gap:6px; font-size:0.6875rem; margin-left:auto;">
+            <span data-i18n="v3d_exaggeration">Exageración vertical</span>
+            <input type="range" id="vertExaggInput" min="1" max="6" step="0.5" value="1.5" oninput="update3dExaggeration()" style="width:100px;">
+          </label>
+        </div>
+        <div style="position:relative; height:420px; background:#0d1b1a;">
+          <canvas id="canvas3d" style="width:100%; height:100%; display:block;"></canvas>
+          <div class="map-empty" id="viewer3dEmpty" style="background:transparent; color:#CFE4DD;" data-i18n="v3d_empty">Carga un DEM para comenzar.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="map_layers_title">Capas</h2>
+        <label class="toggle-row"><input type="checkbox" id="show3dWells" checked onchange="render3dWells()"><span data-i18n="v3d_show_wells">Mostrar pozos</span></label>
+        <label class="toggle-row" style="margin-top:8px;"><input type="checkbox" id="show3dWaterTable" checked onchange="render3dWells()"><span data-i18n="v3d_show_water">Mostrar nivel freático</span></label>
       </div>
     </section>
 
@@ -668,6 +782,36 @@
           <p class="settings-note" data-i18n="settings_lang_note">La traducción cubre los textos de la interfaz. Los archivos CSV/SHP exportados mantienen nombres de campo fijos en español para no romper compatibilidad con datos ya exportados.</p>
         </div>
 
+        <div class="settings-group">
+          <label data-i18n="settings_accent">Color principal de la interfaz</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="color" id="accentColorInput" value="#1B5D8E" style="width:44px; height:38px; padding:0; border:1px solid var(--line); border-radius:8px; cursor:pointer;">
+            <button class="btn small ghost" onclick="resetAccentColor()" data-i18n="settings_accent_reset">Restablecer</button>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <label data-i18n="settings_scale">Escala de la interfaz</label>
+          <div class="segmented" id="scaleSegmented">
+            <button data-value="1">100%</button>
+            <button data-value="1.25">125%</button>
+            <button data-value="1.5">150%</button>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <label data-i18n="settings_density">Densidad de información</label>
+          <div class="segmented" id="densitySegmented">
+            <button data-value="compacta" data-i18n="density_compacta">Compacta</button>
+            <button data-value="normal" data-i18n="density_normal">Normal</button>
+            <button data-value="amplia" data-i18n="density_amplia">Amplia</button>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <label class="toggle-row"><input type="checkbox" id="animationsToggle" checked><span data-i18n="settings_animations">Mostrar animaciones</span></label>
+        </div>
+
         <p class="settings-note" data-i18n="settings_persist_note">Estas preferencias se guardan en este navegador y se recuerdan la próxima vez que abras la app.</p>
 
         <div class="settings-group">
@@ -675,6 +819,65 @@
           <input type="text" id="esriKeyInput" placeholder="Pega aquí tu clave (token)" autocomplete="off" autocapitalize="off" spellcheck="false">
           <p class="settings-note" data-i18n="settings_esri_key_note">Sin clave, el panel satelital usa el acceso gratuito sin registro, que Esri puede limitar. Con una clave gratuita (developers.arcgis.com, sin tarjeta) la imagen carga de forma confiable.</p>
         </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="units_title">Unidades</h2>
+        <p class="hint" data-i18n="units_hint">Cambia cómo se muestran profundidad, temperatura y caudal en Estadística. Tus datos capturados se guardan siempre igual (metros, °C, L/s); esto solo afecta la visualización.</p>
+        <div class="segmented" id="unitSegmented">
+          <button data-value="metrico" data-i18n="units_metric">Métrico (m, °C, L/s)</button>
+          <button data-value="imperial" data-i18n="units_imperial">Imperial (ft, °F, GPM)</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="workflow_title">Flujo de trabajo</h2>
+        <p class="hint" data-i18n="workflow_hint">Define cómo quieres que se comporte la app al abrirla.</p>
+
+        <div class="field"><label data-i18n="workflow_home">Pantalla de inicio predeterminada</label>
+          <select id="homeTabSelect"></select>
+        </div>
+
+        <div class="field"><label data-i18n="workflow_open_action">Al abrir la app</label>
+          <select id="openBehaviorSelect">
+            <option value="home" data-i18n="workflow_open_home">Ir a la pantalla de inicio</option>
+            <option value="last" data-i18n="workflow_open_last">Recordar la última pestaña usada</option>
+            <option value="map" data-i18n="workflow_open_map">Abrir siempre el Mapa</option>
+          </select>
+        </div>
+
+        <div class="field"><label data-i18n="workflow_favorite">Módulo favorito</label>
+          <select id="favoriteModuleSelect"></select>
+          <p class="settings-note" data-i18n="workflow_favorite_note">Se marca con ★ en la barra lateral.</p>
+        </div>
+
+        <div class="settings-group">
+          <label class="toggle-row"><input type="checkbox" id="autofillToggle" checked><span data-i18n="workflow_autofill">Autocompletar campos repetitivos al capturar</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTELIGENCIA -->
+    <section class="panel" id="panel-inteligencia">
+      <div class="card">
+        <h2 data-i18n="intel_title">Inteligencia y validación</h2>
+        <p class="hint" data-i18n="intel_hint">Revisiones automáticas basadas en reglas sobre tus propios datos: coordenadas duplicadas, pozos cercanos, elevaciones fuera de rango y campos obligatorios faltantes. No usa inteligencia artificial externa ni envía tus datos a ningún servicio.</p>
+
+        <div class="row2">
+          <div class="field"><label data-i18n="intel_elev_min">Elevación mínima esperada <span class="unit">(m)</span></label>
+            <input type="number" id="elevMinInput" value="0"></div>
+          <div class="field"><label data-i18n="intel_elev_max">Elevación máxima esperada <span class="unit">(m)</span></label>
+            <input type="number" id="elevMaxInput" value="6000"></div>
+        </div>
+
+        <button class="btn primary" onclick="runValidationUI()" style="width:100%;" data-i18n="intel_run">Validar ahora</button>
+      </div>
+
+      <div class="stats-grid" id="intelligenceSummary"></div>
+
+      <div class="card">
+        <h2 data-i18n="intel_results">Resultados</h2>
+        <div id="intelligenceResults"><p class="hint" data-i18n="intel_run_hint">Presiona "Validar ahora" para revisar tus registros.</p></div>
       </div>
     </section>
 
@@ -745,6 +948,32 @@
         <p class="hint" data-i18n="account_reconfigure_hint">Úsalo solo si necesitas conectar esta app a otro proyecto de Supabase.</p>
         <button class="btn ghost" onclick="resetBackendConfig()" style="width:100%;" data-i18n="account_reconfigure_btn">Olvidar conexión actual</button>
       </div>
+
+      <div class="card">
+        <h2 data-i18n="user_security_title">Seguridad de la cuenta</h2>
+        <p class="hint" data-i18n="user_password_hint">Cambia tu contraseña (necesitas haber iniciado sesión).</p>
+        <div class="field"><label data-i18n="user_new_password">Nueva contraseña <span class="unit">(mín. 6 caracteres)</span></label>
+          <input type="password" id="newPasswordInput" autocomplete="new-password"></div>
+        <button class="btn" onclick="changePassword()" style="width:100%;" data-i18n="user_change_password">Cambiar contraseña</button>
+        <p class="hint" style="margin-top:14px;" data-i18n="user_2fa_note">Autenticación en dos pasos, biometría y cierre de sesión remoto quedan planificados para una siguiente fase — requieren infraestructura adicional que aún no está lista.</p>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="user_pin_title">PIN de acceso a este dispositivo</h2>
+        <p class="hint" data-i18n="user_pin_hint">Un bloqueo local simple para este equipo — no reemplaza tu contraseña de cuenta, solo evita que alguien abra la app en este dispositivo sin el PIN.</p>
+        <div class="settings-group">
+          <label class="toggle-row"><input type="checkbox" id="pinEnabledToggle"><span data-i18n="user_pin_enable">Activar PIN de acceso</span></label>
+        </div>
+        <div id="pinSetupFields" style="display:none;">
+          <div class="field"><label data-i18n="user_pin_code">PIN (4 a 6 dígitos)</label>
+            <input type="password" id="pinCodeInput" inputmode="numeric" maxlength="6" autocomplete="off"></div>
+          <div class="field"><label data-i18n="user_pin_timeout">Bloquear tras inactividad <span class="unit">(minutos)</span></label>
+            <select id="pinTimeoutSelect">
+              <option value="1">1</option><option value="5">5</option><option value="15">15</option><option value="30">30</option><option value="0" data-i18n="user_pin_never">Nunca (solo al abrir)</option>
+            </select></div>
+          <button class="btn" onclick="savePinConfig()" style="width:100%;" data-i18n="user_pin_save">Guardar PIN</button>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -752,6 +981,18 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="pin-overlay" id="pinOverlay" style="display:none;">
+  <div class="pin-box">
+    <h2 style="font-family:var(--serif); margin-top:0;" data-i18n="user_pin_locked_title">Aplicación bloqueada</h2>
+    <p data-i18n="user_pin_locked_hint">Ingresa tu PIN para continuar.</p>
+    <input type="password" id="pinUnlockInput" inputmode="numeric" maxlength="6" autocomplete="off">
+    <p id="pinUnlockError" style="color:#FFD6D0; display:none; font-size:0.8125rem;" data-i18n="user_pin_wrong">PIN incorrecto.</p>
+    <div class="save-row" style="margin-top:14px;">
+      <button class="btn primary" onclick="attemptUnlock()" style="width:100%;" data-i18n="user_pin_unlock">Desbloquear</button>
+    </div>
+  </div>
+</div>
 
 
 <div id="satPanel" class="sat-panel">
@@ -768,6 +1009,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
 /* ======================================================================
@@ -813,6 +1056,21 @@ function switchPanel(name){
     fitMapView();
     renderMap();
   }
+  if(name==="visor3d"){
+    if(three3dReady){
+      init3dScene();
+      setTimeout(()=>{
+        const canvas = document.getElementById("canvas3d");
+        if(renderer3d && canvas.clientWidth && canvas.clientHeight){
+          renderer3d.setSize(canvas.clientWidth, canvas.clientHeight, false);
+          camera3d.aspect = canvas.clientWidth/canvas.clientHeight;
+          camera3d.updateProjectionMatrix();
+        }
+      }, 60);
+    } else {
+      document.getElementById("viewer3dEmpty").textContent = t("v3d_no_webgl");
+    }
+  }
   if(name==="estadistica"){
     initChartBuilder();
     renderStats();
@@ -827,9 +1085,15 @@ function switchPanel(name){
     document.getElementById("localUrlInput").value = localServerUrl;
     refreshBackendModeUI();
   }
+  if(name==="inteligencia"){
+    document.getElementById("elevMinInput").value = elevationMin;
+    document.getElementById("elevMaxInput").value = elevationMax;
+  }
   if(TYPES.includes(name)){
     moveSatPanelTo(name);
   }
+  lastActiveTab = name;
+  saveSettings();
 }
 document.querySelectorAll(".sidebar-nav button, .sidebar-footer button[data-panel]").forEach(b=>{
   b.addEventListener("click", ()=>switchPanel(b.dataset.panel));
@@ -905,6 +1169,45 @@ function fieldIds(tipo){
   return map[tipo];
 }
 
+/* ======================================================================
+   FOTOGRAFÍAS DE CAMPO: captura, compresión y vista previa
+   (guardadas localmente en el registro; aún no se sincronizan a la nube)
+   ====================================================================== */
+let pendingPhoto = {};
+
+function handlePhotoCapture(tipo, inputEl){
+  const file = inputEl.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const maxDim = 1280;
+      let w = img.width, h = img.height;
+      if(w > maxDim || h > maxDim){
+        const scale = maxDim / Math.max(w,h);
+        w = Math.round(w*scale); h = Math.round(h*scale);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.6);
+      pendingPhoto[tipo] = dataUrl;
+      const preview = document.getElementById(tipo+"-foto-preview");
+      document.getElementById(tipo+"-foto-img").src = dataUrl;
+      preview.style.display = "flex";
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPhoto(tipo){
+  delete pendingPhoto[tipo];
+  document.getElementById(tipo+"-foto-input").value = "";
+  document.getElementById(tipo+"-foto-preview").style.display = "none";
+}
+
 function saveRecord(tipo){
   const codigoEl = document.getElementById(tipo+"-codigo");
   if(!codigoEl.value.trim()){
@@ -922,10 +1225,12 @@ function saveRecord(tipo){
     tipo,
     fecha: new Date().toISOString(),
     gps: gpsState[tipo] ? {...gpsState[tipo]} : null,
+    foto: pendingPhoto[tipo] || null,
     data
   };
   records.push(rec);
   showToast("Registro " + data.codigo + " guardado");
+  rememberLastValues(tipo, data);
   clearForm(tipo);
   updateBadges();
   if(backendMode==="local"){ if(localToken) localPushRecord(rec); }
@@ -937,8 +1242,10 @@ function clearForm(tipo){
     document.getElementById(tipo+"-"+f).value = "";
   });
   delete gpsState[tipo];
+  clearPhoto(tipo);
   initGpsBox(tipo);
   updateSatPanel(tipo);
+  applyLastValues(tipo);
 }
 
 function updateBadges(){
@@ -983,7 +1290,7 @@ function renderList(){
     const gpsTxt = r.gps ? `${r.gps.lat.toFixed(5)}, ${r.gps.lon.toFixed(5)}` : "sin GPS";
     return `<div class="rec" data-tipo="${r.tipo}">
       <div class="rec-top">
-        <span class="rec-code">${escapeHtml(r.data.codigo||"(sin código)")}</span>
+        <span class="rec-code">${escapeHtml(r.data.codigo||"(sin código)")}${r.foto ? `<img class="rec-thumb" src="${r.foto}" alt="">` : ""}</span>
         <span class="rec-tipo">${TYPE_LABEL[r.tipo]}</span>
       </div>
       <div class="rec-meta">${fTxt} · ${gpsTxt}</div>
@@ -2116,14 +2423,45 @@ const CHART_PALETTE = ["#1B5D8E","#B05A2A","#3C8C9C","#7A3D1B","#3C5A66","#9C3B2
 
 let pointPickerSelected = new Set();
 let pointColors = new Map();
+let unitSystem = "metrico";
+
+const UNIT_FIELD_TYPES = { profundidad:"length", nivel_estatico:"length", nivel_dinamico:"length", temp:"temp", caudal:"flow" };
+
+function convertForDisplay(field, value){
+  const type = UNIT_FIELD_TYPES[field];
+  if(!type || unitSystem !== "imperial" || value===null || value===undefined || isNaN(value)) return value;
+  if(type==="length") return value * 3.28084;
+  if(type==="temp") return value * 9/5 + 32;
+  if(type==="flow") return value * 15.850323;
+  return value;
+}
+function unitSuffix(field){
+  const type = UNIT_FIELD_TYPES[field];
+  if(!type) return "";
+  if(unitSystem==="imperial"){
+    if(type==="length") return " (ft)";
+    if(type==="temp") return " (°F)";
+    if(type==="flow") return " (GPM)";
+  } else {
+    if(type==="length") return " (m)";
+    if(type==="temp") return " (°C)";
+    if(type==="flow") return " (L/s)";
+  }
+  return "";
+}
 
 function plainLabel(key){
   return t(key).replace(/<[^>]+>/g,"").trim();
 }
 function fieldLabel(field){
-  if(FIELD_LABEL_KEY[field]) return plainLabel(FIELD_LABEL_KEY[field]);
-  if(FIELD_LABEL_PLAIN[field]) return FIELD_LABEL_PLAIN[field];
-  return field;
+  let base;
+  if(FIELD_LABEL_KEY[field]) base = plainLabel(FIELD_LABEL_KEY[field]);
+  else if(FIELD_LABEL_PLAIN[field]) base = FIELD_LABEL_PLAIN[field];
+  else base = field;
+  if(UNIT_FIELD_TYPES[field]){
+    base = base.replace(/\s*\([^)]*\)\s*$/,"") + unitSuffix(field);
+  }
+  return base;
 }
 
 /* Campos numéricos disponibles para un tipo: los propios de la app +
@@ -2315,9 +2653,10 @@ function buildCustomChart(){
       const cod = r.data.codigo || ("#"+r.id);
       const val = parseFloat(r.data[field]);
       if(isNaN(val)) return;
+      const converted = convertForDisplay(field, val);
       const dateLabel = new Date(r.fecha).toISOString().slice(0,10);
       if(!byCodigo[cod]) byCodigo[cod] = {};
-      byCodigo[cod][dateLabel] = val;
+      byCodigo[cod][dateLabel] = converted;
     });
     const codigos = Object.keys(byCodigo);
     const allDates = Array.from(new Set(selectedRecs.map(r=>new Date(r.fecha).toISOString().slice(0,10)))).sort();
@@ -2353,7 +2692,7 @@ function buildCustomChart(){
     selectedRecs.forEach((r,i)=>{
       const x = parseFloat(r.data[fx]), y = parseFloat(r.data[fy]);
       if(!isNaN(x) && !isNaN(y)){
-        points.push({x, y, codigo: r.data.codigo||""});
+        points.push({x: convertForDisplay(fx,x), y: convertForDisplay(fy,y), codigo: r.data.codigo||""});
         colors.push(colorForPoint(r.id, i));
       }
     });
@@ -2383,7 +2722,7 @@ function buildCustomChart(){
       const val = parseFloat(r.data[field]);
       if(isNaN(val)) return;
       labels.push(r.data.codigo || ("#"+r.id));
-      data.push(val);
+      data.push(convertForDisplay(field, val));
       colors.push(colorForPoint(r.id, i));
     });
     if(data.length===0){ showToast(t("stats_no_numeric_data")); return; }
@@ -2410,6 +2749,107 @@ function initChartBuilder(){
 function renderStats(){
   renderGeneralStats();
   renderBarPie();
+}
+
+
+/* ======================================================================
+   INTELIGENCIA: validaciones basadas en reglas sobre los datos propios
+   ====================================================================== */
+function haversineMeters(lat1, lon1, lat2, lon2){
+  const R = 6371000;
+  const toRad = d => d*Math.PI/180;
+  const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+
+function runValidation(){
+  const issues = [];
+  const withGps = records.filter(r=>r.gps);
+
+  for(let i=0;i<withGps.length;i++){
+    for(let j=i+1;j<withGps.length;j++){
+      const d = haversineMeters(withGps[i].gps.lat, withGps[i].gps.lon, withGps[j].gps.lat, withGps[j].gps.lon);
+      if(d < 2){
+        issues.push({sev:"warn", msg: t("val_dup_coord") + ": " + (withGps[i].data.codigo||"?") + " / " + (withGps[j].data.codigo||"?") + " (" + d.toFixed(1) + " m)"});
+      }
+    }
+  }
+
+  const pozos = withGps.filter(r=>r.tipo==="pozo");
+  for(let i=0;i<pozos.length;i++){
+    for(let j=i+1;j<pozos.length;j++){
+      if(pozos[i].data.codigo === pozos[j].data.codigo) continue;
+      const d = haversineMeters(pozos[i].gps.lat, pozos[i].gps.lon, pozos[j].gps.lat, pozos[j].gps.lon);
+      if(d >= 2 && d < 20){
+        issues.push({sev:"info", msg: t("val_nearby_well") + ": " + pozos[i].data.codigo + " / " + pozos[j].data.codigo + " (" + d.toFixed(0) + " m)"});
+      }
+    }
+  }
+
+  records.filter(r=>r.gps && r.gps.alt!==null && r.gps.alt!==undefined).forEach(r=>{
+    if(r.gps.alt < elevationMin || r.gps.alt > elevationMax){
+      issues.push({sev:"warn", msg: t("val_elevation") + ": " + (r.data.codigo||"?") + " (" + r.gps.alt + " m)"});
+    }
+  });
+
+  records.forEach(r=>{
+    if(!r.data.codigo) issues.push({sev:"error", msg: t("val_missing_codigo") + " (id " + r.id + ")"});
+    if(!r.gps) issues.push({sev:"info", msg: t("val_missing_gps") + ": " + (r.data.codigo || r.id)});
+  });
+
+  return issues;
+}
+
+function runValidationUI(){
+  const issues = runValidation();
+  const counts = {error:0, warn:0, info:0};
+  issues.forEach(i=>counts[i.sev]++);
+
+  document.getElementById("intelligenceSummary").innerHTML = `
+    <div class="stat"><div class="n">${counts.error}</div><div class="l">${t("val_errors")}</div></div>
+    <div class="stat"><div class="n">${counts.warn}</div><div class="l">${t("val_warnings")}</div></div>
+    <div class="stat"><div class="n">${counts.info}</div><div class="l">${t("val_info")}</div></div>
+    <div class="stat"><div class="n">${records.length}</div><div class="l">${t("stats_total")}</div></div>
+  `;
+
+  const container = document.getElementById("intelligenceResults");
+  container.innerHTML = issues.length
+    ? issues.map(i=>`<div class="val-item val-${i.sev}">${escapeHtml(i.msg)}</div>`).join("")
+    : `<p class="hint">${t("val_all_clear")}</p>`;
+}
+
+/* Autocompletar campos repetitivos: recuerda los últimos valores usados por tipo */
+function rememberLastValues(tipo, data){
+  if(!autofillEnabled) return;
+  const copy = Object.assign({}, data);
+  delete copy.codigo; delete copy.obs;
+  lastValues[tipo] = copy;
+  saveSettings();
+}
+function applyLastValues(tipo){
+  if(!autofillEnabled) return;
+  const lv = lastValues[tipo];
+  if(!lv) return;
+  fieldIds(tipo).forEach(f=>{
+    if(f==="codigo" || f==="obs") return;
+    const key = f.replace(/-/g,"_");
+    const el = document.getElementById(tipo+"-"+f);
+    if(el && !el.value && lv[key]) el.value = lv[key];
+  });
+}
+
+/* Módulo favorito en la barra lateral */
+function applyFavoriteModule(){
+  document.querySelectorAll(".sidebar-nav button .fav-star").forEach(s=>s.remove());
+  if(!favoriteModule) return;
+  const btn = document.querySelector('.sidebar-nav button[data-panel="'+favoriteModule+'"]');
+  if(btn){
+    const star = document.createElement("span");
+    star.className = "fav-star";
+    star.textContent = " ★";
+    btn.appendChild(star);
+  }
 }
 
 
@@ -2769,6 +3209,335 @@ async function localSyncNow(){
 }
 
 
+/* ======================================================================
+   SEGURIDAD: PIN de acceso local, bloqueo automático, cambio de contraseña
+   ====================================================================== */
+function savePinConfig(){
+  const code = document.getElementById("pinCodeInput").value.trim();
+  if(!/^\d{4,6}$/.test(code)){ showToast(t("user_pin_invalid")); return; }
+  pinCode = code;
+  pinTimeout = parseInt(document.getElementById("pinTimeoutSelect").value, 10);
+  saveSettings();
+  showToast(t("user_pin_saved"));
+}
+
+function showLockScreen(){
+  appUnlocked = false;
+  document.getElementById("pinOverlay").style.display = "flex";
+  document.getElementById("pinUnlockInput").value = "";
+  document.getElementById("pinUnlockError").style.display = "none";
+}
+
+function attemptUnlock(){
+  const val = document.getElementById("pinUnlockInput").value.trim();
+  if(val === pinCode){
+    appUnlocked = true;
+    document.getElementById("pinOverlay").style.display = "none";
+    lastActivityTime = Date.now();
+  } else {
+    document.getElementById("pinUnlockError").style.display = "block";
+  }
+}
+
+function registerActivity(){
+  lastActivityTime = Date.now();
+}
+["click","keydown","touchstart"].forEach(evt=>document.addEventListener(evt, registerActivity, {passive:true}));
+
+setInterval(()=>{
+  if(!pinEnabled || !appUnlocked || pinTimeout===0) return;
+  if(Date.now() - lastActivityTime > pinTimeout*60000) showLockScreen();
+}, 15000);
+
+async function changePassword(){
+  const newPass = document.getElementById("newPasswordInput").value;
+  if(newPass.length < 6){ showToast(t("account_password_short")); return; }
+  if(backendMode === "local"){
+    if(!localServerUrl || !localToken){ showToast(t("account_fill_fields")); return; }
+    try{
+      const res = await fetch(localServerUrl + "/api/auth/password", {
+        method:"POST",
+        headers:{"Content-Type":"application/json", "Authorization":"Bearer "+localToken},
+        body: JSON.stringify({newPassword:newPass})
+      });
+      const json = await res.json();
+      if(!res.ok){ showToast(json.error || t("account_local_conn_error")); return; }
+      showToast(t("user_password_changed"));
+      document.getElementById("newPasswordInput").value = "";
+    }catch(e){ showToast(t("account_local_conn_error")); }
+    return;
+  }
+  if(!sb || !currentUser){ showToast(t("account_fill_fields")); return; }
+  try{
+    const {error} = await sb.auth.updateUser({password:newPass});
+    if(error){ showToast(error.message); return; }
+    showToast(t("user_password_changed"));
+    document.getElementById("newPasswordInput").value = "";
+  }catch(e){ showToast(t("account_supa_error")); }
+}
+
+
+/* ======================================================================
+   VISUALIZADOR 3D: terreno desde DEM (ASCII Grid), ortofoto y pozos
+   Nota: esta pieza usa Three.js (WebGL) y no pudo verificarse visualmente
+   en este entorno de desarrollo — la lógica de parseo del DEM sí se
+   probó de forma aislada. Es razonable que la orientación norte/sur
+   necesite un ajuste fino la primera vez que se pruebe con datos reales.
+   ====================================================================== */
+let scene3d = null, camera3d = null, renderer3d = null, controls3d = null;
+let terrainMesh3d = null, wellsGroup3d = null;
+let dem3d = null;
+let pendingOrtho3dImg = null;
+let ortho3d = null;
+let vertExaggeration = 1.5;
+let viewer3dInitialized = false;
+let three3dReady = (typeof THREE !== "undefined");
+
+function parseAsciiGrid(text){
+  const lines = text.split(/\r\n|\r|\n/).filter(l=>l.trim().length);
+  const header = {};
+  let i=0;
+  for(; i<lines.length; i++){
+    const m = lines[i].trim().match(/^(ncols|nrows|xllcorner|xllcenter|yllcorner|yllcenter|cellsize|nodata_value)\s+(.+)$/i);
+    if(!m) break;
+    header[m[1].toLowerCase()] = parseFloat(m[2]);
+  }
+  const ncols = header.ncols, nrows = header.nrows;
+  const cellsize = header.cellsize;
+  const xll = header.xllcorner !== undefined ? header.xllcorner : header.xllcenter;
+  const yll = header.yllcorner !== undefined ? header.yllcorner : header.yllcenter;
+  const nodata = header.nodata_value !== undefined ? header.nodata_value : -9999;
+
+  const values = [];
+  for(; i<lines.length; i++){
+    lines[i].trim().split(/\s+/).forEach(v=>{ if(v!=="") values.push(parseFloat(v)); });
+  }
+  const grid = [];
+  for(let r=0;r<nrows;r++) grid.push(values.slice(r*ncols, (r+1)*ncols));
+  return {ncols, nrows, cellsize, xll, yll, nodata, grid};
+}
+
+function init3dScene(){
+  if(viewer3dInitialized || !three3dReady) return;
+  const canvas = document.getElementById("canvas3d");
+  try{
+    renderer3d = new THREE.WebGLRenderer({canvas, antialias:true});
+    renderer3d.setPixelRatio(window.devicePixelRatio || 1);
+  }catch(e){ three3dReady = false; return; }
+
+  scene3d = new THREE.Scene();
+  scene3d.background = new THREE.Color(0x0d1b1a);
+
+  camera3d = new THREE.PerspectiveCamera(50, 1, 1, 200000);
+  camera3d.position.set(200, 200, 200);
+
+  scene3d.add(new THREE.AmbientLight(0xffffff, 0.65));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.75);
+  sun.position.set(500, 800, 300);
+  scene3d.add(sun);
+
+  controls3d = new THREE.OrbitControls(camera3d, renderer3d.domElement);
+  controls3d.enableDamping = true;
+
+  function resize3d(){
+    const el = document.getElementById("canvas3d");
+    const w = el.clientWidth, h = el.clientHeight;
+    if(!w || !h) return;
+    renderer3d.setSize(w, h, false);
+    camera3d.aspect = w/h;
+    camera3d.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize3d);
+  resize3d();
+
+  function animate3d(){
+    requestAnimationFrame(animate3d);
+    if(controls3d) controls3d.update();
+    if(renderer3d && scene3d && camera3d) renderer3d.render(scene3d, camera3d);
+  }
+  animate3d();
+  viewer3dInitialized = true;
+}
+
+function utmToLocal3d(utmX, utmY){
+  const width = (dem3d.ncols-1)*dem3d.cellsize;
+  const depth = (dem3d.nrows-1)*dem3d.cellsize;
+  const x = (utmX - dem3d.xll) - width/2;
+  const z = ((dem3d.yll + depth) - utmY) - depth/2;
+  return {x, z};
+}
+
+function sampleTerrainHeight(utmX, utmY){
+  const col = (utmX - dem3d.xll) / dem3d.cellsize;
+  const rowFromNorth = ((dem3d.yll + (dem3d.nrows-1)*dem3d.cellsize) - utmY) / dem3d.cellsize;
+  const r = Math.round(Math.min(Math.max(rowFromNorth, 0), dem3d.nrows-1));
+  const c = Math.round(Math.min(Math.max(col, 0), dem3d.ncols-1));
+  let v = dem3d.grid[r][c];
+  if(v===dem3d.nodata || isNaN(v)) v = dem3d.minZ;
+  return (v - dem3d.minZ) * vertExaggeration;
+}
+
+function buildTerrainMesh(){
+  if(!dem3d || !scene3d) return;
+  if(terrainMesh3d){
+    scene3d.remove(terrainMesh3d);
+    terrainMesh3d.geometry.dispose();
+    terrainMesh3d.material.dispose();
+  }
+  const {ncols, nrows, cellsize, grid, nodata} = dem3d;
+  const width = (ncols-1)*cellsize;
+  const depth = (nrows-1)*cellsize;
+
+  let minZ = Infinity, maxZ = -Infinity;
+  for(let r=0;r<nrows;r++) for(let c=0;c<ncols;c++){
+    const v = grid[r][c];
+    if(v!==nodata && !isNaN(v)){ if(v<minZ) minZ=v; if(v>maxZ) maxZ=v; }
+  }
+  if(minZ===Infinity){ minZ=0; maxZ=1; }
+  dem3d.minZ = minZ; dem3d.maxZ = maxZ;
+
+  const geometry = new THREE.PlaneGeometry(width, depth, ncols-1, nrows-1);
+  geometry.rotateX(-Math.PI/2);
+  const pos = geometry.attributes.position;
+  for(let r=0;r<nrows;r++){
+    for(let c=0;c<ncols;c++){
+      const idx = r*ncols + c;
+      let v = grid[r][c];
+      if(v===nodata || isNaN(v)) v = minZ;
+      pos.setY(idx, (v-minZ) * vertExaggeration);
+    }
+  }
+  geometry.computeVertexNormals();
+
+  const material = (ortho3d && ortho3d.texture)
+    ? new THREE.MeshStandardMaterial({map: ortho3d.texture, side: THREE.DoubleSide})
+    : new THREE.MeshStandardMaterial({color: 0x6b7a5e, side: THREE.DoubleSide});
+  terrainMesh3d = new THREE.Mesh(geometry, material);
+  scene3d.add(terrainMesh3d);
+}
+
+function render3dWells(){
+  if(!scene3d || !dem3d) return;
+  if(wellsGroup3d) scene3d.remove(wellsGroup3d);
+  wellsGroup3d = new THREE.Group();
+  scene3d.add(wellsGroup3d);
+
+  const showWellsEl = document.getElementById("show3dWells");
+  if(!showWellsEl || !showWellsEl.checked) return;
+  const showWater = document.getElementById("show3dWaterTable").checked;
+
+  const zoneInfo = getActiveUtmZone();
+  records.filter(r=>r.tipo==="pozo" && r.gps).forEach(r=>{
+    const p = latLonToUTM(r.gps.lat, r.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
+    const local = utmToLocal3d(p.x, p.y);
+    const groundY = sampleTerrainHeight(p.x, p.y);
+    const depth = parseFloat(r.data.profundidad) || 5;
+    const scaledDepth = Math.max(depth * vertExaggeration, dem3d.cellsize*0.5);
+    const radius = Math.max(dem3d.cellsize*0.15, 0.5);
+
+    const cyl = new THREE.Mesh(
+      new THREE.CylinderGeometry(radius, radius, scaledDepth, 10),
+      new THREE.MeshStandardMaterial({color: 0x1B5D8E})
+    );
+    cyl.position.set(local.x, groundY - scaledDepth/2, local.z);
+    wellsGroup3d.add(cyl);
+
+    const nivelEst = parseFloat(r.data.nivel_estatico);
+    if(showWater && !isNaN(nivelEst)){
+      const waterY = groundY - nivelEst*vertExaggeration;
+      const disc = new THREE.Mesh(
+        new THREE.CylinderGeometry(radius*1.5, radius*1.5, Math.max(dem3d.cellsize*0.05,0.2), 10),
+        new THREE.MeshStandardMaterial({color: 0x4FA3D9, transparent:true, opacity:0.85})
+      );
+      disc.position.set(local.x, waterY, local.z);
+      wellsGroup3d.add(disc);
+    }
+  });
+}
+
+function reset3dView(){
+  if(!dem3d || !camera3d || !controls3d) return;
+  const width = (dem3d.ncols-1)*dem3d.cellsize;
+  const depth = (dem3d.nrows-1)*dem3d.cellsize;
+  const maxDim = Math.max(width, depth, 10);
+  camera3d.position.set(maxDim*0.6, maxDim*0.6, maxDim*0.6);
+  controls3d.target.set(0,0,0);
+  controls3d.update();
+}
+
+function update3dExaggeration(){
+  vertExaggeration = parseFloat(document.getElementById("vertExaggInput").value);
+  if(dem3d){ buildTerrainMesh(); render3dWells(); }
+}
+
+function handleDemFile(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  if(!three3dReady){ document.getElementById("demStatus").textContent = t("v3d_no_webgl"); return; }
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const parsed = parseAsciiGrid(e.target.result);
+      if(!parsed.ncols || !parsed.nrows || !parsed.cellsize) throw new Error("encabezado inválido");
+      dem3d = parsed;
+      document.getElementById("demStatus").textContent = file.name + ": " + dem3d.ncols + "×" + dem3d.nrows + " celdas, " + dem3d.cellsize + " m/celda";
+      document.getElementById("viewer3dEmpty").style.display = "none";
+      init3dScene();
+      buildTerrainMesh();
+      render3dWells();
+      reset3dView();
+      showToast(t("v3d_dem_loaded"));
+    }catch(err){
+      document.getElementById("demStatus").textContent = t("v3d_dem_error");
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value = "";
+}
+
+function handle3dImageFile(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const img = new Image();
+    img.onload = ()=>{
+      pendingOrtho3dImg = {img, file};
+      document.getElementById("ortho3dWorldSection").style.display = "block";
+      document.getElementById("ortho3dImgStatus").textContent = file.name + " (" + img.width + "×" + img.height + " px) cargada.";
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  evt.target.value = "";
+}
+
+function handle3dWorldFile(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const lines = e.target.result.split(/\r\n|\r|\n/).map(l=>parseFloat(l.trim())).filter(n=>!isNaN(n));
+    if(lines.length<6 || !pendingOrtho3dImg){ showToast(t("v3d_world_error")); return; }
+    const [A,D,B,E,C,F] = lines;
+    const w = pendingOrtho3dImg.img.width, h = pendingOrtho3dImg.img.height;
+    const minX = Math.min(C, C+A*w), maxX = Math.max(C, C+A*w);
+    const minY = Math.min(F, F+E*h), maxY = Math.max(F, F+E*h);
+
+    if(!three3dReady){ showToast(t("v3d_no_webgl")); return; }
+    const texLoader = new THREE.TextureLoader();
+    texLoader.load(pendingOrtho3dImg.img.src, tex=>{
+      ortho3d = {img: pendingOrtho3dImg.img, minX, maxX, minY, maxY, texture: tex};
+      pendingOrtho3dImg = null;
+      if(dem3d){ buildTerrainMesh(); render3dWells(); }
+      showToast(t("v3d_ortho_applied"));
+    });
+  };
+  reader.readAsText(file);
+  evt.target.value = "";
+}
+
+
 const I18N = {
   es: {
     settings_btn_aria:"Configuración", settings_title:"Configuración",
@@ -2817,6 +3586,45 @@ const I18N = {
     settings_esri_key:"Clave API de Esri (opcional)",
     settings_esri_key_note:"Sin clave, el panel satelital usa el acceso gratuito sin registro, que Esri puede limitar. Con una clave gratuita (developers.arcgis.com, sin tarjeta) la imagen carga de forma confiable.",
     settings_esri_key_saved:"Clave guardada",
+    settings_accent:"Color principal de la interfaz", settings_accent_reset:"Restablecer",
+    settings_scale:"Escala de la interfaz", settings_density:"Densidad de información",
+    density_compacta:"Compacta", density_normal:"Normal", density_amplia:"Amplia",
+    settings_animations:"Mostrar animaciones",
+    workflow_title:"Flujo de trabajo", workflow_hint:"Define cómo quieres que se comporte la app al abrirla.",
+    workflow_home:"Pantalla de inicio predeterminada", workflow_open_action:"Al abrir la app",
+    workflow_open_home:"Ir a la pantalla de inicio", workflow_open_last:"Recordar la última pestaña usada", workflow_open_map:"Abrir siempre el Mapa",
+    workflow_favorite:"Módulo favorito", workflow_favorite_note:"Se marca con ★ en la barra lateral.",
+    workflow_autofill:"Autocompletar campos repetitivos al capturar",
+    nav_inteligencia:"Inteligencia",
+    intel_title:"Inteligencia y validación",
+    intel_hint:"Revisiones automáticas basadas en reglas sobre tus propios datos: coordenadas duplicadas, pozos cercanos, elevaciones fuera de rango y campos obligatorios faltantes. No usa inteligencia artificial externa ni envía tus datos a ningún servicio.",
+    intel_elev_min:"Elevación mínima esperada", intel_elev_max:"Elevación máxima esperada",
+    intel_run:"Validar ahora", intel_results:"Resultados", intel_run_hint:"Presiona \"Validar ahora\" para revisar tus registros.",
+    val_errors:"Errores", val_warnings:"Avisos", val_info:"Informativo", val_all_clear:"No se encontraron problemas. Todo en orden.",
+    val_dup_coord:"Coordenadas duplicadas", val_nearby_well:"Pozos muy cercanos entre sí", val_elevation:"Elevación fuera de rango esperado",
+    val_missing_codigo:"Falta el código de punto", val_missing_gps:"Sin coordenadas GPS",
+    user_security_title:"Seguridad de la cuenta", user_password_hint:"Cambia tu contraseña (necesitas haber iniciado sesión).",
+    user_new_password:"Nueva contraseña", user_change_password:"Cambiar contraseña",
+    user_2fa_note:"Autenticación en dos pasos, biometría y cierre de sesión remoto quedan planificados para una siguiente fase — requieren infraestructura adicional que aún no está lista.",
+    user_pin_title:"PIN de acceso a este dispositivo",
+    user_pin_hint:"Un bloqueo local simple para este equipo — no reemplaza tu contraseña de cuenta, solo evita que alguien abra la app en este dispositivo sin el PIN.",
+    user_pin_enable:"Activar PIN de acceso", user_pin_code:"PIN (4 a 6 dígitos)", user_pin_timeout:"Bloquear tras inactividad",
+    user_pin_never:"Nunca (solo al abrir)", user_pin_save:"Guardar PIN", user_pin_invalid:"El PIN debe tener entre 4 y 6 dígitos",
+    user_pin_saved:"PIN guardado", user_pin_locked_title:"Aplicación bloqueada", user_pin_locked_hint:"Ingresa tu PIN para continuar.",
+    user_pin_wrong:"PIN incorrecto.", user_pin_unlock:"Desbloquear", user_password_changed:"Contraseña actualizada",
+    label_foto:"Fotografía de campo (opcional)", btn_quitar_foto:"Quitar foto",
+    units_title:"Unidades", units_hint:"Cambia cómo se muestran profundidad, temperatura y caudal en Estadística. Tus datos capturados se guardan siempre igual (metros, °C, L/s); esto solo afecta la visualización.",
+    units_metric:"Métrico (m, °C, L/s)", units_imperial:"Imperial (ft, °F, GPM)",
+    nav_3d:"Visualizador 3D",
+    v3d_title:"Visualizador 3D",
+    v3d_hint:"Carga un modelo de elevación (DEM) en formato ASCII Grid (.asc) — se exporta fácilmente desde QGIS — y opcionalmente una ortofoto georreferenciada, para ver la topografía en 3D junto con tus pozos capturados y su nivel freático.",
+    v3d_choose_dem:"Elegir archivo DEM (.asc)", v3d_choose_ortho:"Elegir ortofoto (.png / .jpg)", v3d_choose_world:"Elegir archivo world de la ortofoto",
+    v3d_tin_note:"¿Tienes un TIN (por ejemplo de Civil 3D)? Conviértelo primero a un DEM raster (.asc) desde tu software de origen o QGIS — importar mallas TIN irregulares directamente no está soportado todavía.",
+    v3d_center:"Centrar vista", v3d_exaggeration:"Exageración vertical", v3d_empty:"Carga un DEM para comenzar.",
+    v3d_show_wells:"Mostrar pozos", v3d_show_water:"Mostrar nivel freático",
+    v3d_dem_loaded:"DEM cargado", v3d_dem_error:"No se pudo leer el archivo. Verifica que sea un ASCII Grid válido.",
+    v3d_world_error:"Archivo world inválido o falta la imagen", v3d_ortho_applied:"Ortofoto aplicada al terreno",
+    v3d_no_webgl:"El visualizador 3D no está disponible (sin WebGL o sin conexión para cargar Three.js).",
     nav_estadistica:"Estadística", nav_account:"Cuenta", nav_config:"Configuración",
     account_title:"Cuenta de equipo",
     account_intro:"Inicia sesión para sincronizar tus puntos con tu equipo desde cualquier dispositivo. Requiere conexión a internet y un proyecto gratuito de Supabase.",
@@ -2907,6 +3715,45 @@ const I18N = {
     settings_esri_key:"Esri API key (optional)",
     settings_esri_key_note:"Without a key, the satellite panel uses free unregistered access, which Esri may limit. With a free key (developers.arcgis.com, no card needed) imagery loads reliably.",
     settings_esri_key_saved:"Key saved",
+    settings_accent:"Main interface color", settings_accent_reset:"Reset",
+    settings_scale:"Interface scale", settings_density:"Information density",
+    density_compacta:"Compact", density_normal:"Normal", density_amplia:"Spacious",
+    settings_animations:"Show animations",
+    workflow_title:"Workflow", workflow_hint:"Define how you want the app to behave when you open it.",
+    workflow_home:"Default home screen", workflow_open_action:"On opening the app",
+    workflow_open_home:"Go to the home screen", workflow_open_last:"Remember the last tab used", workflow_open_map:"Always open the Map",
+    workflow_favorite:"Favorite module", workflow_favorite_note:"Marked with ★ in the sidebar.",
+    workflow_autofill:"Autofill repetitive fields while capturing",
+    nav_inteligencia:"Intelligence",
+    intel_title:"Intelligence & validation",
+    intel_hint:"Automatic rule-based checks on your own data: duplicate coordinates, nearby wells, out-of-range elevations, and missing required fields. Doesn't use external AI or send your data anywhere.",
+    intel_elev_min:"Minimum expected elevation", intel_elev_max:"Maximum expected elevation",
+    intel_run:"Validate now", intel_results:"Results", intel_run_hint:"Press \"Validate now\" to review your records.",
+    val_errors:"Errors", val_warnings:"Warnings", val_info:"Info", val_all_clear:"No issues found. Everything looks good.",
+    val_dup_coord:"Duplicate coordinates", val_nearby_well:"Wells very close to each other", val_elevation:"Elevation outside expected range",
+    val_missing_codigo:"Missing point code", val_missing_gps:"No GPS coordinates",
+    user_security_title:"Account security", user_password_hint:"Change your password (you need to be signed in).",
+    user_new_password:"New password", user_change_password:"Change password",
+    user_2fa_note:"Two-factor authentication, biometrics, and remote sign-out are planned for a future phase — they need additional infrastructure that isn't ready yet.",
+    user_pin_title:"Access PIN for this device",
+    user_pin_hint:"A simple local lock for this device — it doesn't replace your account password, it just keeps someone from opening the app on this device without the PIN.",
+    user_pin_enable:"Enable access PIN", user_pin_code:"PIN (4 to 6 digits)", user_pin_timeout:"Lock after inactivity",
+    user_pin_never:"Never (only on open)", user_pin_save:"Save PIN", user_pin_invalid:"PIN must be 4 to 6 digits",
+    user_pin_saved:"PIN saved", user_pin_locked_title:"App locked", user_pin_locked_hint:"Enter your PIN to continue.",
+    user_pin_wrong:"Wrong PIN.", user_pin_unlock:"Unlock", user_password_changed:"Password updated",
+    label_foto:"Field photo (optional)", btn_quitar_foto:"Remove photo",
+    units_title:"Units", units_hint:"Change how depth, temperature, and flow rate are displayed in Statistics. Your captured data is always stored the same way (meters, °C, L/s); this only affects display.",
+    units_metric:"Metric (m, °C, L/s)", units_imperial:"Imperial (ft, °F, GPM)",
+    nav_3d:"3D Viewer",
+    v3d_title:"3D Viewer",
+    v3d_hint:"Load an elevation model (DEM) in ASCII Grid format (.asc) — easily exported from QGIS — and optionally a georeferenced orthophoto, to see the topography in 3D along with your captured wells and their water table.",
+    v3d_choose_dem:"Choose DEM file (.asc)", v3d_choose_ortho:"Choose orthophoto (.png / .jpg)", v3d_choose_world:"Choose orthophoto's world file",
+    v3d_tin_note:"Have a TIN (e.g. from Civil 3D)? Convert it to a raster DEM (.asc) first from your source software or QGIS — importing irregular TIN meshes directly isn't supported yet.",
+    v3d_center:"Center view", v3d_exaggeration:"Vertical exaggeration", v3d_empty:"Load a DEM to get started.",
+    v3d_show_wells:"Show wells", v3d_show_water:"Show water table",
+    v3d_dem_loaded:"DEM loaded", v3d_dem_error:"Couldn't read the file. Check that it's a valid ASCII Grid.",
+    v3d_world_error:"Invalid world file or missing image", v3d_ortho_applied:"Orthophoto applied to terrain",
+    v3d_no_webgl:"The 3D viewer isn't available (no WebGL, or no connection to load Three.js).",
     nav_estadistica:"Statistics", nav_account:"Account", nav_config:"Settings",
     account_title:"Team account",
     account_intro:"Sign in to sync your points with your team from any device. Requires an internet connection and a free Supabase project.",
@@ -2955,6 +3802,26 @@ const I18N = {
 let appLang = "es";
 let appTheme = "papel";
 let appFontScale = 1;
+let accentColor = null;
+let interfaceScale = 1;
+let density = "normal";
+let animationsEnabled = true;
+
+let homeTab = "pozo";
+let openBehavior = "home";
+let favoriteModule = null;
+let autofillEnabled = true;
+let lastValues = {};
+let lastActiveTab = "pozo";
+
+let elevationMin = 0;
+let elevationMax = 6000;
+
+let pinEnabled = false;
+let pinCode = "";
+let pinTimeout = 5;
+let lastActivityTime = Date.now();
+let appUnlocked = true;
 
 function t(key){
   return (I18N[appLang] && I18N[appLang][key]) || (I18N.es[key]) || key;
@@ -2978,17 +3845,59 @@ function applyLanguage(){
 
 function applyTheme(){
   document.documentElement.setAttribute("data-theme", appTheme);
+  applyAccentColor();
 }
 
 function applyFontScale(){
   document.documentElement.style.fontSize = (16*appFontScale)+"px";
 }
 
+function applyAccentColor(){
+  if(accentColor){
+    document.documentElement.style.setProperty("--teal", accentColor);
+    document.documentElement.style.setProperty("--teal-d", darkenHex(accentColor, 40));
+  } else {
+    document.documentElement.style.removeProperty("--teal");
+    document.documentElement.style.removeProperty("--teal-d");
+  }
+}
+function darkenHex(hex, amount){
+  const num = parseInt(hex.replace("#",""), 16);
+  let r = Math.max(0, (num>>16) - amount);
+  let g = Math.max(0, ((num>>8)&0xff) - amount);
+  let b = Math.max(0, (num&0xff) - amount);
+  return "#" + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+}
+function resetAccentColor(){
+  accentColor = null;
+  document.getElementById("accentColorInput").value = "#1B5D8E";
+  applyAccentColor();
+  saveSettings();
+}
+
+function applyInterfaceScale(){
+  const shell = document.querySelector(".shell");
+  if(shell) shell.style.zoom = interfaceScale;
+}
+
+function applyDensity(){
+  document.body.classList.remove("density-compacta","density-amplia");
+  if(density==="compacta") document.body.classList.add("density-compacta");
+  if(density==="amplia") document.body.classList.add("density-amplia");
+}
+
+function applyAnimations(){
+  document.body.classList.toggle("no-animations", !animationsEnabled);
+}
+
 function saveSettings(){
   try{
     localStorage.setItem("hidrocampo_settings", JSON.stringify({
       lang:appLang, theme:appTheme, fontScale:appFontScale, esriApiKey,
-      supaUrl, supaKey, backendMode, localServerUrl, localToken, localUserEmail
+      supaUrl, supaKey, backendMode, localServerUrl, localToken, localUserEmail,
+      accentColor, interfaceScale, density, animationsEnabled,
+      homeTab, openBehavior, favoriteModule, autofillEnabled, lastValues,
+      elevationMin, elevationMax, pinEnabled, pinCode, pinTimeout, lastActiveTab, unitSystem
     }));
   }catch(e){}
 }
@@ -3008,6 +3917,22 @@ function loadSettings(){
       if(s.localServerUrl) localServerUrl = s.localServerUrl;
       if(s.localToken) localToken = s.localToken;
       if(s.localUserEmail) localUserEmail = s.localUserEmail;
+      if(s.accentColor) accentColor = s.accentColor;
+      if(s.interfaceScale) interfaceScale = s.interfaceScale;
+      if(s.density) density = s.density;
+      if(typeof s.animationsEnabled === "boolean") animationsEnabled = s.animationsEnabled;
+      if(s.homeTab) homeTab = s.homeTab;
+      if(s.openBehavior) openBehavior = s.openBehavior;
+      if(s.favoriteModule) favoriteModule = s.favoriteModule;
+      if(typeof s.autofillEnabled === "boolean") autofillEnabled = s.autofillEnabled;
+      if(s.lastValues) lastValues = s.lastValues;
+      if(typeof s.elevationMin === "number") elevationMin = s.elevationMin;
+      if(typeof s.elevationMax === "number") elevationMax = s.elevationMax;
+      if(typeof s.pinEnabled === "boolean") pinEnabled = s.pinEnabled;
+      if(s.pinCode) pinCode = s.pinCode;
+      if(typeof s.pinTimeout === "number") pinTimeout = s.pinTimeout;
+      if(s.lastActiveTab) lastActiveTab = s.lastActiveTab;
+      if(s.unitSystem) unitSystem = s.unitSystem;
     }
   }catch(e){}
 }
@@ -3030,6 +3955,39 @@ function refreshSegmented(){
   document.querySelectorAll("#themeSegmented button").forEach(b=>b.classList.toggle("active", b.dataset.value===appTheme));
   document.querySelectorAll("#fontSegmented button").forEach(b=>b.classList.toggle("active", parseFloat(b.dataset.value)===appFontScale));
   document.querySelectorAll("#langSegmented button").forEach(b=>b.classList.toggle("active", b.dataset.value===appLang));
+  document.querySelectorAll("#scaleSegmented button").forEach(b=>b.classList.toggle("active", parseFloat(b.dataset.value)===interfaceScale));
+  document.querySelectorAll("#densitySegmented button").forEach(b=>b.classList.toggle("active", b.dataset.value===density));
+  document.querySelectorAll("#unitSegmented button").forEach(b=>b.classList.toggle("active", b.dataset.value===unitSystem));
+  const accentEl = document.getElementById("accentColorInput");
+  if(accentEl) accentEl.value = accentColor || "#1B5D8E";
+  const animEl = document.getElementById("animationsToggle");
+  if(animEl) animEl.checked = animationsEnabled;
+
+  const homeSel = document.getElementById("homeTabSelect");
+  const favSel = document.getElementById("favoriteModuleSelect");
+  if(homeSel){
+    const opts = ["pozo","manantial","calidad","geologia","mapa","estadistica","registros","datos"];
+    const optsHtml = opts.map(o=>`<option value="${o}">${t(TYPE_I18N_KEY[o] || ("nav_"+o))}</option>`).join("");
+    homeSel.innerHTML = optsHtml;
+    homeSel.value = homeTab;
+    favSel.innerHTML = `<option value="">—</option>` + optsHtml;
+    favSel.value = favoriteModule || "";
+  }
+  const openSel = document.getElementById("openBehaviorSelect");
+  if(openSel) openSel.value = openBehavior;
+  const autofillEl = document.getElementById("autofillToggle");
+  if(autofillEl) autofillEl.checked = autofillEnabled;
+
+  const elevMinEl = document.getElementById("elevMinInput");
+  const elevMaxEl = document.getElementById("elevMaxInput");
+  if(elevMinEl){ elevMinEl.value = elevationMin; elevMaxEl.value = elevationMax; }
+
+  const pinToggle = document.getElementById("pinEnabledToggle");
+  if(pinToggle){
+    pinToggle.checked = pinEnabled;
+    document.getElementById("pinSetupFields").style.display = pinEnabled ? "block" : "none";
+    document.getElementById("pinTimeoutSelect").value = String(pinTimeout);
+  }
 }
 
 document.getElementById("themeSegmented").addEventListener("click", e=>{
@@ -3050,6 +4008,38 @@ document.getElementById("backendModeSegmented").addEventListener("click", e=>{
   saveSettings();
   refreshBackendModeUI();
 });
+document.getElementById("scaleSegmented").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  interfaceScale = parseFloat(b.dataset.value); applyInterfaceScale(); refreshSegmented(); saveSettings();
+});
+document.getElementById("densitySegmented").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  density = b.dataset.value; applyDensity(); refreshSegmented(); saveSettings();
+});
+document.getElementById("unitSegmented").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  unitSystem = b.dataset.value; refreshSegmented(); saveSettings();
+  if(document.getElementById("panel-estadistica").classList.contains("active")) buildCustomChart();
+});
+document.getElementById("accentColorInput").addEventListener("input", e=>{
+  accentColor = e.target.value; applyAccentColor(); saveSettings();
+});
+document.getElementById("animationsToggle").addEventListener("change", e=>{
+  animationsEnabled = e.target.checked; applyAnimations(); saveSettings();
+});
+document.getElementById("homeTabSelect").addEventListener("change", e=>{ homeTab = e.target.value; saveSettings(); });
+document.getElementById("openBehaviorSelect").addEventListener("change", e=>{ openBehavior = e.target.value; saveSettings(); });
+document.getElementById("favoriteModuleSelect").addEventListener("change", e=>{
+  favoriteModule = e.target.value || null; saveSettings(); applyFavoriteModule();
+});
+document.getElementById("autofillToggle").addEventListener("change", e=>{ autofillEnabled = e.target.checked; saveSettings(); });
+document.getElementById("elevMinInput").addEventListener("change", e=>{ elevationMin = parseFloat(e.target.value)||0; saveSettings(); });
+document.getElementById("elevMaxInput").addEventListener("change", e=>{ elevationMax = parseFloat(e.target.value)||6000; saveSettings(); });
+document.getElementById("pinEnabledToggle").addEventListener("change", e=>{
+  pinEnabled = e.target.checked;
+  document.getElementById("pinSetupFields").style.display = pinEnabled ? "block" : "none";
+  if(!pinEnabled){ pinCode = ""; saveSettings(); }
+});
 document.getElementById("chartBuilderType").addEventListener("change", updateChartBuilderFieldsUI);
 document.getElementById("chartBuilderTipo").addEventListener("change", ()=>{
   pointPickerSelected.clear();
@@ -3063,10 +4053,18 @@ document.getElementById("chartBuilderTipo").addEventListener("change", ()=>{
 loadSettings();
 applyTheme();
 applyFontScale();
+applyInterfaceScale();
+applyDensity();
+applyAnimations();
 applyLanguage();
-moveSatPanelTo("pozo");
+applyFavoriteModule();
+
+const initialTab = openBehavior==="map" ? "mapa" : (openBehavior==="last" ? lastActiveTab : homeTab);
+switchPanel(TYPES.includes(initialTab) || ["mapa","estadistica","registros","datos","inteligencia","config","cuenta"].includes(initialTab) ? initialTab : "pozo");
+
 if(backendMode==="supabase" && supaUrl && supaKey) initSupabaseClient();
 if(backendMode==="local" && localServerUrl && localToken) localSyncNow();
+if(pinEnabled && pinCode) showLockScreen();
 
 if("serviceWorker" in navigator){
   window.addEventListener("load", ()=>{
