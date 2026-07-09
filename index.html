@@ -154,6 +154,10 @@
     .sat-panel{height:320px;}
   }
 
+  @media (max-width: 700px){
+    .capture-layout{flex-direction:column;}
+  }
+
   @media (max-width: 560px){
     .row3{grid-template-columns:1fr;}
     .export-type-row{flex-wrap:wrap; row-gap:8px;}
@@ -319,7 +323,8 @@
   .map-zoom-btn{width:34px; height:34px; padding:0; font-size:1rem; line-height:1;}
   .map-wrap{position:relative; background:var(--map-bg);}
   #mapSvg{width:100%; height:360px; display:block; touch-action:none;}
-  .map-empty{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--map-bg); text-align:center; color:var(--ink-soft); padding:16px;}
+  .map-empty{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:transparent; text-align:center; color:var(--ink-soft); padding:16px; pointer-events:none;}
+  .map-empty span, .map-empty .glyph{background:rgba(255,255,255,0.82); border-radius:8px; padding:6px 12px;}
   .map-scale{position:absolute; left:10px; bottom:8px; display:flex; align-items:center; gap:6px; background:var(--scale-bg); padding:3px 9px; border-radius:4px; border:1px solid var(--line);}
   .map-point-card{
     position:absolute; top:14px; right:14px; width:250px; max-height:calc(100% - 28px); overflow-y:auto;
@@ -370,8 +375,8 @@
 
   /* ---- Panel satelital + layout de dos columnas ---- */
   .capture-layout{display:flex; gap:16px; flex-wrap:wrap; align-items:stretch;}
-  .capture-form-col{flex:1 1 35%; min-width:260px;}
-  .capture-map-col{flex:1 1 65%; min-width:300px; display:flex;}
+  .capture-form-col{flex:1 1 35%; min-width:0;}
+  .capture-map-col{flex:1 1 65%; min-width:0; display:flex;}
   .sat-panel{
     position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden;
     background:var(--card); flex:1 1 auto; min-height:500px; display:flex; flex-direction:column;
@@ -459,6 +464,7 @@
       <div class="card">
         <h2 data-i18n="pozo_title">Pozo / piezómetro</h2>
         <p class="hint" data-i18n="pozo_hint">Nivel freático, construcción y litología del punto.</p>
+        <div class="field"><label data-i18n="label_proyecto">Nombre de proyecto</label><input type="text" id="pozo-proyecto" list="proyectoOptions" placeholder="Ej: Prospección Cuenca Norte"></div>
         <div class="field"><label class="req" data-i18n="label_codigo">Código de punto</label><input type="text" id="pozo-codigo" placeholder="POZ-001"></div>
         <div id="pozo-gps" class="gps-box"></div>
         <div class="row2">
@@ -520,6 +526,7 @@
       <div class="card">
         <h2 data-i18n="manantial_title">Manantial / fuente superficial</h2>
         <p class="hint" data-i18n="manantial_hint">Afloramientos, caudal y características del agua.</p>
+        <div class="field"><label data-i18n="label_proyecto">Nombre de proyecto</label><input type="text" id="manantial-proyecto" list="proyectoOptions" placeholder="Ej: Prospección Cuenca Norte"></div>
         <div class="field"><label class="req" data-i18n="label_codigo">Código de punto</label><input type="text" id="manantial-codigo" placeholder="MAN-001"></div>
         <div id="manantial-gps" class="gps-box"></div>
         <div class="row2">
@@ -566,6 +573,7 @@
       <div class="card">
         <h2 data-i18n="calidad_title">Calidad de agua in situ</h2>
         <p class="hint" data-i18n="calidad_hint">Parámetros fisicoquímicos medidos en campo.</p>
+        <div class="field"><label data-i18n="label_proyecto">Nombre de proyecto</label><input type="text" id="calidad-proyecto" list="proyectoOptions" placeholder="Ej: Prospección Cuenca Norte"></div>
         <div class="field"><label class="req" data-i18n="label_codigo">Código de punto</label><input type="text" id="calidad-codigo" placeholder="CAL-001 (puede ser igual a un pozo/manantial)"></div>
         <div id="calidad-gps" class="gps-box"></div>
         <div class="row3">
@@ -619,7 +627,9 @@
       <div class="card">
         <h2 data-i18n="geologia_title">Punto geológico</h2>
         <p class="hint" data-i18n="geologia_hint">Afloramientos, formación y estructura.</p>
+        <div class="field"><label data-i18n="label_proyecto">Nombre de proyecto</label><input type="text" id="geologia-proyecto" list="proyectoOptions" placeholder="Ej: Prospección Cuenca Norte"></div>
         <div class="field"><label class="req" data-i18n="label_codigo">Código de punto</label><input type="text" id="geologia-codigo" placeholder="GEO-001"></div>
+        <datalist id="proyectoOptions"></datalist>
         <div id="geologia-gps" class="gps-box"></div>
         <div class="field"><label data-i18n="label_formacion">Formación / unidad</label><input type="text" id="geologia-formacion"></div>
         <div class="field"><label data-i18n="label_litologia_principal">Litología principal</label><input type="text" id="geologia-litologia" placeholder="Ej: arenisca cuarzosa, caliza, lutita..."></div>
@@ -767,6 +777,10 @@
         <div class="map-toolbar">
           <button class="btn small ghost" onclick="reset3dView()" data-i18n="v3d_center">Centrar vista</button>
           <div class="v3d-orient-group">
+            <button class="btn map-zoom-btn ghost" onclick="zoom3d(0.8)" title="Acercar (+)">🔍+</button>
+            <button class="btn map-zoom-btn ghost" onclick="zoom3d(1.25)" title="Alejar (-)">🔍−</button>
+          </div>
+          <div class="v3d-orient-group">
             <button class="btn map-zoom-btn ghost" onclick="set3dOrientation('n')" title="Norte">N</button>
             <button class="btn map-zoom-btn ghost" onclick="set3dOrientation('s')" title="Sur">S</button>
             <button class="btn map-zoom-btn ghost" onclick="set3dOrientation('e')" title="Este">E</button>
@@ -779,6 +793,12 @@
           </label>
         </div>
         <div class="map-toolbar" style="border-top:1px solid var(--line);">
+          <label style="display:flex; align-items:center; gap:6px; font-size:0.6875rem;">
+            <span data-i18n="v3d_project_filter">Proyecto</span>
+            <select id="proyectoFilterSelect" onchange="render3dWells()" style="width:auto; font-size:0.75rem; padding:5px 7px;">
+              <option value="" data-i18n="v3d_project_all">Todos</option>
+            </select>
+          </label>
           <label style="display:flex; align-items:center; gap:6px; font-size:0.6875rem;">
             <span data-i18n="v3d_color_by">Colorear pozos por</span>
             <select id="colorByAttrSelect" onchange="render3dWells()" style="width:auto; font-size:0.75rem; padding:5px 7px;">
@@ -794,7 +814,7 @@
         </div>
         <p class="hint" id="lineDrawHint" style="padding:0 12px; margin:8px 0 0; min-height:14px;"></p>
         <div style="position:relative; height:420px; background:#0d1b1a; margin-top:8px;">
-          <canvas id="canvas3d" style="width:100%; height:100%; display:block;"></canvas>
+          <canvas id="canvas3d" style="width:100%; height:100%; display:block; cursor:grab;"></canvas>
           <div class="map-empty" id="viewer3dEmpty" style="background:transparent; color:#CFE4DD;" data-i18n="v3d_empty">Carga un DEM para comenzar.</div>
           <div id="v3dLocatorMini" class="v3d-locator"></div>
           <div id="v3dLegend" class="v3d-legend" style="display:none;"></div>
@@ -1297,6 +1317,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+(function(){
+  setTimeout(function(){
+    if(typeof Chart === "undefined"){
+      var s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js";
+      document.head.appendChild(s);
+    }
+  }, 2000);
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -1319,10 +1350,10 @@ let mapInitialized = false;
 let currentViewBox = {x:0,y:0,w:100,h:100};
 
 const FIELD_TYPES = {
-  pozo: { profundidad:"N", diametro:"N", nivel_estatico:"N", nivel_dinamico:"N", caudal_bombeo:"N", capacidad_especifica:"N", uso:"C", litologia:"C", obs:"C" },
-  manantial: { caudal:"N", temp:"N", metodo:"C", tipo_aflor:"C", vegetacion:"C", obs:"C" },
-  calidad: { ph:"N", ce:"N", temp:"N", od:"N", std:"N", turbidez:"N", ca:"N", mg:"N", na:"N", k:"N", hco3:"N", cl:"N", so4:"N", obs:"C" },
-  geologia: { formacion:"C", litologia:"C", rumbo:"C", buzamiento:"C", estructuras:"C", obs:"C" }
+  pozo: { proyecto:"C", profundidad:"N", diametro:"N", nivel_estatico:"N", nivel_dinamico:"N", caudal_bombeo:"N", capacidad_especifica:"N", uso:"C", litologia:"C", obs:"C" },
+  manantial: { proyecto:"C", caudal:"N", temp:"N", metodo:"C", tipo_aflor:"C", vegetacion:"C", obs:"C" },
+  calidad: { proyecto:"C", ph:"N", ce:"N", temp:"N", od:"N", std:"N", turbidez:"N", ca:"N", mg:"N", na:"N", k:"N", hco3:"N", cl:"N", so4:"N", obs:"C" },
+  geologia: { proyecto:"C", formacion:"C", litologia:"C", rumbo:"C", buzamiento:"C", estructuras:"C", obs:"C" }
 };
 
 /* ======================================================================
@@ -1405,32 +1436,38 @@ function renderDashboardTrendChart(){
   const emptyMsg = document.getElementById("dashboardTrendEmpty");
   if(!canvas || typeof Chart === "undefined") return;
   if(dashboardTrendChartInstance){ dashboardTrendChartInstance.destroy(); dashboardTrendChartInstance = null; }
+  canvas.style.display = "block";
 
   const pozosConNivel = records.filter(r=>r.tipo==="pozo" && r.data.nivel_estatico && !isNaN(parseFloat(r.data.nivel_estatico)));
-  if(pozosConNivel.length < 2){
-    canvas.style.display = "none";
-    if(emptyMsg) emptyMsg.style.display = "block";
-    return;
-  }
-  canvas.style.display = "block";
-  if(emptyMsg) emptyMsg.style.display = "none";
+  let weeks, data;
 
-  const byWeek = {};
-  pozosConNivel.forEach(r=>{
-    const key = weekBucketKey(new Date(r.fecha));
-    (byWeek[key] = byWeek[key] || []).push(parseFloat(r.data.nivel_estatico));
-  });
-  const weeks = Object.keys(byWeek).sort();
-  const data = weeks.map(w=>{
-    const vals = byWeek[w];
-    return vals.reduce((s,v)=>s+v,0)/vals.length;
-  });
+  if(pozosConNivel.length < 2){
+    if(emptyMsg) emptyMsg.style.display = "block";
+    const today = new Date();
+    weeks = [];
+    for(let i=7;i>=0;i--){
+      weeks.push(weekBucketKey(new Date(today.getTime() - i*7*24*60*60*1000)));
+    }
+    data = weeks.map(()=>null);
+  } else {
+    if(emptyMsg) emptyMsg.style.display = "none";
+    const byWeek = {};
+    pozosConNivel.forEach(r=>{
+      const key = weekBucketKey(new Date(r.fecha));
+      (byWeek[key] = byWeek[key] || []).push(parseFloat(r.data.nivel_estatico));
+    });
+    weeks = Object.keys(byWeek).sort();
+    data = weeks.map(w=>{
+      const vals = byWeek[w];
+      return vals.reduce((s,v)=>s+v,0)/vals.length;
+    });
+  }
 
   dashboardTrendChartInstance = new Chart(canvas, {
     type: "line",
     data: { labels: weeks, datasets: [{
       data, borderColor:"#1B5D8E", backgroundColor:"rgba(27,93,142,0.15)",
-      fill:true, tension:0.3, pointRadius:3
+      fill:true, tension:0.3, pointRadius:3, spanGaps:false
     }]},
     options: {
       responsive:true, maintainAspectRatio:false,
@@ -1492,11 +1529,54 @@ function renderDashboardDonut(){
   });
 }
 
+let dashboardChartsRetryCount = 0;
+
+function showChartsUnavailable(){
+  const msg = `<p class="hint">${t("dash_charts_unavailable")}</p>`;
+  const trendCanvas = document.getElementById("dashboardTrendChart");
+  if(trendCanvas){ trendCanvas.style.display = "none"; }
+  const trendEmpty = document.getElementById("dashboardTrendEmpty");
+  if(trendEmpty){ trendEmpty.innerHTML = msg; trendEmpty.style.display = "block"; }
+  ["gaugePh","gaugeCap","gaugeValid"].forEach(id=>{
+    const c = document.getElementById(id);
+    if(c) c.style.display = "none";
+  });
+  const donutCanvas = document.getElementById("dashboardDonut");
+  if(donutCanvas){
+    donutCanvas.style.display = "none";
+    if(!donutCanvas.parentElement.querySelector(".chart-unavailable-msg")){
+      const p = document.createElement("p");
+      p.className = "hint chart-unavailable-msg";
+      p.textContent = t("dash_charts_unavailable");
+      donutCanvas.parentElement.appendChild(p);
+    }
+  }
+}
+
 function renderDashboard(){
   renderDashboardKpis();
-  renderDashboardTrendChart();
-  renderDashboardGauges();
-  renderDashboardDonut();
+
+  if(typeof Chart === "undefined"){
+    showChartsUnavailable();
+    if(dashboardChartsRetryCount < 5){
+      dashboardChartsRetryCount++;
+      setTimeout(()=>{
+        if(document.getElementById("panel-dashboard") && document.getElementById("panel-dashboard").classList.contains("active")){
+          renderDashboard();
+        }
+      }, 1500);
+    }
+  } else {
+    dashboardChartsRetryCount = 0;
+    try{
+      renderDashboardTrendChart();
+      renderDashboardGauges();
+      renderDashboardDonut();
+    }catch(e){
+      console.error("Error al renderizar los gráficos del dashboard:", e);
+      showChartsUnavailable();
+    }
+  }
 
   const recent = records.slice(-5).reverse();
   const holder = document.getElementById("dashboardRecent");
@@ -1564,6 +1644,7 @@ function switchPanel(name){
   }
   if(TYPES.includes(name)){
     moveSatPanelTo(name);
+    populateProyectoDatalist();
   }
   lastActiveTab = name;
   saveSettings();
@@ -1634,10 +1715,10 @@ function captureGps(tipo){
 
 function fieldIds(tipo){
   const map = {
-    pozo: ["codigo","profundidad","diametro","nivel-estatico","nivel-dinamico","caudal-bombeo","uso","litologia","obs"],
-    manantial: ["codigo","caudal","temp","metodo","tipo-aflor","vegetacion","obs"],
-    calidad: ["codigo","ph","ce","temp","od","std","turbidez","ca","mg","na","k","hco3","cl","so4","obs"],
-    geologia: ["codigo","formacion","litologia","rumbo","buzamiento","estructuras","obs"]
+    pozo: ["proyecto","codigo","profundidad","diametro","nivel-estatico","nivel-dinamico","caudal-bombeo","uso","litologia","obs"],
+    manantial: ["proyecto","codigo","caudal","temp","metodo","tipo-aflor","vegetacion","obs"],
+    calidad: ["proyecto","codigo","ph","ce","temp","od","std","turbidez","ca","mg","na","k","hco3","cl","so4","obs"],
+    geologia: ["proyecto","codigo","formacion","litologia","rumbo","buzamiento","estructuras","obs"]
   };
   return map[tipo];
 }
@@ -1719,6 +1800,14 @@ function getValidLitIntervals(tipo){
     .sort((a,b)=>a.desde-b.desde);
 }
 
+function populateProyectoDatalist(){
+  const dl = document.getElementById("proyectoOptions");
+  if(!dl) return;
+  const set = new Set();
+  records.forEach(r=>{ if(r.data.proyecto) set.add(r.data.proyecto); });
+  dl.innerHTML = Array.from(set).sort().map(p=>`<option value="${escapeHtml(p)}"></option>`).join("");
+}
+
 function saveRecord(tipo){
   const codigoEl = document.getElementById(tipo+"-codigo");
   if(!codigoEl.value.trim()){
@@ -1753,6 +1842,7 @@ function saveRecord(tipo){
   records.push(rec);
   showToast("Registro " + data.codigo + " guardado");
   rememberLastValues(tipo, data);
+  populateProyectoDatalist();
   clearForm(tipo);
   updateBadges();
   if(backendMode==="local"){ if(localToken) localPushRecord(rec); }
@@ -2580,11 +2670,23 @@ function computeCombinedBounds(){
   return {minX,minY,maxX,maxY};
 }
 
+function buildEmptyGridSVG(){
+  const size = 100, step = 10;
+  let html = "";
+  for(let i=-size; i<=size; i+=step){
+    html += `<line x1="${i}" y1="${-size}" x2="${i}" y2="${size}" stroke="#dcdcdc" stroke-width="0.3"/>`;
+    html += `<line x1="${-size}" y1="${i}" x2="${size}" y2="${i}" stroke="#dcdcdc" stroke-width="0.3"/>`;
+  }
+  html += `<line x1="${-size}" y1="0" x2="${size}" y2="0" stroke="#b5b5b5" stroke-width="0.6"/>`;
+  html += `<line x1="0" y1="${-size}" x2="0" y2="${size}" stroke="#b5b5b5" stroke-width="0.6"/>`;
+  return html;
+}
+
 function fitMapView(){
   const b = computeCombinedBounds();
   const emptyMsg = document.getElementById("mapEmptyMsg");
   if(!b){
-    currentViewBox = {x:0,y:0,w:100,h:100};
+    currentViewBox = {x:-100,y:-100,w:200,h:200};
     if(emptyMsg) emptyMsg.style.display = "flex";
     applyViewBox();
     return;
@@ -2627,6 +2729,10 @@ function renderMap(){
   };
 
   let html = "";
+  const hasAnyData = !!mapImage || dxfEntities.length>0 || records.some(r=>r.gps);
+  if(!hasAnyData){
+    html += buildEmptyGridSVG();
+  }
   if(mapImage && layersOn.img){
     html += `<image x="${mapImage.minX}" y="${-mapImage.maxY}" width="${mapImage.maxX-mapImage.minX}" height="${mapImage.maxY-mapImage.minY}" href="${mapImage.img.src}" preserveAspectRatio="none" opacity="0.85"/>`;
   }
@@ -2854,7 +2960,7 @@ function writeDbf(fields, rows){
 }
 
 const DBF_ABBR = {
-  id:"ID", tipo_registro:"TIPO_REG", codigo:"CODIGO", fecha:"FECHA",
+  id:"ID", tipo_registro:"TIPO_REG", codigo:"CODIGO", fecha:"FECHA", proyecto:"PROYECTO",
   lat:"LAT", lon:"LON", alt:"ALT", precision:"PRECISION",
   profundidad:"PROFUND", diametro:"DIAMETRO",
   nivel_estatico:"NIV_ESTAT", nivel_dinamico:"NIV_DINAM", uso:"USO",
@@ -3194,7 +3300,7 @@ const FIELD_LABEL_KEY = {
   od:"label_od", turbidez:"label_turbidez",
   caudal_bombeo:"label_caudal_bombeo", capacidad_especifica:"label_capacidad_especifica"
 };
-const FIELD_LABEL_PLAIN = { ph:"pH", ce:"CE", std:"STD", ca:"Ca2+ (mg/L)", mg:"Mg2+ (mg/L)", na:"Na+ (mg/L)", k:"K+ (mg/L)", hco3:"HCO3- (mg/L)", cl:"Cl- (mg/L)", so4:"SO4 2- (mg/L)" };
+const FIELD_LABEL_PLAIN = { ph:"pH", ce:"CE", std:"STD", ca:"Ca2+ (mg/L)", mg:"Mg2+ (mg/L)", na:"Na+ (mg/L)", k:"K+ (mg/L)", hco3:"HCO3- (mg/L)", cl:"Cl- (mg/L)", so4:"SO4 2- (mg/L)", proyecto:"Nombre de proyecto" };
 const CHART_PALETTE = ["#1B5D8E","#B05A2A","#3C8C9C","#7A3D1B","#3C5A66","#9C3B2E","#4FA3D9","#D98452","#00594D","#8E44AD","#16A085","#C0392B","#2C3E50","#F39C12","#27AE60","#8E5B3F","#5D6D7E","#B03060","#556B2F","#4682B4"];
 
 let pointPickerSelected = new Set();
@@ -4006,10 +4112,10 @@ let localToken = null;
 let localUserEmail = null;
 
 const LOCAL_FIELD_MAP = {
-  pozo: {profundidad:"Profundidad", diametro:"Diametro", nivel_estatico:"NivelEstatico", nivel_dinamico:"NivelDinamico", caudal_bombeo:"CaudalBombeo", capacidad_especifica:"CapacidadEspecifica", uso:"Uso", litologia:"Litologia", obs:"Obs"},
-  manantial: {caudal:"Caudal", temp:"Temp", metodo:"Metodo", tipo_aflor:"TipoAflor", vegetacion:"Vegetacion", obs:"Obs"},
-  calidad: {ph:"PH", ce:"CE", temp:"Temp", od:"OD", std:"STD", turbidez:"Turbidez", ca:"Ca", mg:"Mg", na:"Na", k:"K", hco3:"Hco3", cl:"Cl", so4:"So4", obs:"Obs"},
-  geologia: {formacion:"Formacion", litologia:"Litologia", rumbo:"Rumbo", buzamiento:"Buzamiento", estructuras:"Estructuras", obs:"Obs"}
+  pozo: {proyecto:"Proyecto", profundidad:"Profundidad", diametro:"Diametro", nivel_estatico:"NivelEstatico", nivel_dinamico:"NivelDinamico", caudal_bombeo:"CaudalBombeo", capacidad_especifica:"CapacidadEspecifica", uso:"Uso", litologia:"Litologia", obs:"Obs"},
+  manantial: {proyecto:"Proyecto", caudal:"Caudal", temp:"Temp", metodo:"Metodo", tipo_aflor:"TipoAflor", vegetacion:"Vegetacion", obs:"Obs"},
+  calidad: {proyecto:"Proyecto", ph:"PH", ce:"CE", temp:"Temp", od:"OD", std:"STD", turbidez:"Turbidez", ca:"Ca", mg:"Mg", na:"Na", k:"K", hco3:"Hco3", cl:"Cl", so4:"So4", obs:"Obs"},
+  geologia: {proyecto:"Proyecto", formacion:"Formacion", litologia:"Litologia", rumbo:"Rumbo", buzamiento:"Buzamiento", estructuras:"Estructuras", obs:"Obs"}
 };
 
 function initSupabaseClient(){
@@ -4460,6 +4566,45 @@ function parseAsciiGrid(text){
   return {ncols, nrows, cellsize, xll, yll, nodata, grid};
 }
 
+let axesGroup3d = null;
+
+function makeAxisLabel3D(text, colorHex){
+  try{
+    const canvas = document.createElement("canvas");
+    canvas.width = 128; canvas.height = 64;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = colorHex;
+    ctx.font = "bold 28px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, 64, 32);
+    const texture = new THREE.CanvasTexture(canvas);
+    const material = new THREE.SpriteMaterial({map: texture, depthTest:false});
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(24, 12, 1);
+    return sprite;
+  }catch(e){ return null; }
+}
+
+function buildAxesHelper3D(size){
+  size = size || 80;
+  if(axesGroup3d && scene3d){ scene3d.remove(axesGroup3d); axesGroup3d = null; }
+  axesGroup3d = new THREE.Group();
+
+  try{
+    axesGroup3d.add(new THREE.AxesHelper(size));
+  }catch(e){}
+
+  const labelX = makeAxisLabel3D(t("v3d_axis_x"), "#ff5555");
+  if(labelX){ labelX.position.set(size*1.1, 0, 0); axesGroup3d.add(labelX); }
+  const labelY = makeAxisLabel3D(t("v3d_axis_y"), "#55d055");
+  if(labelY){ labelY.position.set(0, size*1.1, 0); axesGroup3d.add(labelY); }
+  const labelZ = makeAxisLabel3D(t("v3d_axis_z"), "#5599ff");
+  if(labelZ){ labelZ.position.set(0, 0, size*1.1); axesGroup3d.add(labelZ); }
+
+  if(scene3d) scene3d.add(axesGroup3d);
+}
+
 function init3dScene(){
   if(viewer3dInitialized || !three3dReady) return;
   const canvas = document.getElementById("canvas3d");
@@ -4478,6 +4623,8 @@ function init3dScene(){
   const sun = new THREE.DirectionalLight(0xffffff, 0.75);
   sun.position.set(500, 800, 300);
   scene3d.add(sun);
+
+  buildAxesHelper3D(80);
 
   controls3d = new THREE.OrbitControls(camera3d, renderer3d.domElement);
   controls3d.enableDamping = true;
@@ -4580,10 +4727,10 @@ function colorForAttrValue(val, min, max){
   return (r<<16)|(g<<8)|b;
 }
 
-function buildCategoryColorMap(attr){
+function buildCategoryColorMap(attr, recs){
   const map = new Map();
   const seen = new Set();
-  records.filter(r=>r.gps).forEach(r=>{
+  (recs||records).filter(r=>r.gps).forEach(r=>{
     const raw = (r.data[attr]||"").trim();
     if(!raw) return;
     const key = raw.toLowerCase();
@@ -4620,9 +4767,9 @@ function updateV3dLegend(mode, a, b, categoryMap){
   ).join("");
 }
 
-function buildIntervalColorMap(){
+function buildIntervalColorMap(recs){
   const map = new Map();
-  records.filter(r=>r.tipo==="pozo" && Array.isArray(r.data.litologia_intervalos)).forEach(r=>{
+  (recs||records).filter(r=>r.tipo==="pozo" && Array.isArray(r.data.litologia_intervalos)).forEach(r=>{
     r.data.litologia_intervalos.forEach(iv=>{
       const key = (iv.tipo||"").toLowerCase();
       if(key && !map.has(key)){
@@ -4634,6 +4781,17 @@ function buildIntervalColorMap(){
   return map;
 }
 
+function populateProjectFilterOptions(){
+  const sel = document.getElementById("proyectoFilterSelect");
+  if(!sel) return;
+  const current = sel.value;
+  const set = new Set();
+  records.forEach(r=>{ if(r.data.proyecto) set.add(r.data.proyecto); });
+  const opts = Array.from(set).sort();
+  sel.innerHTML = `<option value="">${t("v3d_project_all")}</option>` + opts.map(p=>`<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join("");
+  if(opts.includes(current)) sel.value = current;
+}
+
 function render3dWells(){
   if(!scene3d || !dem3d) return;
   if(wellsGroup3d) scene3d.remove(wellsGroup3d);
@@ -4641,22 +4799,26 @@ function render3dWells(){
   scene3d.add(wellsGroup3d);
   wellMeshRegistry = [];
 
+  populateProjectFilterOptions();
+  const projectFilter = document.getElementById("proyectoFilterSelect").value;
+  const scopedRecords = projectFilter ? records.filter(r=>r.data.proyecto===projectFilter) : records;
+
   const showWater = document.getElementById("show3dWaterTable").checked;
   const colorAttr = document.getElementById("colorByAttrSelect").value;
   const zoneInfo = getActiveUtmZone();
   const isCategorical = CATEGORICAL_ATTRS.includes(colorAttr);
 
-  const intervalColorMap = buildIntervalColorMap();
+  const intervalColorMap = buildIntervalColorMap(scopedRecords);
   const hasIntervalData = intervalColorMap.size > 0;
 
   let minAttr = Infinity, maxAttr = -Infinity, categoryMap = null;
   if(hasIntervalData){
     updateV3dLegend("category", "litologia_intervalos", null, intervalColorMap);
   } else if(isCategorical){
-    categoryMap = buildCategoryColorMap(colorAttr);
+    categoryMap = buildCategoryColorMap(colorAttr, scopedRecords);
     updateV3dLegend("category", colorAttr, null, categoryMap);
   } else if(colorAttr !== "tipo"){
-    records.filter(r=>r.gps).forEach(r=>{
+    scopedRecords.filter(r=>r.gps).forEach(r=>{
       const v = parseFloat(r.data[colorAttr]);
       if(!isNaN(v)){ if(v<minAttr) minAttr=v; if(v>maxAttr) maxAttr=v; }
     });
@@ -4670,7 +4832,7 @@ function render3dWells(){
     const showEl = document.getElementById("show3d-"+tipo);
     if(!showEl || !showEl.checked) return;
 
-    records.filter(r=>r.tipo===tipo && r.gps).forEach(r=>{
+    scopedRecords.filter(r=>r.tipo===tipo && r.gps).forEach(r=>{
       const p = latLonToUTM(r.gps.lat, r.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
       const local = utmToLocal3d(p.x, p.y);
       const groundY = sampleTerrainHeight(p.x, p.y);
@@ -4758,6 +4920,10 @@ function setup3dRaycasting(){
   if(!renderer3d) return;
   const raycaster = new THREE.Raycaster();
   const mouseV = new THREE.Vector2();
+
+  renderer3d.domElement.addEventListener("pointerdown", ()=>{ renderer3d.domElement.style.cursor = "grabbing"; });
+  window.addEventListener("pointerup", ()=>{ if(renderer3d) renderer3d.domElement.style.cursor = "grab"; });
+
   renderer3d.domElement.addEventListener("click", (event)=>{
     const rect = renderer3d.domElement.getBoundingClientRect();
     mouseV.x = ((event.clientX-rect.left)/rect.width)*2-1;
@@ -4873,6 +5039,15 @@ function reset3dView(){
   const maxDim = Math.max(width, depth, 10);
   camera3d.position.set(maxDim*0.6, maxDim*0.6, maxDim*0.6);
   controls3d.target.set(0,0,0);
+  controls3d.update();
+}
+
+function zoom3d(factor){
+  if(!camera3d || !controls3d) return;
+  const target = controls3d.target;
+  camera3d.position.x = target.x + (camera3d.position.x - target.x) * factor;
+  camera3d.position.y = target.y + (camera3d.position.y - target.y) * factor;
+  camera3d.position.z = target.z + (camera3d.position.z - target.z) * factor;
   controls3d.update();
 }
 
@@ -5116,6 +5291,8 @@ function handleDemFile(evt){
       document.getElementById("viewer3dEmpty").style.display = "none";
       init3dScene();
       buildTerrainMesh();
+      const axisSize = Math.max((dem3d.ncols-1)*dem3d.cellsize, (dem3d.nrows-1)*dem3d.cellsize) * 0.55;
+      buildAxesHelper3D(axisSize);
       render3dLayerVis();
       render3dWells();
       buildBoundingBox3d();
@@ -5318,6 +5495,9 @@ const I18N = {
     lit_intervals_hint:"Agrega tramos con profundidad de inicio, fin y tipo de roca. Se usa para pintar el pozo por capas en el Visualizador 3D y en las secciones transversales.",
     lit_add_interval:"+ Agregar intervalo", lit_desde:"Desde", lit_hasta:"Hasta", lit_tipo_roca:"Tipo de roca",
     v3d_fence_built:"Malla 3D de correlación generada entre pozos con intervalos definidos",
+    v3d_axis_x:"X (Este)", v3d_axis_y:"Y (Elev.)", v3d_axis_z:"Z (Sur)",
+    dash_charts_unavailable:"No se pudieron cargar los gráficos (revisa tu conexión a internet). Reintentando automáticamente...",
+    label_proyecto:"Nombre de proyecto", v3d_project_filter:"Proyecto", v3d_project_all:"Todos",
     nav_estadistica:"Estadística", nav_account:"Cuenta", nav_config:"Configuración",
     account_title:"Cuenta de equipo",
     account_intro:"Inicia sesión para sincronizar tus puntos con tu equipo desde cualquier dispositivo. Requiere conexión a internet y un proyecto gratuito de Supabase.",
@@ -5499,6 +5679,9 @@ const I18N = {
     lit_intervals_hint:"Add depth intervals with start, end, and rock type. Used to color the well by layer in the 3D Viewer and cross-sections.",
     lit_add_interval:"+ Add interval", lit_desde:"From", lit_hasta:"To", lit_tipo_roca:"Rock type",
     v3d_fence_built:"3D correlation mesh generated between wells with defined intervals",
+    v3d_axis_x:"X (East)", v3d_axis_y:"Y (Elev.)", v3d_axis_z:"Z (South)",
+    dash_charts_unavailable:"Couldn't load the charts (check your internet connection). Retrying automatically...",
+    label_proyecto:"Project name", v3d_project_filter:"Project", v3d_project_all:"All",
     nav_estadistica:"Statistics", nav_account:"Account", nav_config:"Settings",
     account_title:"Team account",
     account_intro:"Sign in to sync your points with your team from any device. Requires an internet connection and a free Supabase project.",
