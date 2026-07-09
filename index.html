@@ -93,6 +93,7 @@
   .app-topbar .badge-count{margin-left:auto; background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.18); color:#fff;}
   .app-topbar .hamburger{color:#fff; border-color:rgba(255,255,255,0.25);}
   .icon-btn-dark{background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:#fff; width:32px; height:32px; border-radius:50%; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .icon-btn-dark.active{background:var(--teal); border-color:var(--teal);}
 
   .shell{display:flex; min-height:100vh; margin-top:52px; background:var(--paper);}
 
@@ -115,6 +116,17 @@
   .sidebar-nav button .ic, .sidebar-footer button .ic{font-size:1.05rem; width:20px; text-align:center; flex:0 0 auto;}
   .sidebar-nav button:hover, .sidebar-footer button:hover{background:rgba(243,239,227,0.08); color:var(--paper);}
   .sidebar-nav button.active, .sidebar-footer button.active{background:var(--teal); color:#fff;}
+  .sidebar-group{margin-bottom:3px;}
+  .sidebar-group-header{
+    display:flex; align-items:center; justify-content:space-between; width:100%; text-align:left;
+    background:transparent; border:none; color:rgba(243,239,227,0.5); font-family:var(--sans);
+    font-size:0.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+    padding:10px 12px 4px; cursor:pointer;
+  }
+  .sidebar-group-header .chev{transition:transform 0.15s ease;}
+  .sidebar-group-items{display:flex; flex-direction:column;}
+  .sidebar-group.collapsed .sidebar-group-items{display:none;}
+  .sidebar-group.collapsed .chev{transform:rotate(-90deg);}
   .sidebar-footer{padding:12px; border-top:1px solid rgba(243,239,227,0.14);}
   .sidebar-scrim{display:none; position:fixed; top:52px; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:40;}
 
@@ -212,6 +224,21 @@
   .stats-grid .stat{padding:16px 10px;}
   .stats-grid .stat .n{font-size:1.6rem;}
   .stats-grid .stat .l{font-size:0.6875rem; margin-top:5px;}
+
+  .kpi-row{display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr)); gap:14px; margin-bottom:18px;}
+  .kpi-card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px;}
+  .kpi-label{font-size:0.6875rem; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; color:var(--ink-soft); margin-bottom:8px;}
+  .kpi-value{font-family:var(--serif); font-size:1.9rem; font-weight:700; color:var(--ink); line-height:1;}
+  .kpi-trend{font-size:0.75rem; margin-top:8px; font-weight:600;}
+  .kpi-trend.up{color:#1E8E5A;}
+  .kpi-trend.down{color:var(--danger);}
+  .kpi-trend.flat{color:var(--ink-soft);}
+
+  .gauge-row{display:flex; gap:16px; flex-wrap:wrap;}
+  .gauge-item{flex:1 1 150px; text-align:center;}
+  .gauge-value{font-family:var(--serif); font-size:1.3rem; font-weight:700; margin-top:-46px; position:relative;}
+  .gauge-label{font-size:0.6875rem; color:var(--ink-soft); margin-top:6px;}
+
   .chart-row{display:flex; gap:16px; flex-wrap:wrap; margin-bottom:16px;}
   .chart-card{flex:1 1 320px; margin-bottom:0;}
   .chart-box{position:relative; height:260px;}
@@ -251,6 +278,16 @@
   .val-error{background:rgba(156,59,46,0.08); border-left-color:var(--danger);}
   .val-warn{background:rgba(176,90,42,0.08); border-left-color:var(--clay);}
   .val-info{background:rgba(60,90,102,0.08); border-left-color:var(--slate);}
+  .badge-beta{font-size:0.6rem; font-weight:700; background:var(--clay); color:#fff; padding:2px 7px; border-radius:10px; vertical-align:middle; margin-left:6px;}
+  .val-item .ai-explain-btn{display:block; margin-top:7px; font-size:0.6875rem; padding:4px 9px;}
+  .val-item .ai-explanation{margin-top:7px; padding-top:7px; border-top:1px dashed var(--line); font-size:0.75rem; font-style:italic;}
+  .ai-norm-row{display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--line); font-size:0.8125rem;}
+  .ai-norm-row input[type="text"]{flex:1;}
+  .lit-interval-row{display:flex; gap:6px; align-items:center; margin-bottom:6px;}
+  .lit-interval-row input[type="number"]{width:64px; flex:0 0 auto;}
+  .lit-interval-row input[type="text"]{flex:1; min-width:0;}
+  .lit-interval-row .lit-remove{flex:0 0 auto; width:30px; height:34px; padding:0; font-size:1rem; line-height:1;}
+  .lit-interval-row .lit-sep{color:var(--ink-soft); font-size:0.75rem; flex:0 0 auto;}
 
   .pin-overlay{position:fixed; inset:0; background:var(--teal-d); z-index:200; display:flex; align-items:center; justify-content:center; flex-direction:column; color:var(--paper);}
   .pin-overlay input{max-width:180px; text-align:center; font-size:1.5rem; letter-spacing:6px; font-family:var(--mono);}
@@ -284,6 +321,14 @@
   #mapSvg{width:100%; height:360px; display:block; touch-action:none;}
   .map-empty{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--map-bg); text-align:center; color:var(--ink-soft); padding:16px;}
   .map-scale{position:absolute; left:10px; bottom:8px; display:flex; align-items:center; gap:6px; background:var(--scale-bg); padding:3px 9px; border-radius:4px; border:1px solid var(--line);}
+  .map-point-card{
+    position:absolute; top:14px; right:14px; width:250px; max-height:calc(100% - 28px); overflow-y:auto;
+    background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.18);
+    padding:12px 14px; z-index:15;
+  }
+  .map-point-card-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .map-point-card-head strong{font-family:var(--serif); font-size:0.9375rem;}
+  .map-point-card-close{background:transparent; border:none; font-size:1.1rem; line-height:1; cursor:pointer; color:var(--ink-soft); padding:0 2px;}
   .map-scale .bar{height:2px; background:var(--ink); width:60px;}
   .map-scale .lbl{font-family:var(--mono); font-size:0.625rem; color:var(--ink-soft);}
   .map-hint{font-size:0.6875rem; color:var(--ink-soft); padding:9px 12px 0; line-height:1.4;}
@@ -324,12 +369,12 @@
   .settings-note{font-size:0.6875rem; color:var(--ink-soft); line-height:1.5; margin-top:4px;}
 
   /* ---- Panel satelital + layout de dos columnas ---- */
-  .capture-layout{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;}
-  .capture-form-col{flex:1 1 380px; min-width:0;}
-  .capture-map-col{flex:1 1 320px; min-width:280px;}
+  .capture-layout{display:flex; gap:16px; flex-wrap:wrap; align-items:stretch;}
+  .capture-form-col{flex:1 1 35%; min-width:260px;}
+  .capture-map-col{flex:1 1 65%; min-width:300px; display:flex;}
   .sat-panel{
     position:relative; border:1px solid var(--line); border-radius:12px; overflow:hidden;
-    background:var(--card); height:420px; display:flex; flex-direction:column;
+    background:var(--card); flex:1 1 auto; min-height:500px; display:flex; flex-direction:column;
   }
   .sat-header{
     font-family:var(--sans); font-size:0.75rem; font-weight:600; color:var(--ink-soft);
@@ -358,7 +403,8 @@
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menú">☰</button>
   <span class="app-topbar-brand">Hidrocampo</span>
   <div class="badge-count" id="totalBadge">0 registros</div>
-  <button class="icon-btn-dark" onclick="switchPanel('config')" aria-label="Configuración" data-i18n-aria="settings_btn_aria">⚙</button>
+  <button class="icon-btn-dark" data-panel="cuenta" aria-label="Cuenta" data-i18n-aria="nav_account"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2.5c-3.3 0-9.8 1.6-9.8 4.9v2.4h19.6v-2.4c0-3.3-6.5-4.9-9.8-4.9z"/></svg></button>
+  <button class="icon-btn-dark" data-panel="config" aria-label="Configuración" data-i18n-aria="settings_btn_aria">⚙</button>
 </header>
 <div class="shell">
   <div class="sidebar-scrim" id="sidebarScrim" onclick="toggleSidebar()"></div>
@@ -367,23 +413,36 @@
       <span class="sub" data-i18n="header_sub">CAPTURA Y VISUALIZACIÓN HIDROGEOLÓGICA · OFFLINE</span>
     </div>
     <nav class="sidebar-nav" id="sidebarNav">
-      <button data-panel="pozo" class="active"><span class="ic">⛏</span><span data-i18n="nav_pozo">Pozos</span></button>
-      <button data-panel="manantial"><span class="ic">≈</span><span data-i18n="nav_manantial">Manantiales</span></button>
-      <button data-panel="calidad"><span class="ic">⚗</span><span data-i18n="nav_calidad">Calidad</span></button>
-      <button data-panel="geologia"><span class="ic">▲</span><span data-i18n="nav_geologia">Geología</span></button>
+      <button data-panel="dashboard" class="active"><span class="ic">◱</span><span data-i18n="nav_dashboard">Dashboard</span></button>
       <button data-panel="mapa"><span class="ic">⊞</span><span data-i18n="nav_mapa">Mapa</span></button>
+
+      <div class="sidebar-group">
+        <button class="sidebar-group-header" onclick="toggleSidebarGroup('captura')" type="button">
+          <span data-i18n="nav_group_captura">Captura</span><span class="chev" id="chev-captura">▾</span>
+        </button>
+        <div class="sidebar-group-items" id="sidebarGroup-captura">
+          <button data-panel="pozo"><span class="ic">⛏</span><span data-i18n="nav_pozo">Pozos</span></button>
+          <button data-panel="manantial"><span class="ic">≈</span><span data-i18n="nav_manantial">Manantiales</span></button>
+          <button data-panel="calidad"><span class="ic">⚗</span><span data-i18n="nav_calidad">Calidad</span></button>
+          <button data-panel="geologia"><span class="ic">▲</span><span data-i18n="nav_geologia">Geología</span></button>
+        </div>
+      </div>
+
       <button data-panel="visor3d"><span class="ic">◭</span><span data-i18n="nav_3d">Visualizador 3D</span></button>
-      <button data-panel="estadistica"><span class="ic">▤</span><span data-i18n="nav_estadistica">Estadística</span></button>
+
+      <div class="sidebar-group">
+        <button class="sidebar-group-header" onclick="toggleSidebarGroup('analisis')" type="button">
+          <span data-i18n="nav_group_analisis">Análisis</span><span class="chev" id="chev-analisis">▾</span>
+        </button>
+        <div class="sidebar-group-items" id="sidebarGroup-analisis">
+          <button data-panel="estadistica"><span class="ic">▤</span><span data-i18n="nav_estadistica">Estadísticas</span></button>
+          <button data-panel="datos"><span class="ic">⇅</span><span data-i18n="nav_reportes">Reportes</span></button>
+        </div>
+      </div>
+
       <button data-panel="registros"><span class="ic">☰</span><span data-i18n="nav_registros">Registros</span></button>
-      <button data-panel="datos"><span class="ic">⇅</span><span data-i18n="nav_datos">Datos</span></button>
       <button data-panel="inteligencia"><span class="ic">✦</span><span data-i18n="nav_inteligencia">Inteligencia</span></button>
     </nav>
-    <div class="sidebar-footer">
-      <button data-panel="cuenta">
-        <span class="ic">◍</span><span data-i18n="nav_account">Cuenta</span>
-      </button>
-      <button data-panel="config"><span class="ic">⚙</span><span data-i18n="nav_config">Configuración</span></button>
-    </div>
   </aside>
 
   <div class="main-area">
@@ -394,7 +453,7 @@
   <main>
 
     <!-- POZOS -->
-    <section class="panel active" id="panel-pozo">
+    <section class="panel" id="panel-pozo">
       <div class="capture-layout">
       <div class="capture-form-col">
       <div class="card">
@@ -421,6 +480,17 @@
             <option>Pecuario</option><option>Industrial</option><option>Monitoreo</option><option>Sin uso</option>
           </select></div>
         <div class="field"><label data-i18n="label_litologia">Litología / perfil resumido</label><textarea id="pozo-litologia" placeholder="Ej: 0-5m arena fina, 5-20m arcilla, 20-35m grava..."></textarea></div>
+        <div class="field">
+          <label data-i18n="label_lit_intervals">Perfil litológico por intervalos (opcional — habilita capas 3D)</label>
+          <p class="hint" style="margin:0 0 8px;" data-i18n="lit_intervals_hint">Agrega tramos con profundidad de inicio, fin y tipo de roca. Se usa para pintar el pozo por capas en el Visualizador 3D y en las secciones transversales.</p>
+          <div id="litIntervalsList"></div>
+          <datalist id="litCategoryOptions">
+            <option value="Arena"></option><option value="Grava"></option><option value="Arcilla"></option>
+            <option value="Limo"></option><option value="Caliza"></option><option value="Arenisca"></option>
+            <option value="Roca fracturada"></option><option value="Conglomerado"></option><option value="Lutita"></option>
+          </datalist>
+          <button type="button" class="btn small ghost" onclick="addLitInterval('pozo')" style="width:100%; margin-top:4px;" data-i18n="lit_add_interval">+ Agregar intervalo</button>
+        </div>
         <div class="field"><label data-i18n="label_obs">Observaciones</label>
           <div class="obs-row"><textarea id="pozo-obs"></textarea>
             <button type="button" class="btn small ghost mic-btn" id="pozo-voice-btn" onclick="startVoiceDictation('pozo')" title="Dictar">🎤</button>
@@ -580,6 +650,58 @@
       </div>
     </section>
 
+    <!-- DASHBOARD -->
+    <section class="panel active" id="panel-dashboard">
+      <div class="kpi-row" id="dashboardKpis"></div>
+
+      <div class="card">
+        <h2 data-i18n="dash_trend_title">Tendencia del nivel freático (promedio semanal, todos los pozos)</h2>
+        <div class="chart-box" style="height:260px;"><canvas id="dashboardTrendChart"></canvas></div>
+        <p class="hint" id="dashboardTrendEmpty" style="display:none;" data-i18n="dash_trend_empty">Aún no hay suficientes mediciones de nivel estático para trazar una tendencia.</p>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="dash_gauges_title">Indicadores clave</h2>
+        <div class="gauge-row">
+          <div class="gauge-item">
+            <div class="chart-box" style="height:120px;"><canvas id="gaugePh"></canvas></div>
+            <div class="gauge-value" id="gaugePhValue">—</div>
+            <div class="gauge-label" data-i18n="dash_gauge_ph">pH promedio</div>
+          </div>
+          <div class="gauge-item">
+            <div class="chart-box" style="height:120px;"><canvas id="gaugeCap"></canvas></div>
+            <div class="gauge-value" id="gaugeCapValue">—</div>
+            <div class="gauge-label" data-i18n="dash_gauge_cap">Capacidad específica prom. (L/s/m)</div>
+          </div>
+          <div class="gauge-item">
+            <div class="chart-box" style="height:120px;"><canvas id="gaugeValid"></canvas></div>
+            <div class="gauge-value" id="gaugeValidValue">—</div>
+            <div class="gauge-label" data-i18n="dash_gauge_valid">Puntos sin alertas de Inteligencia</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="dash_dist_title">Distribución por tipo de punto</h2>
+        <div class="chart-box" style="height:220px;"><canvas id="dashboardDonut"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="dash_quick_title">Accesos rápidos</h2>
+        <div class="chart-row">
+          <button class="btn" onclick="switchPanel('pozo')" data-i18n="dash_quick_pozo">+ Pozo</button>
+          <button class="btn" onclick="switchPanel('manantial')" data-i18n="dash_quick_manantial">+ Manantial</button>
+          <button class="btn" onclick="switchPanel('calidad')" data-i18n="dash_quick_calidad">+ Calidad</button>
+          <button class="btn" onclick="switchPanel('geologia')" data-i18n="dash_quick_geologia">+ Geología</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="dash_recent_title">Últimos registros</h2>
+        <div id="dashboardRecent"><p class="hint" data-i18n="dash_recent_empty">Aún no hay registros.</p></div>
+      </div>
+    </section>
+
     <!-- MAPA -->
     <section class="panel" id="panel-mapa">
       <div class="card" style="padding:0; overflow:hidden;">
@@ -599,6 +721,13 @@
           <svg id="mapSvg" viewBox="0 0 100 100"></svg>
           <div class="map-empty" id="mapEmptyMsg"><div class="glyph">○</div><span data-i18n="map_empty">Captura puntos con GPS para verlos aquí.</span></div>
           <div class="map-scale"><div class="bar" id="mapScaleBar"></div><span class="lbl" id="mapScaleLabel">—</span></div>
+          <div class="map-point-card" id="mapPointCard" style="display:none;">
+            <div class="map-point-card-head">
+              <strong id="mapPointCardTitle"></strong>
+              <button class="map-point-card-close" onclick="closeMapPointCard()" aria-label="Cerrar">×</button>
+            </div>
+            <div id="mapPointCardBody"></div>
+          </div>
         </div>
       </div>
 
@@ -683,6 +812,7 @@
           <h2 data-i18n="map_layers_title">Capas</h2>
           <label class="toggle-row"><input type="checkbox" id="show3dTerrain" checked onchange="render3dLayerVis()"><span data-i18n="v3d_layer_terrain">Terreno (DEM)</span></label>
           <label class="toggle-row" style="margin-top:7px;"><input type="checkbox" id="show3dOrtho" checked onchange="render3dLayerVis()"><span data-i18n="v3d_layer_ortho">Ortofoto</span></label>
+          <label class="toggle-row" style="margin-top:7px;"><input type="checkbox" id="show3dBox" checked onchange="render3dLayerVis()"><span data-i18n="v3d_layer_box">Caja y ejes de elevación</span></label>
           <p class="hint" style="margin:12px 0 6px;" data-i18n="v3d_layer_points">Puntos capturados</p>
           <label class="toggle-row"><input type="checkbox" id="show3d-pozo" checked onchange="render3dWells()"><span class="dot c-pozo"></span><span data-i18n="nav_pozo">Pozos</span></label>
           <label class="toggle-row" style="margin-top:7px;"><input type="checkbox" id="show3d-manantial" checked onchange="render3dWells()"><span class="dot c-manantial"></span><span data-i18n="nav_manantial">Manantiales</span></label>
@@ -971,7 +1101,7 @@
     <section class="panel" id="panel-inteligencia">
       <div class="card">
         <h2 data-i18n="intel_title">Inteligencia y validación</h2>
-        <p class="hint" data-i18n="intel_hint">Revisiones automáticas basadas en reglas sobre tus propios datos: coordenadas duplicadas, pozos cercanos, elevaciones fuera de rango y campos obligatorios faltantes. No usa inteligencia artificial externa ni envía tus datos a ningún servicio.</p>
+        <p class="hint" data-i18n="intel_hint">Revisiones automáticas basadas en reglas sobre tus propios datos: coordenadas duplicadas, pozos cercanos, elevaciones fuera de rango y campos obligatorios faltantes. Esta parte no usa inteligencia artificial ni envía tus datos a ningún servicio.</p>
 
         <div class="row2">
           <div class="field"><label data-i18n="intel_elev_min">Elevación mínima esperada <span class="unit">(m)</span></label>
@@ -988,6 +1118,18 @@
       <div class="card">
         <h2 data-i18n="intel_results">Resultados</h2>
         <div id="intelligenceResults"><p class="hint" data-i18n="intel_run_hint">Presiona "Validar ahora" para revisar tus registros.</p></div>
+      </div>
+
+      <div class="card">
+        <h2 data-i18n="ai_title">Asistencia con IA <span class="badge-beta">BETA</span></h2>
+        <p class="hint" data-i18n="ai_hint">Esta parte sí usa un modelo de lenguaje (Claude) a través de tu servidor local — tus datos se envían a la API de Anthropic para procesarlos. Necesitas estar conectado a tu servidor local con una clave de IA configurada (ver hidrocampo-server/.env.example).</p>
+
+        <div id="aiNotConfigured" class="hint" style="display:none;" data-i18n="ai_not_configured">Conéctate a tu servidor local (Cuenta → Servidor local) para usar estas funciones.</div>
+
+        <div id="aiControls">
+          <button class="btn" onclick="normalizeLitologiaAI()" style="width:100%;" data-i18n="ai_normalize_btn">Normalizar litología con IA</button>
+          <div id="aiNormalizeResult" style="margin-top:10px;"></div>
+        </div>
       </div>
     </section>
 
@@ -1186,17 +1328,200 @@ const FIELD_TYPES = {
 /* ======================================================================
    NAVEGACIÓN
    ====================================================================== */
+const SIDEBAR_GROUPS = { captura: TYPES, analisis: ["estadistica","datos"] };
+
+function toggleSidebarGroup(name){
+  const el = document.getElementById("sidebarGroup-"+name);
+  if(el) el.parentElement.classList.toggle("collapsed");
+}
+
+function expandSidebarGroupFor(panelName){
+  Object.entries(SIDEBAR_GROUPS).forEach(([group, members])=>{
+    if(members.includes(panelName)){
+      const el = document.getElementById("sidebarGroup-"+group);
+      if(el) el.parentElement.classList.remove("collapsed");
+    }
+  });
+}
+
+let dashboardTrendChartInstance = null, dashboardGaugePh = null, dashboardGaugeCap = null, dashboardGaugeValid = null, dashboardDonutChart = null;
+
+function trendHtml(current, previous, higherIsWorse){
+  if(previous === null || previous === undefined) return "";
+  if(previous === 0){
+    return current>0 ? `<div class="kpi-trend flat">${t("dash_kpi_new_data")}</div>` : "";
+  }
+  const diff = current - previous;
+  if(Math.abs(diff) < 1e-9) return `<div class="kpi-trend flat">→ ${t("dash_kpi_vs_prev")}</div>`;
+  const pct = Math.abs((diff/Math.abs(previous))*100);
+  const good = higherIsWorse ? diff<0 : diff>0;
+  const arrow = diff>0 ? "↑" : "↓";
+  return `<div class="kpi-trend ${good?"up":"down"}">${arrow} ${pct.toFixed(0)}% ${t("dash_kpi_vs_prev")}</div>`;
+}
+
+function weekBucketKey(d){
+  const ms = 7*24*60*60*1000;
+  return new Date(Math.floor(d.getTime()/ms)*ms).toISOString().slice(0,10);
+}
+
+function renderDashboardKpis(){
+  const holder = document.getElementById("dashboardKpis");
+  if(!holder) return;
+
+  const now = Date.now(), week = 7*24*60*60*1000, fourWeeks = week*4;
+  const last7 = records.filter(r=>now-new Date(r.fecha).getTime()<=week).length;
+  const prev7 = records.filter(r=>{ const d=now-new Date(r.fecha).getTime(); return d>week && d<=week*2; }).length;
+
+  const pozosConNivel = records.filter(r=>r.tipo==="pozo" && r.data.nivel_estatico && !isNaN(parseFloat(r.data.nivel_estatico)));
+  const avgNivel = pozosConNivel.length ? pozosConNivel.reduce((s,r)=>s+parseFloat(r.data.nivel_estatico),0)/pozosConNivel.length : null;
+  const recentNivel = pozosConNivel.filter(r=>now-new Date(r.fecha).getTime()<=fourWeeks);
+  const olderNivel = pozosConNivel.filter(r=>{ const d=now-new Date(r.fecha).getTime(); return d>fourWeeks && d<=fourWeeks*2; });
+  const avgRecentNivel = recentNivel.length ? recentNivel.reduce((s,r)=>s+parseFloat(r.data.nivel_estatico),0)/recentNivel.length : null;
+  const avgOlderNivel = olderNivel.length ? olderNivel.reduce((s,r)=>s+parseFloat(r.data.nivel_estatico),0)/olderNivel.length : null;
+
+  const pozosConProf = records.filter(r=>r.tipo==="pozo" && r.data.profundidad && !isNaN(parseFloat(r.data.profundidad)));
+  const avgProf = pozosConProf.length ? pozosConProf.reduce((s,r)=>s+parseFloat(r.data.profundidad),0)/pozosConProf.length : null;
+
+  const issues = runValidation();
+
+  const cards = [
+    { label:t("dash_kpi_total"), value:records.length, trend:trendHtml(last7, prev7) },
+    { label:t("dash_kpi_nivel"), value: avgNivel!==null ? avgNivel.toFixed(1)+" m" : "—", trend: trendHtml(avgRecentNivel, avgOlderNivel, true) },
+    { label:t("dash_kpi_profundidad"), value: avgProf!==null ? avgProf.toFixed(1)+" m" : "—", trend:"" },
+    { label:t("dash_kpi_alerts"), value: issues.length, trend:"", warn: issues.length>0 }
+  ];
+
+  holder.innerHTML = cards.map(c=>`
+    <div class="kpi-card">
+      <div class="kpi-label">${escapeHtml(c.label)}</div>
+      <div class="kpi-value"${c.warn?' style="color:var(--clay);"':''}>${c.value}</div>
+      ${c.trend||""}
+    </div>
+  `).join("");
+}
+
+function renderDashboardTrendChart(){
+  const canvas = document.getElementById("dashboardTrendChart");
+  const emptyMsg = document.getElementById("dashboardTrendEmpty");
+  if(!canvas || typeof Chart === "undefined") return;
+  if(dashboardTrendChartInstance){ dashboardTrendChartInstance.destroy(); dashboardTrendChartInstance = null; }
+
+  const pozosConNivel = records.filter(r=>r.tipo==="pozo" && r.data.nivel_estatico && !isNaN(parseFloat(r.data.nivel_estatico)));
+  if(pozosConNivel.length < 2){
+    canvas.style.display = "none";
+    if(emptyMsg) emptyMsg.style.display = "block";
+    return;
+  }
+  canvas.style.display = "block";
+  if(emptyMsg) emptyMsg.style.display = "none";
+
+  const byWeek = {};
+  pozosConNivel.forEach(r=>{
+    const key = weekBucketKey(new Date(r.fecha));
+    (byWeek[key] = byWeek[key] || []).push(parseFloat(r.data.nivel_estatico));
+  });
+  const weeks = Object.keys(byWeek).sort();
+  const data = weeks.map(w=>{
+    const vals = byWeek[w];
+    return vals.reduce((s,v)=>s+v,0)/vals.length;
+  });
+
+  dashboardTrendChartInstance = new Chart(canvas, {
+    type: "line",
+    data: { labels: weeks, datasets: [{
+      data, borderColor:"#1B5D8E", backgroundColor:"rgba(27,93,142,0.15)",
+      fill:true, tension:0.3, pointRadius:3
+    }]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{ y:{ reverse:true, title:{display:true, text: t("dash_trend_y")} } }
+    }
+  });
+}
+
+function buildGauge(canvasId, value, max, color){
+  if(typeof Chart === "undefined") return null;
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return null;
+  const pct = max>0 ? Math.max(0, Math.min(1, value/max)) : 0;
+  return new Chart(canvas, {
+    type: "doughnut",
+    data: { datasets: [{ data:[pct, 1-pct], backgroundColor:[color, "#E5E5E5"], borderWidth:0 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      circumference:180, rotation:270, cutout:"75%",
+      plugins:{ legend:{display:false}, tooltip:{enabled:false} }
+    }
+  });
+}
+
+function renderDashboardGauges(){
+  if(typeof Chart === "undefined") return;
+  [dashboardGaugePh, dashboardGaugeCap, dashboardGaugeValid].forEach(g=>{ if(g) g.destroy(); });
+
+  const calidadConPh = records.filter(r=>r.tipo==="calidad" && r.data.ph && !isNaN(parseFloat(r.data.ph)));
+  const avgPh = calidadConPh.length ? calidadConPh.reduce((s,r)=>s+parseFloat(r.data.ph),0)/calidadConPh.length : null;
+  document.getElementById("gaugePhValue").textContent = avgPh!==null ? avgPh.toFixed(2) : "—";
+  const phColor = avgPh===null ? "#cccccc" : (avgPh>=6.5 && avgPh<=8.5 ? "#1E8E5A" : "#B05A2A");
+  dashboardGaugePh = buildGauge("gaugePh", avgPh||0, 14, phColor);
+
+  const pozosConCap = records.filter(r=>r.tipo==="pozo" && r.data.capacidad_especifica && !isNaN(parseFloat(r.data.capacidad_especifica)));
+  const avgCap = pozosConCap.length ? pozosConCap.reduce((s,r)=>s+parseFloat(r.data.capacidad_especifica),0)/pozosConCap.length : null;
+  document.getElementById("gaugeCapValue").textContent = avgCap!==null ? avgCap.toFixed(2) : "—";
+  const capMax = Math.max((avgCap||0)*1.5, 1);
+  dashboardGaugeCap = buildGauge("gaugeCap", avgCap||0, capMax, "#3C8C9C");
+
+  const issues = runValidation();
+  const total = records.length;
+  const pctValid = total>0 ? Math.max(0, 100-(issues.length/total)*100) : 0;
+  document.getElementById("gaugeValidValue").textContent = total>0 ? pctValid.toFixed(0)+"%" : "—";
+  dashboardGaugeValid = buildGauge("gaugeValid", pctValid, 100, pctValid>=80 ? "#1E8E5A" : "#B05A2A");
+}
+
+function renderDashboardDonut(){
+  if(typeof Chart === "undefined") return;
+  if(dashboardDonutChart){ dashboardDonutChart.destroy(); dashboardDonutChart = null; }
+  const canvas = document.getElementById("dashboardDonut");
+  if(!canvas) return;
+  const counts = TYPES.map(tp=>records.filter(r=>r.tipo===tp).length);
+  dashboardDonutChart = new Chart(canvas, {
+    type: "doughnut",
+    data: { labels: TYPES.map(tp=>TYPE_LABEL[tp]), datasets: [{ data:counts, backgroundColor: TYPES.map(tp=>CHART_COLORS[tp]) }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:"bottom", labels:{boxWidth:12, font:{size:10}}} } }
+  });
+}
+
+function renderDashboard(){
+  renderDashboardKpis();
+  renderDashboardTrendChart();
+  renderDashboardGauges();
+  renderDashboardDonut();
+
+  const recent = records.slice(-5).reverse();
+  const holder = document.getElementById("dashboardRecent");
+  holder.innerHTML = recent.length
+    ? recent.map(r=>`<div class="v3d-info-row"><span>${escapeHtml(r.data.codigo||"("+t("stats_total")+")")} — ${TYPE_LABEL[r.tipo]}</span><span class="k">${new Date(r.fecha).toLocaleDateString()}</span></div>`).join("")
+    : `<p class="hint">${t("dash_recent_empty")}</p>`;
+}
+
 function switchPanel(name){
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
   document.getElementById("panel-"+name).classList.add("active");
-  document.querySelectorAll(".sidebar-nav button, .sidebar-footer button[data-panel]").forEach(b=>b.classList.toggle("active", b.dataset.panel===name));
+  document.querySelectorAll(".sidebar-nav button, .app-topbar button[data-panel]").forEach(b=>b.classList.toggle("active", b.dataset.panel===name));
   const titleEl = document.getElementById("pageTitle");
-  const activeBtn = document.querySelector('.sidebar-nav button[data-panel="'+name+'"]') || document.querySelector('.sidebar-footer button[data-panel="'+name+'"]');
-  if(titleEl && activeBtn){
-    const span = activeBtn.querySelector("[data-i18n]");
-    titleEl.textContent = span ? span.textContent : activeBtn.textContent;
+  const activeBtn = document.querySelector('.sidebar-nav button[data-panel="'+name+'"]');
+  if(titleEl){
+    if(activeBtn){
+      const span = activeBtn.querySelector("[data-i18n]");
+      titleEl.textContent = span ? span.textContent : activeBtn.textContent;
+    } else if(name==="cuenta" || name==="config"){
+      titleEl.textContent = t(name==="cuenta" ? "nav_account" : "nav_config");
+    }
   }
   closeSidebarMobile();
+  expandSidebarGroupFor(name);
+  if(name==="dashboard") renderDashboard();
   if(name==="registros") renderList();
   if(name==="mapa"){
     if(!mapInitialized){ initMapInteraction(); mapInitialized = true; }
@@ -1235,6 +1560,7 @@ function switchPanel(name){
   if(name==="inteligencia"){
     document.getElementById("elevMinInput").value = elevationMin;
     document.getElementById("elevMaxInput").value = elevationMax;
+    refreshAiAvailability();
   }
   if(TYPES.includes(name)){
     moveSatPanelTo(name);
@@ -1242,7 +1568,7 @@ function switchPanel(name){
   lastActiveTab = name;
   saveSettings();
 }
-document.querySelectorAll(".sidebar-nav button, .sidebar-footer button[data-panel]").forEach(b=>{
+document.querySelectorAll(".sidebar-nav button, .app-topbar button[data-panel]").forEach(b=>{
   b.addEventListener("click", ()=>switchPanel(b.dataset.panel));
 });
 
@@ -1355,6 +1681,44 @@ function clearPhoto(tipo){
   document.getElementById(tipo+"-foto-preview").style.display = "none";
 }
 
+let litIntervalsState = {};
+
+function addLitInterval(tipo, prefill){
+  if(!litIntervalsState[tipo]) litIntervalsState[tipo] = [];
+  litIntervalsState[tipo].push(prefill || {desde:"", hasta:"", tipo:""});
+  renderLitIntervals(tipo);
+}
+function removeLitInterval(tipo, idx){
+  litIntervalsState[tipo].splice(idx,1);
+  renderLitIntervals(tipo);
+}
+function updateLitInterval(tipo, idx, field, value){
+  if(!litIntervalsState[tipo] || !litIntervalsState[tipo][idx]) return;
+  litIntervalsState[tipo][idx][field] = value;
+}
+function renderLitIntervals(tipo){
+  const holder = document.getElementById("litIntervalsList");
+  if(!holder) return;
+  const list = litIntervalsState[tipo] || [];
+  holder.innerHTML = list.map((iv,idx)=>`
+    <div class="lit-interval-row">
+      <input type="number" step="0.1" value="${iv.desde}" placeholder="${t('lit_desde')}" oninput="updateLitInterval('${tipo}',${idx},'desde',this.value)">
+      <span class="lit-sep">–</span>
+      <input type="number" step="0.1" value="${iv.hasta}" placeholder="${t('lit_hasta')}" oninput="updateLitInterval('${tipo}',${idx},'hasta',this.value)">
+      <span class="lit-sep">m</span>
+      <input type="text" value="${escapeHtml(iv.tipo)}" list="litCategoryOptions" placeholder="${t('lit_tipo_roca')}" oninput="updateLitInterval('${tipo}',${idx},'tipo',this.value)">
+      <button type="button" class="btn small ghost lit-remove" onclick="removeLitInterval('${tipo}',${idx})" aria-label="Quitar">×</button>
+    </div>
+  `).join("");
+}
+function getValidLitIntervals(tipo){
+  return (litIntervalsState[tipo]||[])
+    .filter(iv=>iv.desde!=="" && iv.hasta!=="" && iv.tipo.trim())
+    .map(iv=>({desde:parseFloat(iv.desde), hasta:parseFloat(iv.hasta), tipo:iv.tipo.trim()}))
+    .filter(iv=>!isNaN(iv.desde) && !isNaN(iv.hasta) && iv.hasta>iv.desde)
+    .sort((a,b)=>a.desde-b.desde);
+}
+
 function saveRecord(tipo){
   const codigoEl = document.getElementById(tipo+"-codigo");
   if(!codigoEl.value.trim()){
@@ -1373,6 +1737,8 @@ function saveRecord(tipo){
     if(!isNaN(ne) && !isNaN(nd) && !isNaN(q) && abat > 0){
       data.capacidad_especifica = (q/abat).toFixed(3);
     }
+    const intervals = getValidLitIntervals("pozo");
+    if(intervals.length) data.litologia_intervalos = intervals;
   }
   const rec = {
     id: idCounter++,
@@ -1592,6 +1958,8 @@ function clearForm(tipo){
   applyLastValues(tipo);
   if(tipo==="pozo"){
     document.getElementById("specificCapacityBox").style.display = "none";
+    litIntervalsState["pozo"] = [];
+    renderLitIntervals("pozo");
   }
 }
 
@@ -1904,6 +2272,14 @@ function csvEscape(v){
   return s;
 }
 
+function csvCellValue(r, k){
+  const v = r.data[k];
+  if(k==="litologia_intervalos" && Array.isArray(v)){
+    return v.map(iv=>iv.desde+"-"+iv.hasta+"m:"+iv.tipo).join("; ");
+  }
+  return v || "";
+}
+
 function collectExtraKeys(list, known){
   const set = new Set();
   list.forEach(r=>{
@@ -1923,14 +2299,14 @@ function exportCSV(tipo){
     header = ["id","tipo","codigo","fecha","lat","lon","altitud_m","precision_m","obs", ...extraKeys];
     rows = list.map(r=>[r.id, TYPE_LABEL[r.tipo], r.data.codigo, r.fecha,
       r.gps?r.gps.lat:"", r.gps?r.gps.lon:"", r.gps?r.gps.alt:"", r.gps?r.gps.accuracy:"",
-      r.data.obs||"", ...extraKeys.map(k=>r.data[k]||"")]);
+      r.data.obs||"", ...extraKeys.map(k=>csvCellValue(r,k))]);
   } else {
     const keys = fieldIds(tipo).map(k=>k.replace(/-/g,"_"));
     const extraKeys = collectExtraKeys(list, keys);
     header = ["id","fecha","lat","lon","altitud_m","precision_m", ...keys, ...extraKeys];
     rows = list.map(r=>[r.id, r.fecha,
       r.gps?r.gps.lat:"", r.gps?r.gps.lon:"", r.gps?r.gps.alt:"", r.gps?r.gps.accuracy:"",
-      ...keys.map(k=>r.data[k]||""), ...extraKeys.map(k=>r.data[k]||"")]);
+      ...keys.map(k=>r.data[k]||""), ...extraKeys.map(k=>csvCellValue(r,k))]);
   }
   const csv = [header.join(","), ...rows.map(row=>row.map(csvEscape).join(","))].join("\n");
   downloadBlob("\ufeff"+csv, "hidrocampo_" + tipo + "_" + dateStamp() + ".csv", "text/csv;charset=utf-8");
@@ -2272,8 +2648,27 @@ function renderMap(){
 
 function focusRecord(id){
   const r = records.find(x=>x.id===id);
-  if(!r || !r.gps) return;
-  showToast(`${TYPE_LABEL[r.tipo]} ${r.data.codigo||""} · ${r.gps.lat.toFixed(5)}, ${r.gps.lon.toFixed(5)}`);
+  if(!r) return;
+  document.getElementById("mapPointCardTitle").textContent = (r.data.codigo||"—") + " · " + (TYPE_LABEL[r.tipo]||r.tipo);
+  const rows = [];
+  if(r.gps) rows.push(["GPS", r.gps.lat.toFixed(6)+", "+r.gps.lon.toFixed(6)]);
+  fieldIds(r.tipo).forEach(f=>{
+    const key = f.replace(/-/g,"_");
+    if(key==="codigo") return;
+    const val = r.data[key];
+    if(val) rows.push([fieldLabel(key), val]);
+  });
+  const body = document.getElementById("mapPointCardBody");
+  body.innerHTML = rows.map(([k,v])=>`<div class="v3d-info-row"><span class="k">${escapeHtml(k)}</span><span>${escapeHtml(String(v))}</span></div>`).join("")
+    || `<p class="hint">${t("map_point_card_empty")}</p>`;
+  if(r.foto){
+    body.innerHTML += `<img src="${r.foto}" alt="" style="width:100%; border-radius:8px; margin-top:8px;">`;
+  }
+  document.getElementById("mapPointCard").style.display = "block";
+}
+
+function closeMapPointCard(){
+  document.getElementById("mapPointCard").style.display = "none";
 }
 
 function updateScaleBar(){
@@ -2525,7 +2920,7 @@ function buildDbfFieldsForType(tipo, recs){
 
 function addExtraField(key, recs, addField){
   let maxLen = 10;
-  recs.forEach(r=>{ const v=r.data[key]; if(v) maxLen=Math.max(maxLen, new TextEncoder().encode(String(v)).length); });
+  recs.forEach(r=>{ const v=csvCellValue(r,key); if(v) maxLen=Math.max(maxLen, new TextEncoder().encode(String(v)).length); });
   addField(key, "C", Math.min(150,maxLen));
 }
 
@@ -2540,7 +2935,7 @@ function recordToDbfRow(rec, fields){
     else if(f.key==="lon") val = rec.gps ? rec.gps.lon : "";
     else if(f.key==="alt") val = rec.gps && rec.gps.alt!==null ? rec.gps.alt : "";
     else if(f.key==="precision") val = rec.gps && rec.gps.accuracy!==null ? rec.gps.accuracy : "";
-    else val = rec.data[f.key] !== undefined ? rec.data[f.key] : "";
+    else val = csvCellValue(rec, f.key);
     row[f.name] = val;
   });
   return row;
@@ -3441,8 +3836,11 @@ function runValidation(){
   return issues;
 }
 
+let lastValidationIssues = [];
+
 function runValidationUI(){
   const issues = runValidation();
+  lastValidationIssues = issues;
   const counts = {error:0, warn:0, info:0};
   issues.forEach(i=>counts[i.sev]++);
 
@@ -3455,8 +3853,108 @@ function runValidationUI(){
 
   const container = document.getElementById("intelligenceResults");
   container.innerHTML = issues.length
-    ? issues.map(i=>`<div class="val-item val-${i.sev}">${escapeHtml(i.msg)}</div>`).join("")
+    ? issues.map((i,idx)=>`<div class="val-item val-${i.sev}" id="valItem-${idx}">
+        ${escapeHtml(i.msg)}
+        <button class="btn small ghost ai-explain-btn" onclick="explainAnomalyAI(${idx})" data-i18n="ai_explain_btn">Explicar con IA</button>
+      </div>`).join("")
     : `<p class="hint">${t("val_all_clear")}</p>`;
+
+  refreshAiAvailability();
+}
+
+function aiAvailable(){
+  return backendMode==="local" && !!localServerUrl && !!localToken;
+}
+
+function refreshAiAvailability(){
+  const notConfigured = document.getElementById("aiNotConfigured");
+  const controls = document.getElementById("aiControls");
+  if(!notConfigured || !controls) return;
+  const ok = aiAvailable();
+  notConfigured.style.display = ok ? "none" : "block";
+  controls.style.display = ok ? "block" : "none";
+}
+
+async function explainAnomalyAI(idx){
+  const issue = lastValidationIssues[idx];
+  if(!issue) return;
+  if(!aiAvailable()){ showToast(t("ai_not_configured")); return; }
+  const item = document.getElementById("valItem-"+idx);
+  const btn = item.querySelector(".ai-explain-btn");
+  btn.disabled = true;
+  btn.textContent = t("ai_loading");
+  try{
+    const res = await fetch(localServerUrl + "/api/ai/explain-anomaly", {
+      method:"POST",
+      headers:{"Content-Type":"application/json", "Authorization":"Bearer "+localToken},
+      body: JSON.stringify({ issue: issue.msg, context: {} })
+    });
+    const json = await res.json();
+    if(!res.ok){ showToast(json.error || t("ai_error")); btn.disabled=false; btn.textContent=t("ai_explain_btn"); return; }
+    let expDiv = item.querySelector(".ai-explanation");
+    if(!expDiv){
+      expDiv = document.createElement("div");
+      expDiv.className = "ai-explanation";
+      item.appendChild(expDiv);
+    }
+    expDiv.textContent = json.explanation;
+    btn.remove();
+  }catch(e){
+    showToast(t("ai_error"));
+    btn.disabled = false;
+    btn.textContent = t("ai_explain_btn");
+  }
+}
+
+async function normalizeLitologiaAI(){
+  if(!aiAvailable()){ showToast(t("ai_not_configured")); return; }
+  const values = new Set();
+  records.forEach(r=>{
+    if((r.tipo==="pozo" || r.tipo==="geologia") && r.data.litologia && r.data.litologia.trim()){
+      values.add(r.data.litologia.trim());
+    }
+  });
+  const list = Array.from(values);
+  if(list.length===0){ showToast(t("ai_no_litologia")); return; }
+
+  const resultEl = document.getElementById("aiNormalizeResult");
+  resultEl.innerHTML = `<p class="hint">${t("ai_loading")}</p>`;
+  try{
+    const res = await fetch(localServerUrl + "/api/ai/normalize-litologia", {
+      method:"POST",
+      headers:{"Content-Type":"application/json", "Authorization":"Bearer "+localToken},
+      body: JSON.stringify({ values: list })
+    });
+    const json = await res.json();
+    if(!res.ok){ resultEl.innerHTML = `<p class="hint">${escapeHtml(json.error || t("ai_error"))}</p>`; return; }
+    const mapping = json.mapping || {};
+    resultEl.innerHTML = `<p class="hint">${t("ai_normalize_review")}</p>` +
+      Object.entries(mapping).map(([orig, cat], i)=>`
+        <div class="ai-norm-row">
+          <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(orig)}">${escapeHtml(orig)}</span>
+          <span>→</span>
+          <input type="text" id="aiNormInput-${i}" value="${escapeHtml(cat)}" data-orig="${escapeHtml(orig)}">
+        </div>
+      `).join("") +
+      `<button class="btn primary" onclick="applyLitologiaNormalization()" style="width:100%; margin-top:10px;" data-i18n="ai_normalize_apply">Aplicar categorías (guarda en campo nuevo, no borra el texto original)</button>`;
+  }catch(e){
+    resultEl.innerHTML = `<p class="hint">${t("ai_error")}</p>`;
+  }
+}
+
+function applyLitologiaNormalization(){
+  const inputs = document.querySelectorAll('#aiNormalizeResult input[data-orig]');
+  const map = {};
+  inputs.forEach(inp=>{ map[inp.dataset.orig] = inp.value.trim(); });
+  let count = 0;
+  records.forEach(r=>{
+    if((r.tipo==="pozo" || r.tipo==="geologia") && r.data.litologia){
+      const key = r.data.litologia.trim();
+      if(map[key]){ r.data.litologia_categoria = map[key]; count++; }
+    }
+  });
+  showToast(count + " " + t("ai_normalize_applied"));
+  document.getElementById("aiNormalizeResult").innerHTML = "";
 }
 
 /* Autocompletar campos repetitivos: recuerda los últimos valores usados por tipo */
@@ -3926,6 +4424,7 @@ async function changePassword(){
    ====================================================================== */
 let scene3d = null, camera3d = null, renderer3d = null, controls3d = null;
 let terrainMesh3d = null, wellsGroup3d = null;
+let boundingBox3d = null, elevAxisGroup3d = null;
 let wellMeshRegistry = [];
 let lineDrawMode = false;
 let lineDrawPoints = [];
@@ -4121,6 +4620,20 @@ function updateV3dLegend(mode, a, b, categoryMap){
   ).join("");
 }
 
+function buildIntervalColorMap(){
+  const map = new Map();
+  records.filter(r=>r.tipo==="pozo" && Array.isArray(r.data.litologia_intervalos)).forEach(r=>{
+    r.data.litologia_intervalos.forEach(iv=>{
+      const key = (iv.tipo||"").toLowerCase();
+      if(key && !map.has(key)){
+        const hex = CHART_PALETTE[map.size % CHART_PALETTE.length];
+        map.set(key, {label: iv.tipo, colorHex: hex, colorInt: parseInt(hex.replace("#","0x"))});
+      }
+    });
+  });
+  return map;
+}
+
 function render3dWells(){
   if(!scene3d || !dem3d) return;
   if(wellsGroup3d) scene3d.remove(wellsGroup3d);
@@ -4133,8 +4646,13 @@ function render3dWells(){
   const zoneInfo = getActiveUtmZone();
   const isCategorical = CATEGORICAL_ATTRS.includes(colorAttr);
 
+  const intervalColorMap = buildIntervalColorMap();
+  const hasIntervalData = intervalColorMap.size > 0;
+
   let minAttr = Infinity, maxAttr = -Infinity, categoryMap = null;
-  if(isCategorical){
+  if(hasIntervalData){
+    updateV3dLegend("category", "litologia_intervalos", null, intervalColorMap);
+  } else if(isCategorical){
     categoryMap = buildCategoryColorMap(colorAttr);
     updateV3dLegend("category", colorAttr, null, categoryMap);
   } else if(colorAttr !== "tipo"){
@@ -4159,23 +4677,41 @@ function render3dWells(){
       const radius = Math.max(dem3d.cellsize*0.15, 0.5);
 
       let color = CHART_COLORS[tipo] ? parseInt(CHART_COLORS[tipo].replace("#","0x")) : 0x1B5D8E;
-      if(isCategorical){
+      if(isCategorical && !hasIntervalData){
         const raw = (r.data[colorAttr]||"").trim().toLowerCase();
         if(raw && categoryMap.has(raw)) color = categoryMap.get(raw).colorInt;
-      } else if(colorAttr !== "tipo"){
+      } else if(!isCategorical && colorAttr !== "tipo"){
         const v = parseFloat(r.data[colorAttr]);
         if(!isNaN(v)) color = colorForAttrValue(v, minAttr, maxAttr);
       }
 
       let mesh;
       if(tipo === "pozo"){
-        const depth = parseFloat(r.data.profundidad) || 5;
-        const scaledDepth = Math.max(depth * vertExaggeration, dem3d.cellsize*0.5);
-        mesh = new THREE.Mesh(
-          new THREE.CylinderGeometry(radius, radius, scaledDepth, 10),
-          new THREE.MeshStandardMaterial({color})
-        );
-        mesh.position.set(local.x, groundY - scaledDepth/2, local.z);
+        const intervals = Array.isArray(r.data.litologia_intervalos) ? r.data.litologia_intervalos : null;
+        if(intervals && intervals.length){
+          intervals.forEach(iv=>{
+            const topDepth = iv.desde * vertExaggeration;
+            const bottomDepth = iv.hasta * vertExaggeration;
+            const segH = Math.max(bottomDepth - topDepth, 0.15);
+            const key = (iv.tipo||"").toLowerCase();
+            const segColor = intervalColorMap.has(key) ? intervalColorMap.get(key).colorInt : color;
+            const segMesh = new THREE.Mesh(
+              new THREE.CylinderGeometry(radius, radius, segH, 10),
+              new THREE.MeshStandardMaterial({color: segColor})
+            );
+            segMesh.position.set(local.x, groundY - topDepth - segH/2, local.z);
+            wellsGroup3d.add(segMesh);
+            wellMeshRegistry.push({mesh: segMesh, recordId: r.id});
+          });
+        } else {
+          const depth = parseFloat(r.data.profundidad) || 5;
+          const scaledDepth = Math.max(depth * vertExaggeration, dem3d.cellsize*0.5);
+          mesh = new THREE.Mesh(
+            new THREE.CylinderGeometry(radius, radius, scaledDepth, 10),
+            new THREE.MeshStandardMaterial({color})
+          );
+          mesh.position.set(local.x, groundY - scaledDepth/2, local.z);
+        }
 
         const nivelEst = parseFloat(r.data.nivel_estatico);
         if(showWater && !isNaN(nivelEst)){
@@ -4194,8 +4730,10 @@ function render3dWells(){
         );
         mesh.position.set(local.x, groundY + radius*1.3, local.z);
       }
-      wellsGroup3d.add(mesh);
-      wellMeshRegistry.push({mesh, recordId: r.id});
+      if(mesh){
+        wellsGroup3d.add(mesh);
+        wellMeshRegistry.push({mesh, recordId: r.id});
+      }
     });
   });
 }
@@ -4249,12 +4787,68 @@ function setup3dRaycasting(){
   });
 }
 
+function makeTextSprite(text){
+  const canvas = document.createElement("canvas");
+  canvas.width = 128; canvas.height = 48;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgba(20,24,31,0.78)";
+  ctx.fillRect(0, 0, 128, 48);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "26px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 64, 24);
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(30, 11, 1);
+  return sprite;
+}
+
+function buildBoundingBox3d(){
+  if(!scene3d || !dem3d) return;
+  if(boundingBox3d){ scene3d.remove(boundingBox3d); boundingBox3d = null; }
+  if(elevAxisGroup3d){ scene3d.remove(elevAxisGroup3d); elevAxisGroup3d = null; }
+
+  const width = (dem3d.ncols-1)*dem3d.cellsize;
+  const depth = (dem3d.nrows-1)*dem3d.cellsize;
+  const topY = (dem3d.maxZ - dem3d.minZ) * vertExaggeration;
+
+  let maxWellDepth = 5;
+  records.filter(r=>r.tipo==="pozo").forEach(r=>{
+    const d = parseFloat(r.data.profundidad);
+    if(!isNaN(d) && d > maxWellDepth) maxWellDepth = d;
+  });
+  const bottomY = -(maxWellDepth * vertExaggeration) - dem3d.cellsize;
+
+  const boxGeom = new THREE.BoxGeometry(width, topY-bottomY, depth);
+  const edgesGeom = new THREE.EdgesGeometry(boxGeom);
+  const boxMat = new THREE.LineBasicMaterial({ color: 0x7d97a8 });
+  boundingBox3d = new THREE.LineSegments(edgesGeom, boxMat);
+  boundingBox3d.position.set(0, (topY+bottomY)/2, 0);
+  scene3d.add(boundingBox3d);
+
+  elevAxisGroup3d = new THREE.Group();
+  const steps = 5;
+  for(let i=0; i<=steps; i++){
+    const y = bottomY + (topY-bottomY)*(i/steps);
+    const realElev = dem3d.minZ + (y/vertExaggeration);
+    const label = makeTextSprite(realElev.toFixed(0)+"m");
+    label.position.set(-width/2 - dem3d.cellsize*1.5, y, -depth/2 - dem3d.cellsize*1.5);
+    elevAxisGroup3d.add(label);
+  }
+  scene3d.add(elevAxisGroup3d);
+}
+
 function render3dLayerVis(){
   if(terrainMesh3d) terrainMesh3d.visible = document.getElementById("show3dTerrain").checked;
   const showOrtho = document.getElementById("show3dOrtho").checked;
   if(terrainMesh3d && terrainMesh3d.material && terrainMesh3d.material.map){
     terrainMesh3d.material.wireframe = false;
   }
+  const showBox = document.getElementById("show3dBox").checked;
+  if(boundingBox3d) boundingBox3d.visible = showBox;
+  if(elevAxisGroup3d) elevAxisGroup3d.visible = showBox;
 }
 
 let locatorMap3d = null;
@@ -4311,12 +4905,15 @@ function toggleLineDrawMode(){
   document.getElementById("lineDrawHint").textContent = lineDrawMode ? t("v3d_line_hint_first") : "";
 }
 
+let fenceMesh3d = null;
+
 function clearSectionLine(){
   lineDrawMode = false;
   lineDrawPoints = [];
   document.getElementById("lineDrawBtn").classList.remove("active");
   document.getElementById("lineDrawHint").textContent = "";
   if(sectionLine3d && scene3d){ scene3d.remove(sectionLine3d); sectionLine3d = null; }
+  if(fenceMesh3d && scene3d){ scene3d.remove(fenceMesh3d); fenceMesh3d = null; }
   document.getElementById("sectionCard").style.display = "none";
 }
 
@@ -4353,6 +4950,57 @@ function finishLineDraw(){
   }
 
   buildCrossSection(p1, p2);
+}
+
+function buildFenceMesh3D(candidates){
+  if(fenceMesh3d && scene3d){ scene3d.remove(fenceMesh3d); fenceMesh3d = null; }
+  if(typeof THREE === "undefined" || typeof THREE.BufferGeometry !== "function") return;
+
+  const withIntervals = candidates.filter(c=>Array.isArray(c.rec.data.litologia_intervalos) && c.rec.data.litologia_intervalos.length);
+  if(withIntervals.length < 2) return;
+
+  const intervalColorMap = buildIntervalColorMap();
+  const zoneInfo = getActiveUtmZone();
+  const group = new THREE.Group();
+
+  for(let i=0;i<withIntervals.length-1;i++){
+    const wellA = withIntervals[i].rec, wellB = withIntervals[i+1].rec;
+    const intsA = wellA.data.litologia_intervalos, intsB = wellB.data.litologia_intervalos;
+    const n = Math.min(intsA.length, intsB.length);
+    if(n===0) continue;
+
+    const pA = latLonToUTM(wellA.gps.lat, wellA.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
+    const localA = utmToLocal3d(pA.x, pA.y);
+    const groundA = sampleTerrainHeight(pA.x, pA.y);
+    const pB = latLonToUTM(wellB.gps.lat, wellB.gps.lon, zoneInfo.zone, zoneInfo.hemisphere);
+    const localB = utmToLocal3d(pB.x, pB.y);
+    const groundB = sampleTerrainHeight(pB.x, pB.y);
+
+    for(let j=0;j<n;j++){
+      const ivA = intsA[j], ivB = intsB[j];
+      const key = (ivA.tipo||"").toLowerCase();
+      const segColor = intervalColorMap.has(key) ? intervalColorMap.get(key).colorInt : 0x999999;
+
+      const yA_top = groundA - ivA.desde*vertExaggeration, yA_bot = groundA - ivA.hasta*vertExaggeration;
+      const yB_top = groundB - ivB.desde*vertExaggeration, yB_bot = groundB - ivB.hasta*vertExaggeration;
+
+      const vertices = new Float32Array([
+        localA.x, yA_top, localA.z,  localB.x, yB_top, localB.z,  localB.x, yB_bot, localB.z,
+        localA.x, yA_top, localA.z,  localB.x, yB_bot, localB.z,  localA.x, yA_bot, localA.z
+      ]);
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+      geometry.computeVertexNormals();
+      const material = new THREE.MeshStandardMaterial({color: segColor, side: THREE.DoubleSide});
+      group.add(new THREE.Mesh(geometry, material));
+    }
+  }
+
+  if(group.children.length){
+    fenceMesh3d = group;
+    scene3d.add(fenceMesh3d);
+    showToast(t("v3d_fence_built"));
+  }
 }
 
 function buildCrossSection(p1, p2){
@@ -4392,6 +5040,8 @@ function buildCrossSection(p1, p2){
   const svg = buildCrossSectionSVG(candidates, terrainProfile, lineLen);
   document.getElementById("sectionSvgHolder").innerHTML = svg;
   document.getElementById("sectionCard").style.display = "block";
+
+  buildFenceMesh3D(candidates);
   showToast(candidates.length + " " + t("v3d_line_wells_found"));
 }
 
@@ -4449,7 +5099,7 @@ function buildCrossSectionSVG(candidates, terrainProfile, lineLen){
 
 function update3dExaggeration(){
   vertExaggeration = parseFloat(document.getElementById("vertExaggInput").value);
-  if(dem3d){ buildTerrainMesh(); render3dWells(); }
+  if(dem3d){ buildTerrainMesh(); render3dWells(); buildBoundingBox3d(); render3dLayerVis(); }
 }
 
 function handleDemFile(evt){
@@ -4468,6 +5118,8 @@ function handleDemFile(evt){
       buildTerrainMesh();
       render3dLayerVis();
       render3dWells();
+      buildBoundingBox3d();
+      render3dLayerVis();
       reset3dView();
       const withGps = records.filter(r=>r.gps);
       if(withGps.length){
@@ -4628,7 +5280,7 @@ const I18N = {
     btn_edit:"Editar", btn_history:"Historial", btn_delete:"Eliminar",
     edit_save:"Guardar cambios", edit_changes_saved:"cambio(s) guardado(s)", edit_no_changes:"No hubo cambios", edit_created:"Creado",
     v3d_color_by:"Colorear pozos por", v3d_color_tipo:"Tipo de punto",
-    v3d_layer_terrain:"Terreno (DEM)", v3d_layer_ortho:"Ortofoto", v3d_layer_points:"Puntos capturados",
+    v3d_layer_terrain:"Terreno (DEM)", v3d_layer_ortho:"Ortofoto", v3d_layer_points:"Puntos capturados", v3d_layer_box:"Caja y ejes de elevación",
     v3d_info_title:"Ficha del punto", v3d_info_hint:"Haz clic en un punto del modelo 3D para ver su información aquí.",
     v3d_legal_note:"Modelo generado a partir de tus propios datos de campo. No reemplaza un estudio geotécnico certificado ni un levantamiento topográfico oficial.",
     v3d_color_litologia:"Litología (por categoría)", v3d_color_formacion:"Formación geológica (por categoría)",
@@ -4641,6 +5293,31 @@ const I18N = {
     v3d_line_wells_found:"pozos encontrados a lo largo de la línea",
     v3d_section_title:"Sección transversal", v3d_section_hint:"Generada a partir de la línea de corte, con los pozos cercanos ordenados a lo largo de la línea.",
     v3d_section_terrain:"Perfil del terreno",
+    nav_dashboard:"Dashboard", nav_group_captura:"Captura", nav_group_analisis:"Análisis", nav_reportes:"Reportes",
+    dash_quick_title:"Accesos rápidos", dash_quick_pozo:"+ Pozo", dash_quick_manantial:"+ Manantial",
+    dash_quick_calidad:"+ Calidad", dash_quick_geologia:"+ Geología",
+    dash_recent_title:"Últimos registros", dash_recent_empty:"Aún no hay registros.",
+    map_point_card_empty:"Sin datos adicionales para este punto.",
+    ai_title:"Asistencia con IA", ai_hint:"Esta parte sí usa un modelo de lenguaje (Claude) a través de tu servidor local — tus datos se envían a la API de Anthropic para procesarlos. Necesitas estar conectado a tu servidor local con una clave de IA configurada (ver hidrocampo-server/.env.example).",
+    ai_not_configured:"Conéctate a tu servidor local (Cuenta → Servidor local) para usar estas funciones.",
+    ai_normalize_btn:"Normalizar litología con IA", ai_explain_btn:"Explicar con IA",
+    ai_loading:"Consultando IA...", ai_error:"No se pudo consultar la IA. Revisa tu servidor local y la clave configurada.",
+    ai_no_litologia:"No hay litología capturada todavía para normalizar.",
+    ai_normalize_review:"Revisa y ajusta las categorías sugeridas antes de aplicarlas:",
+    ai_normalize_apply:"Aplicar categorías (guarda en campo nuevo, no borra el texto original)",
+    ai_normalize_applied:"registro(s) actualizados con la categoría de litología",
+    dash_trend_title:"Tendencia del nivel freático (promedio semanal, todos los pozos)",
+    dash_trend_empty:"Aún no hay suficientes mediciones de nivel estático para trazar una tendencia.",
+    dash_trend_y:"Nivel estático (m) — más arriba es más superficial",
+    dash_gauges_title:"Indicadores clave",
+    dash_gauge_ph:"pH promedio", dash_gauge_cap:"Capacidad específica prom. (L/s/m)", dash_gauge_valid:"Puntos sin alertas de Inteligencia",
+    dash_dist_title:"Distribución por tipo de punto",
+    dash_kpi_total:"Total de registros", dash_kpi_nivel:"Nivel freático promedio", dash_kpi_profundidad:"Profundidad promedio de pozos",
+    dash_kpi_alerts:"Alertas de Inteligencia", dash_kpi_vs_prev:"vs. semanas anteriores", dash_kpi_new_data:"dato nuevo",
+    label_lit_intervals:"Perfil litológico por intervalos (opcional — habilita capas 3D)",
+    lit_intervals_hint:"Agrega tramos con profundidad de inicio, fin y tipo de roca. Se usa para pintar el pozo por capas en el Visualizador 3D y en las secciones transversales.",
+    lit_add_interval:"+ Agregar intervalo", lit_desde:"Desde", lit_hasta:"Hasta", lit_tipo_roca:"Tipo de roca",
+    v3d_fence_built:"Malla 3D de correlación generada entre pozos con intervalos definidos",
     nav_estadistica:"Estadística", nav_account:"Cuenta", nav_config:"Configuración",
     account_title:"Cuenta de equipo",
     account_intro:"Inicia sesión para sincronizar tus puntos con tu equipo desde cualquier dispositivo. Requiere conexión a internet y un proyecto gratuito de Supabase.",
@@ -4784,7 +5461,7 @@ const I18N = {
     btn_edit:"Edit", btn_history:"History", btn_delete:"Delete",
     edit_save:"Save changes", edit_changes_saved:"change(s) saved", edit_no_changes:"No changes", edit_created:"Created",
     v3d_color_by:"Color wells by", v3d_color_tipo:"Point type",
-    v3d_layer_terrain:"Terrain (DEM)", v3d_layer_ortho:"Orthophoto", v3d_layer_points:"Captured points",
+    v3d_layer_terrain:"Terrain (DEM)", v3d_layer_ortho:"Orthophoto", v3d_layer_points:"Captured points", v3d_layer_box:"Box and elevation axes",
     v3d_info_title:"Point details", v3d_info_hint:"Click a point in the 3D model to see its info here.",
     v3d_legal_note:"Model generated from your own field data. Does not replace a certified geotechnical study or an official topographic survey.",
     v3d_color_litologia:"Lithology (by category)", v3d_color_formacion:"Geological formation (by category)",
@@ -4797,6 +5474,31 @@ const I18N = {
     v3d_line_wells_found:"wells found along the line",
     v3d_section_title:"Cross section", v3d_section_hint:"Generated from the cut line, with nearby wells ordered along the line.",
     v3d_section_terrain:"Terrain profile",
+    nav_dashboard:"Dashboard", nav_group_captura:"Capture", nav_group_analisis:"Analysis", nav_reportes:"Reports",
+    dash_quick_title:"Quick actions", dash_quick_pozo:"+ Well", dash_quick_manantial:"+ Spring",
+    dash_quick_calidad:"+ Quality", dash_quick_geologia:"+ Geology",
+    dash_recent_title:"Recent records", dash_recent_empty:"No records yet.",
+    map_point_card_empty:"No additional data for this point.",
+    ai_title:"AI Assistance", ai_hint:"This part does use a language model (Claude) through your local server — your data is sent to the Anthropic API for processing. You need to be connected to your local server with an AI key configured (see hidrocampo-server/.env.example).",
+    ai_not_configured:"Connect to your local server (Account → Local server) to use these features.",
+    ai_normalize_btn:"Normalize lithology with AI", ai_explain_btn:"Explain with AI",
+    ai_loading:"Querying AI...", ai_error:"Couldn't query the AI. Check your local server and configured key.",
+    ai_no_litologia:"No lithology captured yet to normalize.",
+    ai_normalize_review:"Review and adjust the suggested categories before applying:",
+    ai_normalize_apply:"Apply categories (saves to a new field, doesn't erase the original text)",
+    ai_normalize_applied:"record(s) updated with the lithology category",
+    dash_trend_title:"Water table trend (weekly average, all wells)",
+    dash_trend_empty:"Not enough static level measurements yet to plot a trend.",
+    dash_trend_y:"Static level (m) — higher on chart is shallower",
+    dash_gauges_title:"Key indicators",
+    dash_gauge_ph:"Average pH", dash_gauge_cap:"Avg. specific capacity (L/s/m)", dash_gauge_valid:"Points without Intelligence alerts",
+    dash_dist_title:"Distribution by point type",
+    dash_kpi_total:"Total records", dash_kpi_nivel:"Average water table level", dash_kpi_profundidad:"Average well depth",
+    dash_kpi_alerts:"Intelligence alerts", dash_kpi_vs_prev:"vs. previous weeks", dash_kpi_new_data:"new data",
+    label_lit_intervals:"Lithology profile by interval (optional — enables 3D layers)",
+    lit_intervals_hint:"Add depth intervals with start, end, and rock type. Used to color the well by layer in the 3D Viewer and cross-sections.",
+    lit_add_interval:"+ Add interval", lit_desde:"From", lit_hasta:"To", lit_tipo_roca:"Rock type",
+    v3d_fence_built:"3D correlation mesh generated between wells with defined intervals",
     nav_estadistica:"Statistics", nav_account:"Account", nav_config:"Settings",
     account_title:"Team account",
     account_intro:"Sign in to sync your points with your team from any device. Requires an internet connection and a free Supabase project.",
@@ -4850,7 +5552,7 @@ let interfaceScale = 1;
 let density = "normal";
 let animationsEnabled = true;
 
-let homeTab = "pozo";
+let homeTab = "dashboard";
 let openBehavior = "home";
 let favoriteModule = null;
 let autofillEnabled = true;
@@ -5009,8 +5711,9 @@ function refreshSegmented(){
   const homeSel = document.getElementById("homeTabSelect");
   const favSel = document.getElementById("favoriteModuleSelect");
   if(homeSel){
-    const opts = ["pozo","manantial","calidad","geologia","mapa","estadistica","registros","datos"];
-    const optsHtml = opts.map(o=>`<option value="${o}">${t(TYPE_I18N_KEY[o] || ("nav_"+o))}</option>`).join("");
+    const opts = ["dashboard","pozo","manantial","calidad","geologia","mapa","estadistica","registros","datos"];
+    const labelOverride = {datos:"nav_reportes"};
+    const optsHtml = opts.map(o=>`<option value="${o}">${t(labelOverride[o] || TYPE_I18N_KEY[o] || ("nav_"+o))}</option>`).join("");
     homeSel.innerHTML = optsHtml;
     homeSel.value = homeTab;
     favSel.innerHTML = `<option value="">—</option>` + optsHtml;
@@ -5103,7 +5806,7 @@ applyLanguage();
 applyFavoriteModule();
 
 const initialTab = openBehavior==="map" ? "mapa" : (openBehavior==="last" ? lastActiveTab : homeTab);
-switchPanel(TYPES.includes(initialTab) || ["mapa","estadistica","registros","datos","inteligencia","config","cuenta"].includes(initialTab) ? initialTab : "pozo");
+switchPanel(TYPES.includes(initialTab) || ["dashboard","mapa","visor3d","estadistica","registros","datos","inteligencia","config","cuenta"].includes(initialTab) ? initialTab : "dashboard");
 
 if(backendMode==="supabase" && supaUrl && supaKey) initSupabaseClient();
 if(backendMode==="local" && localServerUrl && localToken) localSyncNow();
